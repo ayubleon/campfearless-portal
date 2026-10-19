@@ -18,14 +18,14 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 const COLORS = ["#336699", "#55C4AE", "#FFD400"]
 const summary = [["5", "Campers departed early"], ["620", "Total registered campers"], ["590", "Campers present on site"], ["40", "Walk in registrations"], ["13", "Total registered facilitators"], ["210", "Pending arrivals"]]
 const campers = [
-  ["Sharon Wanjiru", "Age: 24 - Female", "Josephine Maina", "0714048876", "Downtown", "Registered", "-", "Autistic"],
-  ["Sharon Wanjiru", "Age: 24 - Female", "Josephine Maina", "0714048876", "Downtown", "Registered", "-", "-"],
-  ["Sharon Wanjiru", "Age: 24 - Female", "Josephine Maina", "0714048876", "Downtown", "Registered", "Asthmatic", "-"],
-  ["Kevin Juma", "Age: 18 - Male", "William Kipchumba", "0714048876", "Mashauri", "Checked in", "-", "Down syndrome"],
-  ["Noel Sholo", "Age: 23 - Male", "Helen Sholo", "0714048876", "Hill City", "Checked in", "-", "-"],
-  ["Mase Webster", "Age: 20 - Male", "Jacques Webster", "0714048876", "Hill City", "Checked in", "Sinuses", "-"],
-  ["Carter Nolan", "Age: 20 - Male", "Christine Sio", "0714048876", "Invited", "Checked in", "-", "-"],
-  ["Kety Webster", "Age: 20 - Male", "Jacques Webster", "0714048876", "PCEA", "Checked in", "Protein allergy", "-"],
+  ["Amara Njeri", "Age: 24 - Female", "Grace Njeri", "0703128456", "Downtown", "Registered", "-", "Autistic"],
+  ["Brian Otieno", "Age: 19 - Male", "Peter Otieno", "0718562390", "Downtown", "Registered", "-", "-"],
+  ["Cynthia Wambui", "Age: 22 - Female", "Mercy Wambui", "0721456783", "Downtown", "Registered", "Asthmatic", "-"],
+  ["Daniel Kiptoo", "Age: 18 - Male", "Samuel Kiptoo", "0790345128", "Mashauri", "Checked in", "-", "Down syndrome"],
+  ["Esther Achieng", "Age: 23 - Female", "Rose Achieng", "0742789016", "Hill City", "Checked in", "-", "-"],
+  ["Felix Mwangi", "Age: 20 - Male", "Lucy Mwangi", "0765123478", "Hill City", "Checked in", "Sinuses", "-"],
+  ["Hannah Kamau", "Age: 21 - Female", "David Kamau", "0786231094", "Invited", "Checked in", "-", "-"],
+  ["Ibrahim Hassan", "Age: 20 - Male", "Fatuma Hassan", "0734891267", "PCEA", "Checked in", "Protein allergy", "-"],
 ]
 
 function DonutCard({ title, description, data, centerValue, centerLabel, labels }: any) {
