@@ -92,10 +92,21 @@ export function DashboardOverview() {
   const filtered = campers.filter(([name, , contact, phone]) => `${name} ${contact} ${phone}`.toLowerCase().includes(search.toLowerCase()))
   const handleTableAction = (event: React.MouseEvent<HTMLElement>) => {
     if (!(event.target instanceof HTMLElement)) return
+    const row = event.target.closest("tr") as HTMLTableRowElement | null
+    if (!row) return
+    const menuItem = event.target.closest('[role="menuitem"]')
+    if (menuItem?.textContent?.trim() === "Undo check out") {
+      const camperName = row.querySelector("td")?.textContent?.trim().split("Age:")[0].trim()
+      const camperIndex = campers.findIndex((camper) => camper[0] === camperName)
+      if (camperIndex >= 0) {
+        setCheckedOutCampers((current) => { const next = new Set(current); next.delete(camperIndex); return next })
+        setCheckedInCampers((current) => new Set(current).add(camperIndex))
+        setExitPermitTimes((current) => { const next = { ...current }; delete next[camperName ?? ""]; return next })
+      }
+      return
+    }
     const button = event.target.closest("button")
     if (!button) return
-    const row = button.closest("tr") as HTMLTableRowElement | null
-    if (!row) return
     if (button.textContent?.trim() === "Check in") {
       const camperName = row.querySelector("td")?.textContent?.trim().split("Age:")[0].trim()
       const camperIndex = campers.findIndex((camper) => camper[0] === camperName)
