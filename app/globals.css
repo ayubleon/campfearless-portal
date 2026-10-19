@@ -83,10 +83,10 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
-  --status-checked-in: oklch(0.94 0.07 155);
-  --status-checked-in-foreground: oklch(0.39 0.12 155);
-  --status-registered: oklch(0.95 0.07 70);
-  --status-registered-foreground: oklch(0.47 0.14 48);
+  --status-checked-in: #dcfce7;
+  --status-checked-in-foreground: #15803d;
+  --status-registered: #ffedd5;
+  --status-registered-foreground: #ea580c;
 }
 
 .dark {
@@ -122,10 +122,10 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
-  --status-checked-in: oklch(0.29 0.09 155);
-  --status-checked-in-foreground: oklch(0.82 0.14 155);
-  --status-registered: oklch(0.32 0.1 70);
-  --status-registered-foreground: oklch(0.86 0.15 72);
+  --status-checked-in: #dcfce7;
+  --status-checked-in-foreground: #15803d;
+  --status-registered: #ffedd5;
+  --status-registered-foreground: #ea580c;
 }
 
 @media (prefers-color-scheme: dark) {
