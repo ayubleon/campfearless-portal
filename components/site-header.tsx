@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { Button } from '@/ui/button'
@@ -7,18 +8,22 @@ import { SidebarTrigger } from '@/ui/sidebar'
 
 function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme()
-  const isDark = resolvedTheme === 'dark'
+  const [mounted, setMounted] = useState(false)
+  const isDark = mounted && resolvedTheme === 'dark'
+
+  useEffect(() => setMounted(true), [])
 
   return (
     <Button
       variant="outline"
-      size="sm"
-      className="ml-auto"
+      size="icon"
+      className="ml-auto rounded-full"
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
       aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
     >
-      {isDark ? <Sun /> : <Moon />}
-      {isDark ? 'Light mode' : 'Dark mode'}
+      <span className={`flex size-6 items-center justify-center rounded-full ${!isDark ? 'bg-accent text-accent-foreground' : 'text-muted-foreground'}`}><Sun className="size-4" /></span>
+      <span className={`flex size-6 items-center justify-center rounded-full ${isDark ? 'bg-accent text-accent-foreground' : 'text-muted-foreground'}`}><Moon className="size-4" /></span>
+      <span className="sr-only">Switch to {isDark ? 'light' : 'dark'} mode</span>
     </Button>
   )
 }
