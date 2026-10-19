@@ -35,7 +35,7 @@ function DonutCard({ title, description, data, centerValue, centerLabel, labels 
 
 function QuickSummary() { return <Card className="min-w-0 overflow-hidden"><CardHeader><CardTitle className="text-base">Quick summary</CardTitle><CardDescription>A summary of campers data</CardDescription></CardHeader><CardContent><div className="flex max-h-72 flex-col gap-2 overflow-y-auto px-1 pr-3">{summary.map(([value, label]) => <div key={label} className="rounded-lg border bg-muted/20 px-4 py-3"><div className="text-base font-semibold tabular-nums">{value}</div><div className="text-sm text-muted-foreground">{label}</div></div>)}</div></CardContent></Card> }
 
-function statusClass(status: string) { return status === "Checked in" ? "border-transparent bg-status-checked-in text-status-checked-in-foreground" : status === "Registered" ? "border-transparent bg-status-registered text-status-registered-foreground" : "border-2 border-border bg-muted text-muted-foreground" }
+function statusClass(status: string) { return status === "Checked in" ? "border-transparent bg-status-checked-in text-status-checked-in-foreground" : status === "Registered" ? "border-transparent bg-status-registered text-status-registered-foreground" : "rounded-full border-2 border-border bg-muted text-muted-foreground" }
 
 function CheckInAction({ camperName, status, onCheckIn, onExit }: { camperName: string; status: string; onCheckIn: () => void; onExit: () => void }) {
   const checkedIn = status === "Checked in"
