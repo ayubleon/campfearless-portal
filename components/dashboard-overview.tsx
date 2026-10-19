@@ -44,14 +44,12 @@ function CheckInAction({ camperName, status, onCheckIn, onExit }: { camperName: 
 function RowActions() {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <button
-          type="button"
-          className={buttonVariants({ variant: "ghost", size: "icon" })}
-          aria-label="More actions"
-        >
-          <IconDotsVertical />
-        </button>
+      <DropdownMenuTrigger
+        type="button"
+        className={buttonVariants({ variant: "ghost", size: "icon" })}
+        aria-label="More actions"
+      >
+        <IconDotsVertical />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" sideOffset={6} className="z-50 min-w-44">
         <DropdownMenuItem>Edit details</DropdownMenuItem>
