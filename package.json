@@ -21,6 +21,7 @@
     "@radix-ui/react-select": "latest",
     "@radix-ui/react-separator": "latest",
     "@radix-ui/react-slot": "latest",
+    "@radix-ui/react-switch": "^1.4.1",
     "@radix-ui/react-tabs": "latest",
     "@radix-ui/react-toggle": "latest",
     "@radix-ui/react-toggle-group": "latest",

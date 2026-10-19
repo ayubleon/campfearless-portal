@@ -1,9 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Moon, Sun } from 'lucide-react'
+import { Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import { Button } from '@/ui/button'
+import { Switch } from '@/ui/switch'
 import { SidebarTrigger } from '@/ui/sidebar'
 
 function ThemeToggle() {
@@ -14,17 +14,15 @@ function ThemeToggle() {
   useEffect(() => setMounted(true), [])
 
   return (
-    <Button
-      variant="outline"
-      size="icon"
-      className="ml-auto rounded-full"
-      onClick={() => setTheme(isDark ? 'light' : 'dark')}
-      aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
-    >
-      <span className={`flex size-6 items-center justify-center rounded-full ${!isDark ? 'bg-accent text-accent-foreground' : 'text-muted-foreground'}`}><Sun className="size-4" /></span>
-      <span className={`flex size-6 items-center justify-center rounded-full ${isDark ? 'bg-accent text-accent-foreground' : 'text-muted-foreground'}`}><Moon className="size-4" /></span>
-      <span className="sr-only">Switch to {isDark ? 'light' : 'dark'} mode</span>
-    </Button>
+    <div className="ml-auto flex items-center gap-2">
+      <Sun className="size-4 text-muted-foreground" aria-hidden="true" />
+      <Switch
+        checked={isDark}
+        onCheckedChange={(checked) => setTheme(checked ? 'dark' : 'light')}
+        disabled={!mounted}
+        aria-label="Toggle dark mode"
+      />
+    </div>
   )
 }
 
