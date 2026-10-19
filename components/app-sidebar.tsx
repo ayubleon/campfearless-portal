@@ -27,10 +27,12 @@ import {
   SidebarMenuItem,
 } from '@/ui/sidebar'
 
+const roleName = "Registration Facilitator"
+
 const data = {
   user: {
     name: "John Doe",
-    email: "Registration Facilitator",
+    email: roleName,
     avatar: "/avatars/john-doe.jpg",
   },
   sections: [
@@ -73,13 +75,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               className="h-auto gap-3 p-0 hover:bg-transparent"
             >
               <a href="#">
-                <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-[#18181b] text-[10px] font-bold leading-none text-white">
-                  CAMP
-                  <span className="sr-only">Fearless</span>
+                <span className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white p-1.5 dark:bg-[#18181b]">
+                  <img
+                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Frame%201000005756-Snn0NVpYSU5MruXfptoDy95BACFSkJ.png"
+                    alt="Camp Fearless logo"
+                    className="h-full w-full object-contain dark:invert"
+                  />
                 </span>
                 <span className="grid gap-0.5">
                   <span className="text-base font-bold tracking-tight">CAMP FEARLESS</span>
-                  <span className="text-xs font-normal text-muted-foreground">Registration Facilitator</span>
+                  <span className="text-xs font-normal text-muted-foreground">{roleName}</span>
                 </span>
               </a>
             </SidebarMenuButton>
