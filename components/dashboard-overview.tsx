@@ -111,7 +111,7 @@ export function DashboardOverview() {
         </DialogHeader>
         <DialogFooter className="grid grid-cols-2 gap-2 sm:mt-6 sm:justify-stretch">
           <Button type="button" variant="outline" onClick={() => setExitPermitCamper(null)}>Cancel</Button>
-          <Button type="button" className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => { const issuedAt = new Date().toLocaleString(); if (exitPermitRow) { exitPermitRow.cells[3].textContent = "Checked out"; exitPermitRow.cells[6].textContent = issuedAt } setExitPermitRow(null); setExitPermitCamper(null) }}>Issue permit</Button>
+          <Button type="button" className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => { const issuedAt = new Date().toLocaleString([], { year: "2-digit", month: "numeric", day: "numeric", hour: "numeric", minute: "2-digit" }); if (exitPermitRow) { exitPermitRow.cells[3].textContent = "Checked out"; exitPermitRow.cells[6].textContent = issuedAt } setExitPermitRow(null); setExitPermitCamper(null) }}>Issue permit</Button>
         </DialogFooter>
         <Button type="button" variant="ghost" size="icon" className="absolute right-3 top-3" onClick={() => setExitPermitCamper(null)} aria-label="Close"><X /></Button>
       </DialogContent>
