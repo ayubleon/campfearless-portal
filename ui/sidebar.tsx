@@ -233,10 +233,15 @@ const Sidebar = React.forwardRef<
       >
         {/* This is what handles the sidebar gap on desktop */}
         <div
-          style={{ width: "var(--sidebar-width)" }}
+          style={{
+            width:
+              state === "collapsed" && collapsible === "offcanvas"
+                ? 0
+                : "var(--sidebar-width)",
+          }}
           className={cn(
             "relative shrink-0 bg-transparent transition-[width] duration-200 ease-linear",
-            variant !== "inset" && "group-data-[collapsible=offcanvas]:w-0",
+            "group-data-[collapsible=offcanvas]:w-0",
             "group-data-[side=right]:rotate-180",
             variant === "floating" || variant === "inset"
               ? "group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4))]"
