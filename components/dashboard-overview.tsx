@@ -45,9 +45,13 @@ function RowActions() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label="More actions">
+        <button
+          type="button"
+          className={buttonVariants({ variant: "ghost", size: "icon" })}
+          aria-label="More actions"
+        >
           <IconDotsVertical />
-        </Button>
+        </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" sideOffset={6} className="z-50 min-w-44">
         <DropdownMenuItem>Edit details</DropdownMenuItem>
