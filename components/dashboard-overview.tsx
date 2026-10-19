@@ -5,7 +5,7 @@ import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts"
 import { IconChevronDown, IconDotsVertical, IconSearch, IconTicket } from "@tabler/icons-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/ui/dropdown-menu"
 import { Badge } from "@/ui/badge"
-import { Button } from "@/ui/button"
+import { Button, buttonVariants } from "@/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/ui/card"
 import { Input } from "@/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select"
@@ -37,10 +37,11 @@ function statusClass(status: string) { return status === "Checked in" ? "border-
 function RowActions() {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label="More actions">
-          <IconDotsVertical />
-        </Button>
+      <DropdownMenuTrigger
+        aria-label="More actions"
+        className={buttonVariants({ variant: "ghost", size: "icon" })}
+      >
+        <IconDotsVertical />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" sideOffset={6} className="z-50 min-w-44">
         <DropdownMenuItem>Edit details</DropdownMenuItem>
