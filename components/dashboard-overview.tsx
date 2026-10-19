@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts"
+import { AlertCircle, X } from "lucide-react"
 import { IconChevronDown, IconDotsVertical, IconSearch, IconTicket } from "@tabler/icons-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/ui/dropdown-menu"
 import { Badge } from "@/ui/badge"
@@ -12,6 +13,7 @@ import { Input } from "@/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/ui/table"
 import { Tabs, TabsList, TabsTrigger } from "@/ui/tabs"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
 const COLORS = ["#336699", "#55C4AE", "#FFD400"]
 const summary = [["5", "Campers departed early"], ["620", "Total registered campers"], ["590", "Campers present on site"], ["40", "Walk in registrations"], ["13", "Total registered facilitators"], ["210", "Pending arrivals"]]
@@ -38,8 +40,25 @@ function statusClass(status: string) { return status === "Checked in" ? "border-
 function CheckInAction({ camperName, status, onCheckIn, onExit }: { camperName: string; status: string; onCheckIn: () => void; onExit: () => void }) {
   const checkedIn = status === "Checked in"
   const checkedOut = status === "Checked out"
+  const [open, setOpen] = React.useState(false)
   if (checkedOut) return <span className="whitespace-nowrap text-sm text-muted-foreground">{status}</span>
-  return <Button type="button" className={cn("whitespace-nowrap", !checkedIn && "bg-primary text-primary-foreground hover:bg-primary/90")} variant={checkedIn ? "outline" : "default"} onClick={checkedIn ? onExit : onCheckIn}>{checkedIn ? "Issue exit permit" : "Check in"}</Button>
+  if (!checkedIn) return <Button type="button" className="whitespace-nowrap bg-primary text-primary-foreground hover:bg-primary/90" onClick={onCheckIn}>Check in</Button>
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <Button type="button" variant="outline" className="whitespace-nowrap" onClick={() => setOpen(true)}>Issue exit permit</Button>
+      <DialogContent showCloseButton={false} className="gap-0 sm:max-w-lg">
+        <DialogHeader className="gap-3 text-left">
+          <DialogTitle className="flex items-center gap-2 text-lg"><AlertCircle className="text-destructive" data-icon="inline-start" />Issue early exit permit</DialogTitle>
+          <DialogDescription>You are about to issue an official early exit permit for <strong className="text-foreground">{camperName}</strong>. This will transition their status to <strong className="text-foreground">Checked out</strong></DialogDescription>
+        </DialogHeader>
+        <DialogFooter className="grid grid-cols-2 gap-2 sm:mt-6 sm:justify-stretch">
+          <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+          <Button type="button" className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => { onExit(); setOpen(false) }}>Issue permit</Button>
+        </DialogFooter>
+        <Button type="button" variant="ghost" size="icon" className="absolute right-3 top-3" onClick={() => setOpen(false)} aria-label="Close"><X /></Button>
+      </DialogContent>
+    </Dialog>
+  )
 }
 
 function RowActions() {
