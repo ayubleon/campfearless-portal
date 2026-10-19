@@ -6,6 +6,7 @@ import { IconChevronDown, IconDotsVertical, IconSearch, IconTicket } from "@tabl
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/ui/dropdown-menu"
 import { Badge } from "@/ui/badge"
 import { Button, buttonVariants } from "@/ui/button"
+import { cn } from "@/lib/utils"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/ui/card"
 import { Input } from "@/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select"
@@ -27,18 +28,18 @@ const campers = [
 ]
 
 function DonutCard({ title, description, data, centerValue, centerLabel, labels }: any) {
-  return <Card className="min-w-0 shadow-none"><CardHeader><CardTitle className="text-base">{title}</CardTitle><CardDescription>{description}</CardDescription></CardHeader><CardContent><div className="relative mx-auto h-56 w-full max-w-xs"><ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={data} dataKey="value" innerRadius="52%" outerRadius="78%" strokeWidth={0}>{data.map((entry: any, index: number) => <Cell key={entry.name} fill={COLORS[index % COLORS.length]} />)}</Pie></PieChart></ResponsiveContainer><div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center"><strong className="text-xl">{centerValue}</strong><span className="text-xs text-muted-foreground">{centerLabel}</span></div></div><div className="flex flex-wrap justify-center gap-x-3 gap-y-2 text-xs text-muted-foreground">{data.map((item: any, index: number) => <span key={item.name} className="inline-flex items-center gap-1"><i className="size-2.5 rounded-full" style={{ backgroundColor: COLORS[index] }} />{labels[index]} {item.value}</span>)}</div></CardContent></Card>
+  return <Card className="min-w-0"><CardHeader><CardTitle className="text-base">{title}</CardTitle><CardDescription>{description}</CardDescription></CardHeader><CardContent><div className="relative mx-auto h-56 w-full max-w-xs"><ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={data} dataKey="value" innerRadius="52%" outerRadius="78%" strokeWidth={0}>{data.map((entry: any, index: number) => <Cell key={entry.name} fill={COLORS[index % COLORS.length]} />)}</Pie></PieChart></ResponsiveContainer><div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center"><strong className="text-xl">{centerValue}</strong><span className="text-xs text-muted-foreground">{centerLabel}</span></div></div><div className="flex flex-wrap justify-center gap-x-3 gap-y-2 text-xs text-muted-foreground">{data.map((item: any, index: number) => <span key={item.name} className="inline-flex items-center gap-1"><i className="size-2.5 rounded-full" style={{ backgroundColor: COLORS[index] }} />{labels[index]} {item.value}</span>)}</div></CardContent></Card>
 }
 
-function QuickSummary() { return <Card className="min-w-0 overflow-hidden shadow-none"><CardHeader><CardTitle className="text-base">Quick summary</CardTitle><CardDescription>A summary of campers data</CardDescription></CardHeader><CardContent><div className="flex max-h-72 flex-col gap-2 overflow-y-auto px-1 pr-3">{summary.map(([value, label]) => <div key={label} className="rounded-lg border bg-muted/20 px-4 py-3"><div className="text-base font-semibold tabular-nums">{value}</div><div className="text-sm text-muted-foreground">{label}</div></div>)}</div></CardContent></Card> }
+function QuickSummary() { return <Card className="min-w-0 overflow-hidden"><CardHeader><CardTitle className="text-base">Quick summary</CardTitle><CardDescription>A summary of campers data</CardDescription></CardHeader><CardContent><div className="flex max-h-72 flex-col gap-2 overflow-y-auto px-1 pr-3">{summary.map(([value, label]) => <div key={label} className="rounded-lg border bg-muted/20 px-4 py-3"><div className="text-base font-semibold tabular-nums">{value}</div><div className="text-sm text-muted-foreground">{label}</div></div>)}</div></CardContent></Card> }
 
-function statusClass(status: string) { return status === "Checked in" ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-400" : status === "Registered" ? "border-orange-200 bg-orange-50 text-orange-700 dark:border-orange-900 dark:bg-orange-950/40 dark:text-orange-400" : "border-slate-200 bg-slate-50 text-slate-600 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-400" }
+function statusVariant(status: string) { return status === "Checked in" ? "default" : status === "Registered" ? "secondary" : "outline" }
 
 function CheckInAction({ camperName, status, onCheckIn, onExit }: { camperName: string; status: string; onCheckIn: () => void; onExit: () => void }) {
   const checkedIn = status === "Checked in"
   const checkedOut = status === "Checked out"
   if (checkedOut) return <span className="whitespace-nowrap text-sm text-muted-foreground">{status}</span>
-  return <Button type="button" className={checkedIn ? "whitespace-nowrap" : "whitespace-nowrap bg-[#336699] text-white hover:bg-[#2b5985]"} variant={checkedIn ? "outline" : "default"} onClick={checkedIn ? onExit : onCheckIn}>{checkedIn ? "Issue exit permit" : "Check in"}</Button>
+  return <Button type="button" className={cn("whitespace-nowrap", !checkedIn && "bg-primary text-primary-foreground hover:bg-primary/90")} variant={checkedIn ? "outline" : "default"} onClick={checkedIn ? onExit : onCheckIn}>{checkedIn ? "Issue exit permit" : "Check in"}</Button>
 }
 
 function RowActions() {
@@ -51,7 +52,7 @@ function RowActions() {
       >
         <IconDotsVertical />
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" sideOffset={6} className="z-50 min-w-44">
+      <DropdownMenuContent align="end" sideOffset={6} className="min-w-44">
         <DropdownMenuItem>Edit details</DropdownMenuItem>
         <DropdownMenuItem>Undo check in</DropdownMenuItem>
         <DropdownMenuSeparator />

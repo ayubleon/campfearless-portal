@@ -1,17 +1,13 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { Sun } from 'lucide-react'
-import { useTheme } from 'next-themes'
+import { useAppTheme } from '@/components/theme-provider'
 import { Switch } from '@/ui/switch'
 import { SidebarTrigger } from '@/ui/sidebar'
 
 function ThemeToggle() {
-  const { resolvedTheme, setTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
-  const isDark = mounted && resolvedTheme === 'dark'
-
-  useEffect(() => setMounted(true), [])
+  const { theme, setTheme } = useAppTheme()
+  const isDark = theme === 'dark'
 
   return (
     <div className="ml-auto flex items-center gap-2">
@@ -19,7 +15,6 @@ function ThemeToggle() {
       <Switch
         checked={isDark}
         onCheckedChange={(checked) => setTheme(checked ? 'dark' : 'light')}
-        disabled={!mounted}
         aria-label="Toggle dark mode"
       />
     </div>
