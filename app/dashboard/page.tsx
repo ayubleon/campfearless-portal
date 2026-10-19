@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { AppSidebar } from '@/components/app-sidebar'
 import { DashboardOverview } from '@/components/dashboard-overview'
 import { SiteHeader } from '@/components/site-header'
