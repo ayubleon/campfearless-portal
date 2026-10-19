@@ -88,14 +88,16 @@ export function DashboardOverview() {
   const [exitPermitRow, setExitPermitRow] = React.useState<HTMLTableRowElement | null>(null)
   const filtered = campers.filter(([name, , contact, phone]) => `${name} ${contact} ${phone}`.toLowerCase().includes(search.toLowerCase()))
   const handleTableAction = (event: React.MouseEvent<HTMLElement>) => {
-    const button = (event.target as HTMLElement).closest("button")
+    if (!(event.target instanceof HTMLElement)) return
+    const button = event.target.closest("button")
+    if (!button) return
     const row = button.closest("tr") as HTMLTableRowElement | null
-    if (!button || !row) return
+    if (!row) return
     if (button.textContent?.trim() === "Check in") {
       button.textContent = "Issue exit permit"
       const statusCell = row.cells[3]
-      statusCell.textContent = "Checked in"
       statusCell.className = "text-center"
+      statusCell.innerHTML = `<span class="inline-flex items-center rounded-lg border px-3 py-1 text-xs font-medium border-transparent bg-status-checked-in text-status-checked-in-foreground">Checked in</span>`
       return
     }
     if (button.textContent?.trim() !== "Issue exit permit") return
@@ -111,7 +113,7 @@ export function DashboardOverview() {
         </DialogHeader>
         <DialogFooter className="grid grid-cols-2 gap-2 sm:mt-6 sm:justify-stretch">
           <Button type="button" variant="outline" onClick={() => setExitPermitCamper(null)}>Cancel</Button>
-          <Button type="button" className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => { const issuedAt = new Date().toLocaleString([], { year: "2-digit", month: "numeric", day: "numeric", hour: "numeric", minute: "2-digit" }); if (exitPermitRow) { exitPermitRow.cells[3].textContent = "Checked out"; exitPermitRow.cells[6].textContent = issuedAt; exitPermitRow.cells[6].classList.add("text-muted-foreground") } setExitPermitRow(null); setExitPermitCamper(null) }}>Issue permit</Button>
+          <Button type="button" className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => { const issuedAt = new Date().toLocaleString([], { year: "2-digit", month: "numeric", day: "numeric", hour: "numeric", minute: "2-digit" }); if (exitPermitRow) { exitPermitRow.classList.add("text-muted-foreground"); exitPermitRow.cells[3].innerHTML = `<span class="inline-flex items-center rounded-lg border-2 border-border bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">Checked out</span>`; exitPermitRow.cells[6].textContent = issuedAt; exitPermitRow.cells[6].classList.add("text-muted-foreground") } setExitPermitRow(null); setExitPermitCamper(null) }}>Issue permit</Button>
         </DialogFooter>
         <Button type="button" variant="ghost" size="icon" className="absolute right-3 top-3" onClick={() => setExitPermitCamper(null)} aria-label="Close"><X /></Button>
       </DialogContent>
