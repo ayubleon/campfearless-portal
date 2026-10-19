@@ -83,10 +83,10 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
-  --status-checked-in: oklch(0.87 0.17 145);
-  --status-checked-in-foreground: oklch(0.28 0.09 145);
-  --status-registered: oklch(0.88 0.16 75);
-  --status-registered-foreground: oklch(0.35 0.1 55);
+  --status-checked-in: oklch(0.94 0.08 145);
+  --status-checked-in-foreground: oklch(0.36 0.1 145);
+  --status-registered: oklch(0.95 0.08 75);
+  --status-registered-foreground: oklch(0.42 0.1 55);
 }
 
 .dark {
@@ -122,10 +122,10 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
-  --status-checked-in: oklch(0.42 0.12 145);
-  --status-checked-in-foreground: oklch(0.92 0.15 145);
-  --status-registered: oklch(0.48 0.13 65);
-  --status-registered-foreground: oklch(0.94 0.15 80);
+  --status-checked-in: oklch(0.27 0.08 145);
+  --status-checked-in-foreground: oklch(0.78 0.13 145);
+  --status-registered: oklch(0.3 0.08 65);
+  --status-registered-foreground: oklch(0.82 0.13 75);
 }
 
 @media (prefers-color-scheme: dark) {
