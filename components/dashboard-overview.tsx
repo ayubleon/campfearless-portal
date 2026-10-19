@@ -34,6 +34,13 @@ function QuickSummary() { return <Card className="min-w-0 overflow-hidden shadow
 
 function statusClass(status: string) { return status === "Checked in" ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-400" : status === "Registered" ? "border-orange-200 bg-orange-50 text-orange-700 dark:border-orange-900 dark:bg-orange-950/40 dark:text-orange-400" : "border-slate-200 bg-slate-50 text-slate-600 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-400" }
 
+function CheckInAction({ camperName, status, onCheckIn, onExit }: { camperName: string; status: string; onCheckIn: () => void; onExit: () => void }) {
+  const checkedIn = status === "Checked in"
+  const checkedOut = status === "Checked out"
+  if (checkedOut) return <span className="whitespace-nowrap text-sm text-muted-foreground">{status}</span>
+  return <Button type="button" className={checkedIn ? "whitespace-nowrap" : "whitespace-nowrap bg-[#336699] text-white hover:bg-[#2b5985]"} variant={checkedIn ? "outline" : "default"} onClick={checkedIn ? onExit : onCheckIn}>{checkedIn ? "Issue exit permit" : "Check in"}</Button>
+}
+
 function RowActions() {
   return (
     <DropdownMenu>
