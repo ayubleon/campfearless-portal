@@ -73,7 +73,7 @@ function RowActions({ status, onUndo }: { status: string; onUndo?: () => void })
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" sideOffset={6} className="min-w-44">
         <DropdownMenuItem>Edit details</DropdownMenuItem>
-        {checkedOut && <DropdownMenuItem onSelect={() => onUndo?.()}>Undo check out</DropdownMenuItem>}
+        {checkedOut && <DropdownMenuItem onClick={() => onUndo?.()}>Undo check out</DropdownMenuItem>}
         <DropdownMenuSeparator />
         <DropdownMenuItem className="text-destructive focus:text-destructive">Cancel registration</DropdownMenuItem>
       </DropdownMenuContent>
