@@ -2,31 +2,25 @@
 
 import * as React from "react"
 import {
-  IconCamera,
-  IconChartBar,
-  IconDashboard,
-  IconDatabase,
-  IconFileAi,
-  IconFileDescription,
-  IconFileWord,
-  IconFolder,
-  IconHelp,
-  IconInnerShadowTop,
-  IconListDetails,
-  IconReport,
-  IconSearch,
-  IconSettings,
-  IconUsers,
-} from "@tabler/icons-react"
+  Building2,
+  CalendarDays,
+  ClipboardList,
+  FileCheck2,
+  Grid2X2,
+  History,
+  ReceiptText,
+  UserRound,
+  UsersRound,
+} from "lucide-react"
 
-import { NavDocuments } from '@/components/nav-documents'
-import { NavMain } from '@/components/nav-main'
-import { NavSecondary } from '@/components/nav-secondary'
 import { NavUser } from '@/components/nav-user'
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -35,117 +29,35 @@ import {
 
 const data = {
   user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
+    name: "John Doe",
+    email: "Registration Facilitator",
+    avatar: "/avatars/john-doe.jpg",
   },
-  navMain: [
+  sections: [
     {
-      title: "Dashboard",
-      url: "#",
-      icon: IconDashboard,
+      label: "",
+      items: [{ title: "Dashboard", icon: Grid2X2, active: true }],
     },
     {
-      title: "Lifecycle",
-      url: "#",
-      icon: IconListDetails,
+      label: "Camps",
+      items: [{ title: "Camp setup", icon: CalendarDays }],
     },
     {
-      title: "Analytics",
-      url: "#",
-      icon: IconChartBar,
-    },
-    {
-      title: "Projects",
-      url: "#",
-      icon: IconFolder,
-    },
-    {
-      title: "Team",
-      url: "#",
-      icon: IconUsers,
-    },
-  ],
-  navClouds: [
-    {
-      title: "Capture",
-      icon: IconCamera,
-      isActive: true,
-      url: "#",
+      label: "Registration",
       items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
+        { title: "Reports", icon: ClipboardList },
+        { title: "Registration", icon: UserRound },
+        { title: "Waivers", icon: FileCheck2 },
+        { title: "Payments", icon: ReceiptText },
       ],
     },
     {
-      title: "Proposal",
-      icon: IconFileDescription,
-      url: "#",
+      label: "Administration",
       items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
+        { title: "Users and roles", icon: UsersRound },
+        { title: "Campuses and networks", icon: Building2 },
+        { title: "Audit log", icon: History },
       ],
-    },
-    {
-      title: "Prompts",
-      icon: IconFileAi,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-  ],
-  navSecondary: [
-    {
-      title: "Settings",
-      url: "#",
-      icon: IconSettings,
-    },
-    {
-      title: "Get Help",
-      url: "#",
-      icon: IconHelp,
-    },
-    {
-      title: "Search",
-      url: "#",
-      icon: IconSearch,
-    },
-  ],
-  documents: [
-    {
-      name: "Data Library",
-      url: "#",
-      icon: IconDatabase,
-    },
-    {
-      name: "Reports",
-      url: "#",
-      icon: IconReport,
-    },
-    {
-      name: "Word Assistant",
-      url: "#",
-      icon: IconFileWord,
     },
   ],
 }
@@ -153,25 +65,52 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="offcanvas" {...props}>
-      <SidebarHeader>
+      <SidebarHeader className="px-4 py-5">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              className="data-[slot=sidebar-menu-button]:p-1.5!"
+              className="h-auto gap-3 p-0 hover:bg-transparent"
             >
               <a href="#">
-                <IconInnerShadowTop className="size-5!" />
-                <span className="text-base font-semibold">Acme Inc.</span>
+                <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-[#18181b] text-[10px] font-bold leading-none text-white">
+                  CAMP
+                  <span className="sr-only">Fearless</span>
+                </span>
+                <span className="grid gap-0.5">
+                  <span className="text-base font-bold tracking-tight">CAMP FEARLESS</span>
+                  <span className="text-xs font-normal text-muted-foreground">Registration Facilitator</span>
+                </span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavDocuments items={data.documents} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
+      <SidebarContent className="px-2">
+        {data.sections.map((section) => (
+          <SidebarGroup key={section.label || "dashboard"} className="py-2">
+            {section.label && <SidebarGroupLabel className="px-2 pb-2 text-sm font-normal text-muted-foreground">{section.label}</SidebarGroupLabel>}
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {section.items.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={item.active}
+                      tooltip={item.title}
+                      className="h-9 gap-3 rounded-lg px-2.5 text-sm font-medium"
+                    >
+                      <a href="#">
+                        <item.icon className="size-4" />
+                        <span>{item.title}</span>
+                      </a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />
