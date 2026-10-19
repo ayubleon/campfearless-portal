@@ -103,7 +103,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       asChild
                       isActive={item.active}
                       tooltip={item.title}
-                      className="h-9 gap-3 rounded-lg px-2.5 text-sm font-medium"
+                      className="h-9 gap-3 rounded-lg px-2.5 text-sm font-medium data-[active=true]:bg-black data-[active=true]:text-white data-[active=true]:hover:bg-black data-[active=true]:hover:text-white dark:data-[active=true]:bg-black dark:data-[active=true]:text-white"
                     >
                       <a href="#">
                         <item.icon className="size-4" />
