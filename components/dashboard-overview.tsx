@@ -3,6 +3,7 @@
 import * as React from "react"
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts"
 import { IconChevronDown, IconDotsVertical, IconSearch, IconTicket } from "@tabler/icons-react"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/ui/dropdown-menu"
 import { Badge } from "@/ui/badge"
 import { Button } from "@/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/ui/card"
@@ -32,6 +33,24 @@ function DonutCard({ title, description, data, centerValue, centerLabel, labels 
 function QuickSummary() { return <Card className="min-w-0 shadow-none"><CardHeader className="gap-1 pb-3"><CardTitle className="text-base">Quick summary</CardTitle><CardDescription>A summary of campers data</CardDescription></CardHeader><CardContent><div className="flex max-h-72 flex-col gap-2 overflow-y-auto pr-1">{summary.map(([value, label]) => <div key={label} className="rounded-lg border bg-muted/20 px-4 py-3"><div className="text-base font-semibold tabular-nums">{value}</div><div className="text-sm text-muted-foreground">{label}</div></div>)}</div></CardContent></Card> }
 
 function statusClass(status: string) { return status === "Checked in" ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-400" : status === "Registered" ? "border-orange-200 bg-orange-50 text-orange-700 dark:border-orange-900 dark:bg-orange-950/40 dark:text-orange-400" : "border-slate-200 bg-slate-50 text-slate-600 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-400" }
+
+function RowActions() {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" aria-label="More actions">
+          <IconDotsVertical />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem>Edit details</DropdownMenuItem>
+        <DropdownMenuItem>Undo check in</DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem className="text-destructive focus:text-destructive">Cancel registration</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
 
 export function DashboardOverview() {
   const [campus, setCampus] = React.useState("all")
