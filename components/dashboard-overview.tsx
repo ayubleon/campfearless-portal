@@ -96,7 +96,12 @@ export function DashboardOverview() {
     if (!button) return
     const row = button.closest("tr") as HTMLTableRowElement | null
     if (!row) return
-    if (button.textContent?.trim() === "Check in") return
+    if (button.textContent?.trim() === "Check in") {
+      const camperName = row.querySelector("td")?.textContent?.trim().split("Age:")[0].trim()
+      const camperIndex = campers.findIndex((camper) => camper[0] === camperName)
+      if (camperIndex >= 0) setCheckedInCampers((current) => new Set(current).add(camperIndex))
+      return
+    }
     if (button.textContent?.trim() !== "Issue exit permit") return
     const camperName = row.querySelector("td")?.textContent?.trim().split("Age:")[0].trim() ?? "this camper"
     setExitPermitCamper(camperName)
