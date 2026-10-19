@@ -26,7 +26,7 @@ const campers = [
   ["Mase Webster", "Age: 20 - Male", "Jacques Webster", "0714048876", "Hill City", "Checked in", "Sinuses", "-"],
   ["Carter Nolan", "Age: 20 - Male", "Christine Sio", "0714048876", "Invited", "Checked in", "-", "-"],
   ["Kety Webster", "Age: 20 - Male", "Jacques Webster", "0714048876", "PCEA", "Checked in", "Protein allergy", "-"],
-  ["Karen Jackson", "Age: 19 - Female", "Leon Sholo", "0714048876", "Hill City", "Checked out", "Asthmatic", "-"],
+  ["Amina Otieno", "Age: 22 - Female", "Leon Sholo", "0714048876", "Hill City", "Checked out", "Asthmatic", "-"],
 ]
 
 function DonutCard({ title, description, data, centerValue, centerLabel, labels }: any) {
