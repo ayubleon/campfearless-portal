@@ -14,12 +14,14 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
     const nextTheme = prefersDark ? 'dark' : 'light'
     setTheme(nextTheme)
-    document.documentElement.classList.toggle('dark', prefersDark)
+    document.documentElement.classList.remove('light', 'dark')
+    document.documentElement.classList.add(nextTheme)
   }, [])
 
   const updateTheme = (nextTheme: Theme) => {
     setTheme(nextTheme)
-    document.documentElement.classList.toggle('dark', nextTheme === 'dark')
+    document.documentElement.classList.remove('light', 'dark')
+    document.documentElement.classList.add(nextTheme)
   }
 
   return <ThemeContext.Provider value={{ theme, setTheme: updateTheme }}>{children}</ThemeContext.Provider>
