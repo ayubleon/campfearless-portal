@@ -38,18 +38,7 @@ function CheckInAction({ camperName, status, onCheckIn, onExit }: { camperName: 
   const checkedIn = status === "Checked in"
   const checkedOut = status === "Checked out"
   if (checkedOut) return <span className="whitespace-nowrap text-sm text-muted-foreground">{status}</span>
-  return (
-    <div className="w-64 shrink-0">
-      <Button
-        type="button"
-        className={checkedIn ? "box-border flex w-full justify-center whitespace-nowrap" : "box-border flex w-full justify-center whitespace-nowrap bg-[#336699] text-white hover:bg-[#2b5985]"}
-        variant={checkedIn ? "outline" : "default"}
-        onClick={checkedIn ? onExit : onCheckIn}
-      >
-        {checkedIn ? "Issue exit permit" : "Check in"}
-      </Button>
-    </div>
-  )
+  return <Button type="button" className={checkedIn ? "whitespace-nowrap" : "whitespace-nowrap bg-[#336699] text-white hover:bg-[#2b5985]"} variant={checkedIn ? "outline" : "default"} onClick={checkedIn ? onExit : onCheckIn}>{checkedIn ? "Issue exit permit" : "Check in"}</Button>
 }
 
 function RowActions() {
