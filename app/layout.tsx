@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/ui/sonner'
+import { TooltipProvider } from '@/ui/tooltip'
 
 export const metadata: Metadata = {
   title: 'v0 App',
@@ -43,7 +44,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="antialiased">
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <TooltipProvider>{children}</TooltipProvider>
+        </ThemeProvider>
         <Toaster />
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>

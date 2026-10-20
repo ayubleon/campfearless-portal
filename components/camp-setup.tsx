@@ -12,7 +12,7 @@ import { statusClass } from "@/lib/status"
 import { Badge } from "@/ui/badge"
 import { Button } from "@/ui/button"
 import { Calendar } from "@/ui/calendar"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/ui/card"
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/ui/card"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/ui/dialog"
 import { Input } from "@/ui/input"
 import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover"
@@ -105,7 +105,7 @@ function sameValues<T>(fields: FieldSpec<T>[], a: T, b: T) {
 }
 
 function ValueBox({ children }: { children: React.ReactNode }) {
-  return <div className="flex h-10 min-w-0 items-center rounded-md border bg-muted/20 px-3 text-sm font-normal tabular-nums"><span className="truncate">{children}</span></div>
+  return <div className="flex h-8 min-w-0 items-center rounded-lg border bg-muted/20 px-2.5 text-sm font-normal tabular-nums"><span className="truncate">{children}</span></div>
 }
 
 function Field({ label, editing, children }: { label: string; editing: boolean; children: React.ReactNode }) {
@@ -126,8 +126,8 @@ function NumberField({ label, value, editing, money, onChange }: { label: string
     <Field label={label} editing={editing}>
       {editing ? (
         <span className="relative">
-          {money && <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm font-normal text-muted-foreground">KES</span>}
-          <Input inputMode="numeric" className={cn("bg-muted/40 tabular-nums", money && "pl-12")} value={formatNumber(value)} onChange={(event) => onChange(parseNumber(event.target.value))} />
+          {money && <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-sm font-normal text-muted-foreground">KES</span>}
+          <Input inputMode="numeric" className={cn("bg-muted/40 tabular-nums", money && "pl-11")} value={formatNumber(value)} onChange={(event) => onChange(parseNumber(event.target.value))} />
         </span>
       ) : (
         <ValueBox>{money ? formatMoney(value) : formatNumber(value)}</ValueBox>
@@ -143,7 +143,7 @@ function DateField({ label, value, editing, onChange, disabled }: { label: strin
       {editing ? (
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
-            <Button type="button" variant="outline" className="w-full min-w-0 justify-between bg-muted/40 px-3 font-normal tabular-nums">
+            <Button type="button" variant="outline" className="w-full min-w-0 justify-between bg-muted/40 px-2.5 font-normal tabular-nums">
               <span className="min-w-0 truncate">{formatDate(value)}</span>
               <IconCalendar className="text-muted-foreground" />
             </Button>
@@ -235,12 +235,10 @@ function SetupCard<T>({ title, description, saved, fields, note, saveLabel, succ
 
   return (
     <Card className="shadow-none">
-      <CardHeader className="flex-row items-start justify-between gap-3 space-y-0">
-        <div className="flex flex-col gap-1.5">
-          <CardTitle className="text-base">{title}</CardTitle>
-          <CardDescription>{description}</CardDescription>
-        </div>
-        {canEdit && !editing && <Button type="button" variant="outline" onClick={() => setDraft(saved)}>Edit</Button>}
+      <CardHeader>
+        <CardTitle className="text-base">{title}</CardTitle>
+        <CardDescription>{description}</CardDescription>
+        {canEdit && !editing && <CardAction><Button type="button" variant="outline" onClick={() => setDraft(saved)}>Edit</Button></CardAction>}
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         {children(value, editing, (patch) => setDraft((current) => ({ ...(current ?? saved), ...patch })))}

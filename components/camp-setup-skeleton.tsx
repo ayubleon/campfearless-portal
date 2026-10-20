@@ -1,11 +1,11 @@
-import { Card, CardContent, CardHeader } from "@/ui/card"
+import { Card, CardAction, CardContent, CardHeader } from "@/ui/card"
 import { Skeleton } from "@/ui/skeleton"
 
 function FieldSkeleton() {
   return (
     <div className="flex flex-col gap-2">
       <Skeleton className="h-4 w-28" />
-      <Skeleton className="h-10 w-full" />
+      <Skeleton className="h-8 w-full" />
     </div>
   )
 }
@@ -22,12 +22,10 @@ function ColumnSkeleton({ fields }: { fields: number }) {
 function SetupCardSkeleton({ columns }: { columns: number[] }) {
   return (
     <Card className="shadow-none">
-      <CardHeader className="flex-row items-start justify-between gap-3 space-y-0">
-        <div className="flex flex-col gap-1.5">
-          <Skeleton className="h-4 w-28" />
-          <Skeleton className="h-4 w-60" />
-        </div>
-        <Skeleton className="h-10 w-16" />
+      <CardHeader>
+        <Skeleton className="h-4 w-28" />
+        <Skeleton className="h-4 w-60" />
+        <CardAction><Skeleton className="h-8 w-14" /></CardAction>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <div className="grid gap-x-4 gap-y-6 md:grid-cols-2 xl:grid-cols-3">
