@@ -40,6 +40,10 @@
   --color-status-checked-in-foreground: var(--status-checked-in-foreground);
   --color-status-registered: var(--status-registered);
   --color-status-registered-foreground: var(--status-registered-foreground);
+  --color-status-paused: var(--status-paused);
+  --color-status-paused-foreground: var(--status-paused-foreground);
+  --color-status-scheduled: var(--status-scheduled);
+  --color-status-scheduled-foreground: var(--status-scheduled-foreground);
   --color-brand: var(--brand);
   --color-brand-hover: var(--brand-hover);
   --color-brand-foreground: var(--brand-foreground);
@@ -90,6 +94,10 @@
   --status-checked-in-foreground: #15803d;
   --status-registered: #ffedd5;
   --status-registered-foreground: #ea580c;
+  --status-paused: #fff7ed;
+  --status-paused-foreground: #ea580c;
+  --status-scheduled: #dbeafe;
+  --status-scheduled-foreground: #1d4ed8;
   --brand: #336699;
   --brand-hover: #2b5985;
   --brand-foreground: #ffffff;
@@ -132,6 +140,10 @@
   --status-checked-in-foreground: oklch(0.82 0.13 145);
   --status-registered: oklch(0.32 0.08 65);
   --status-registered-foreground: oklch(0.86 0.14 60);
+  --status-paused: oklch(0.3 0.07 55);
+  --status-paused-foreground: oklch(0.84 0.14 55);
+  --status-scheduled: oklch(0.3 0.08 260);
+  --status-scheduled-foreground: oklch(0.82 0.1 255);
 }
 
 @layer base {

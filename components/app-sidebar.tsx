@@ -1,6 +1,8 @@
 "use client"
 
 import * as React from "react"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
 import {
   Building2,
   CalendarDays,
@@ -38,11 +40,11 @@ const data = {
   sections: [
     {
       label: "",
-      items: [{ title: "Dashboard", icon: Grid2X2, active: true }],
+      items: [{ title: "Dashboard", icon: Grid2X2, url: "/dashboard" }],
     },
     {
       label: "Camps",
-      items: [{ title: "Camp setup", icon: CalendarDays }],
+      items: [{ title: "Camp setup", icon: CalendarDays, url: "/camp-setup" }],
     },
     {
       label: "Registration",
@@ -65,6 +67,8 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const pathname = usePathname()
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader className="px-4 py-5">
@@ -101,14 +105,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton
                       asChild
-                      isActive={item.active}
+                      isActive={"url" in item && pathname === item.url}
                       tooltip={item.title}
                       className="h-9 gap-3 rounded-lg px-2.5 text-sm font-medium data-[active=true]:bg-black data-[active=true]:text-white data-[active=true]:hover:bg-black data-[active=true]:hover:text-white dark:data-[active=true]:bg-black dark:data-[active=true]:text-white"
                     >
-                      <a href="#">
+                      <Link href={"url" in item ? item.url : "#"}>
                         <item.icon className="size-4" />
                         <span>{item.title}</span>
-                      </a>
+                      </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
