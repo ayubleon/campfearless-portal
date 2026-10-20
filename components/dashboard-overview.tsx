@@ -125,7 +125,9 @@ const [checkedOutCampers, setCheckedOutCampers] = React.useState<Set<number>>(()
   }}
   onUndoCheckIn={() => {
     setCheckedInCampers((current) => { const next = new Set(current); next.delete(index); return next })
+    setCheckedOutCampers((current) => { const next = new Set(current); next.delete(index); return next })
     setRowStatuses((current) => ({ ...current, [index]: "Registered" }))
+    setExitPermitTimes((current) => { const next = { ...current }; delete next[index]; return next })
   }}
 /></TableCell></TableRow>)}</TableBody></Table></div></CardContent></Card>
     <Dialog open={Boolean(editCamper)} onOpenChange={(open) => !open && setEditCamper(null)}>
