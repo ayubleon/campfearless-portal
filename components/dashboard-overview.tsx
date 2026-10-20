@@ -130,7 +130,7 @@ const [checkedOutCampers, setCheckedOutCampers] = React.useState<Set<number>>(()
 /></TableCell></TableRow>)}</TableBody></Table></div></CardContent></Card>
     <Dialog open={Boolean(editCamper)} onOpenChange={(open) => !open && setEditCamper(null)}>
       <DialogContent showCloseButton={false} className="gap-0 overflow-y-auto bg-background p-0 sm:max-w-4xl">
-        <DialogHeader className="px-6 py-5 text-left"><DialogTitle className="text-base font-semibold">Edit camper details</DialogTitle><DialogDescription>Fill in your details as per your legal documents</DialogDescription></DialogHeader>
+        <DialogHeader className="space-y-1.5 px-6 py-6 text-left"><DialogTitle className="text-base font-semibold leading-none tracking-tight">Edit camper details</DialogTitle><DialogDescription className="text-sm text-muted-foreground">Fill in your details as per your legal documents</DialogDescription></DialogHeader>
         {editCamper && <div className="flex flex-col gap-6 px-6 py-6">
           <div className="grid gap-4 sm:grid-cols-3">
             <label className="flex flex-col gap-2 text-sm font-medium">First name<Input className="bg-muted/40" value={editCamper.firstName} onChange={(event) => setEditCamper({ ...editCamper, firstName: event.target.value })} /></label>
