@@ -22,10 +22,10 @@ const campers = [
   ["Brian Otieno", "Age: 19 - Male", "Peter Otieno", "0718562390", "Downtown", "Registered", "-", "-"],
   ["Cynthia Wambui", "Age: 22 - Female", "Mercy Wambui", "0721456783", "Downtown", "Registered", "Asthmatic", "-"],
   ["Daniel Kiptoo", "Age: 18 - Male", "Samuel Kiptoo", "0790345128", "Mashauri", "Registered", "-", "Down syndrome"],
-  ["Esther Achieng", "Age: 23 - Female", "Rose Achieng", "0742789016", "Hill City", "Registered", "-", "-"],
-  ["Felix Mwangi", "Age: 20 - Male", "Lucy Mwangi", "0765123478", "Hill City", "Registered", "Sinuses", "-"],
-  ["Hannah Kamau", "Age: 21 - Female", "David Kamau", "0786231094", "Invited", "Registered", "-", "-"],
-  ["Ibrahim Hassan", "Age: 20 - Male", "Fatuma Hassan", "0734891267", "PCEA", "Registered", "Protein allergy", "-"],
+  ["Esther Achieng", "Age: 23 - Female", "Rose Achieng", "0742789016", "Hill City", "Checked in", "-", "-"],
+  ["Felix Mwangi", "Age: 20 - Male", "Lucy Mwangi", "0765123478", "Hill City", "Checked in", "Sinuses", "-"],
+  ["Hannah Kamau", "Age: 21 - Female", "David Kamau", "0786231094", "Invited", "Checked out", "-", "-"],
+  ["Ibrahim Hassan", "Age: 20 - Male", "Fatuma Hassan", "0734891267", "PCEA", "Checked out", "Protein allergy", "-"],
 ]
 
 function DonutCard({ title, description, data, centerValue, centerLabel, labels }: any) {
@@ -87,8 +87,8 @@ export function DashboardOverview() {
   const [search, setSearch] = React.useState("")
   const [exitPermitCamper, setExitPermitCamper] = React.useState<string | null>(null)
   const [rowStatuses, setRowStatuses] = React.useState<Record<number, string>>({})
-  const [checkedOutCampers, setCheckedOutCampers] = React.useState<Set<number>>(() => new Set())
-  const [checkedInCampers, setCheckedInCampers] = React.useState<Set<number>>(() => new Set())
+const [checkedOutCampers, setCheckedOutCampers] = React.useState<Set<number>>(() => new Set(campers.flatMap((camper, index) => camper[5] === "Checked out" ? [index] : [])))
+ const [checkedInCampers, setCheckedInCampers] = React.useState<Set<number>>(() => new Set(campers.flatMap((camper, index) => camper[5] === "Checked in" ? [index] : [])))
   const [exitPermitTimes, setExitPermitTimes] = React.useState<Record<number, string>>({})
   const [exitPermitIndex, setExitPermitIndex] = React.useState<number | null>(null)
   const filtered = campers.filter(([name, , contact, phone]) => `${name} ${contact} ${phone}`.toLowerCase().includes(search.toLowerCase()))
