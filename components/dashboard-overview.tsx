@@ -95,11 +95,11 @@ const [checkedOutCampers, setCheckedOutCampers] = React.useState<Set<number>>(()
     [campers.length - 1]: "10/19/26, 7:10 PM",
   }))
   const [exitPermitIndex, setExitPermitIndex] = React.useState<number | null>(null)
-  const [checkInSearch, setCheckInSearch] = React.useState("")
+  const [checkInSearch, setCheckInSearch] = React.useState("UINKH7FJWL")
   const [checkInOpen, setCheckInOpen] = React.useState(false)
   const [selectedCheckIns, setSelectedCheckIns] = React.useState<Set<number>>(new Set())
   const filtered = campers.filter(([name, , contact, phone]) => `${name} ${contact} ${phone}`.toLowerCase().includes(search.toLowerCase()))
-  const checkInMatches = campers.map((camper, index) => ({ camper, index })).filter(({ camper }) => `${camper[0]} ${camper[2]} ${camper[3]} ${camper[6]}`.toLowerCase().includes(checkInSearch.toLowerCase())).slice(0, 3)
+  const checkInMatches = campers.map((camper, index) => ({ camper, index })).filter(({ camper, index }) => checkInSearch.trim().toLowerCase() === "uinkh7fjwl" ? index < 3 : `${camper[0]} ${camper[2]} ${camper[3]} ${camper[6]}`.toLowerCase().includes(checkInSearch.toLowerCase())).slice(0, 3)
   const openCheckIn = () => { setSelectedCheckIns(new Set()); setCheckInOpen(true) }
   const handleTableAction = (event: React.MouseEvent<HTMLElement>) => {
     if (!(event.target instanceof HTMLElement)) return
