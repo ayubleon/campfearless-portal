@@ -89,7 +89,10 @@ export function DashboardOverview() {
   const [rowStatuses, setRowStatuses] = React.useState<Record<number, string>>({})
 const [checkedOutCampers, setCheckedOutCampers] = React.useState<Set<number>>(() => new Set(campers.flatMap((camper, index) => camper[5] === "Checked out" ? [index] : [])))
  const [checkedInCampers, setCheckedInCampers] = React.useState<Set<number>>(() => new Set(campers.flatMap((camper, index) => camper[5] === "Checked in" ? [index] : [])))
-  const [exitPermitTimes, setExitPermitTimes] = React.useState<Record<number, string>>({})
+  const [exitPermitTimes, setExitPermitTimes] = React.useState<Record<number, string>>(() => ({
+    [campers.length - 2]: "10/19/26, 7:10 PM",
+    [campers.length - 1]: "10/19/26, 7:10 PM",
+  }))
   const [exitPermitIndex, setExitPermitIndex] = React.useState<number | null>(null)
   const filtered = campers.filter(([name, , contact, phone]) => `${name} ${contact} ${phone}`.toLowerCase().includes(search.toLowerCase()))
   const handleTableAction = (event: React.MouseEvent<HTMLElement>) => {
