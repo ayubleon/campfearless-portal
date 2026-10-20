@@ -5,7 +5,7 @@ import { useAppTheme } from '@/components/theme-provider'
 import { Switch } from '@/ui/switch'
 import { SidebarTrigger } from '@/ui/sidebar'
 
-function ThemeToggle() {
+export function ThemeToggle() {
   const { theme, setTheme } = useAppTheme()
   const isDark = theme === 'dark'
 
