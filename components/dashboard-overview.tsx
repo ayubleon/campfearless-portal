@@ -100,7 +100,7 @@ const [checkedOutCampers, setCheckedOutCampers] = React.useState<Set<number>>(()
   const [selectedCheckIns, setSelectedCheckIns] = React.useState<Set<number>>(new Set())
   const filtered = campers.filter(([name, , contact, phone]) => `${name} ${contact} ${phone}`.toLowerCase().includes(search.toLowerCase()))
   const checkInMatches = campers.map((camper, index) => ({ camper, index })).filter(({ camper }) => `${camper[0]} ${camper[2]} ${camper[3]} ${camper[6]}`.toLowerCase().includes(checkInSearch.toLowerCase()))
-  const openCheckIn = () => { const query = checkInSearch.trim(); if (!query) return; setSelectedCheckIns(new Set()); setCheckInOpen(true) }
+  const openCheckIn = () => { setSelectedCheckIns(new Set()); setCheckInOpen(true) }
   const handleTableAction = (event: React.MouseEvent<HTMLElement>) => {
     if (!(event.target instanceof HTMLElement)) return
     const row = event.target.closest("tr") as HTMLTableRowElement | null
