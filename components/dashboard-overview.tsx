@@ -74,7 +74,7 @@ function RowActions({ status, onUndo, onUndoCheckIn, onEdit }: { status: string;
       <DropdownMenuContent align="end" sideOffset={6} className="min-w-44">
         <DropdownMenuItem onSelect={onEdit}>Edit details</DropdownMenuItem>
         {checkedOut && <DropdownMenuItem onPointerDown={() => onUndo?.()} onSelect={() => onUndo?.()}>Undo check out</DropdownMenuItem>}
-        {status === "Registered" && <DropdownMenuItem onSelect={onUndoCheckIn}>Undo check in</DropdownMenuItem>}
+        {status === "Checked in" && <DropdownMenuItem onSelect={onUndoCheckIn}>Undo check in</DropdownMenuItem>}
         <DropdownMenuSeparator />
         <DropdownMenuItem className="text-destructive focus:text-destructive">Cancel registration</DropdownMenuItem>
       </DropdownMenuContent>
