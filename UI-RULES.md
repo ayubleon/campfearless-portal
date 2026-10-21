@@ -48,9 +48,9 @@
 ## Typography
 
 - All headings, labels, buttons, menu items and badges use **sentence case**: "Check in", "Issue exit permit", "Camp roster & status monitor".
-- `CardTitle` gets `className="text-lg"` (kept explicit so a style change can't silently enlarge titles). Its weight is `font-semibold`, set once in `ui/card.tsx` (nova default is medium), so every card title is bolder; never override it per card.
+- `CardTitle` gets `className="text-base"` (kept explicit so a style change can't silently change titles). Its weight is `font-bold`, set once in `ui/card.tsx`, so every card title, section heading (`<h3 className="text-base font-bold">`) and page title in the header is **16px and bold**, on the portal and on the public registration pages alike; never override it per card.
 - `CardDescription`: default (`text-sm text-muted-foreground`). One short sentence that says what the card does, about 100 characters at most and never more than one line on a desktop. How a rule works (what Matched means, who can see the page) goes behind an info button or in the review dialog, not in the description.
-- Dialog title: `text-base font-semibold leading-none tracking-tight`. Exception: destructive or irreversible confirmations use `text-lg` with an icon (see Dialogs).
+- Dialog title: `text-base font-bold leading-none tracking-tight` (16px bold, like every other title). Destructive or irreversible confirmations use the same size with the warning icon (see Dialogs).
 - Body text `text-sm`. Secondary text `text-muted-foreground`. Small meta and legends `text-xs text-muted-foreground`.
 - Emphasis inside muted text: `<strong className="text-foreground">`.
 - Dates with a time always use `formatDateTime` from `@/lib/format`: "20/10/26, 09:20 AM". Date-only fields use `dd/MM/yyyy`. Never `toLocaleString`, which shows month first on some machines.
@@ -114,7 +114,7 @@
 - Import from `@/ui/dialog`. Always pass `showCloseButton={false}` and render the close button inside the header:
   ```tsx
   <DialogHeader className="relative space-y-1 text-left">
-    <DialogTitle className="text-base font-semibold leading-none tracking-tight">Title</DialogTitle>
+    <DialogTitle className="text-base font-bold leading-none tracking-tight">Title</DialogTitle>
     <DialogDescription className="text-sm text-muted-foreground">One sentence.</DialogDescription>
     <Button type="button" variant="ghost" size="icon" aria-label="Close <dialog name>" className="absolute right-0 top-0" onClick={close}><X className="size-4" /></Button>
   </DialogHeader>
@@ -311,7 +311,7 @@ Actions inside a tab (Invite user, Add role) go in the `CardAction` of the card 
 2. Toggle dark mode with the header switch and check every badge, toast and tinted surface.
 3. Check the route's `loading.tsx` skeleton matches the finished page.
 4. Run `pnpm build` (`npx -y pnpm@10 build`) and fix anything it reports. That is what Vercel runs.
-5. Search the new code for hex values, `className` passed to `toast`, `CardTitle` without `text-lg`, and any title-case labels. Fix what you find.
+5. Search the new code for hex values, `className` passed to `toast`, `CardTitle` without `text-base`, and any title-case labels. Fix what you find.
 
 ## Shared links
 

@@ -16,7 +16,7 @@ export function RequirePermission({ permission, children }: { permission: string
     <main className="flex min-w-0 flex-1 flex-col gap-4 p-4 lg:p-6">
       <Card className="shadow-none">
         <CardHeader>
-          <CardTitle className="text-lg">You don&apos;t have access to this page</CardTitle>
+          <CardTitle className="text-base">You don&apos;t have access to this page</CardTitle>
           <CardDescription>The {user.role} role can&apos;t open it. Ask a Super admin if you need it.</CardDescription>
           <CardAction><Button asChild variant="outline"><Link href="/dashboard">Go to dashboard</Link></Button></CardAction>
         </CardHeader>

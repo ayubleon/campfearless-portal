@@ -71,7 +71,7 @@ function NameDialog({ state, networks, campuses, onClose, onSave }: { state: Nam
     <Dialog open onOpenChange={(next) => !next && onClose()}>
       <DialogContent showCloseButton={false} className="gap-0 sm:max-w-lg">
         <DialogHeader className="relative space-y-1 text-left">
-          <DialogTitle className="text-base font-semibold leading-none tracking-tight">{copy.title}</DialogTitle>
+          <DialogTitle className="text-base font-bold leading-none tracking-tight">{copy.title}</DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">{copy.description}</DialogDescription>
           <Button type="button" variant="ghost" size="icon" aria-label={`Close ${copy.title.toLowerCase()}`} className="absolute right-0 top-0" onClick={onClose}><X className="size-4" /></Button>
         </DialogHeader>
@@ -107,7 +107,7 @@ function DeleteDialog({ target, onCancel, onConfirm, onShowCampuses }: { target:
     <Dialog open={target !== null} onOpenChange={(next) => !next && onCancel()}>
       <DialogContent showCloseButton={false} className="gap-0 sm:max-w-lg">
         <DialogHeader className="relative space-y-1 text-left">
-          <DialogTitle className="flex items-center gap-2 pr-8 text-lg font-semibold leading-none tracking-tight"><AlertCircle className="text-destructive" />{blocked ? `Can't delete ${target?.name} yet` : `Delete ${target?.kind}?`}</DialogTitle>
+          <DialogTitle className="flex items-center gap-2 pr-8 text-base font-bold leading-none tracking-tight"><AlertCircle className="text-destructive" />{blocked ? `Can't delete ${target?.name} yet` : `Delete ${target?.kind}?`}</DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">
             {blocked
               ? <>It still has <strong className="text-foreground">{plural(target?.campuses ?? 0, "campus")}</strong>. Move them to another network first, then delete it.</>
@@ -139,7 +139,7 @@ function MoveDialog({ campus, networks, onClose, onMove }: { campus: Campus | nu
     <Dialog open={campus !== null} onOpenChange={(next) => !next && onClose()}>
       <DialogContent showCloseButton={false} className="gap-0 sm:max-w-lg">
         <DialogHeader className="relative space-y-1 text-left">
-          <DialogTitle className="text-base font-semibold leading-none tracking-tight">Move campus</DialogTitle>
+          <DialogTitle className="text-base font-bold leading-none tracking-tight">Move campus</DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">Reports count <strong className="text-foreground">{campus?.name}</strong>&apos;s campers under the new network.</DialogDescription>
           <Button type="button" variant="ghost" size="icon" aria-label="Close move campus" className="absolute right-0 top-0" onClick={onClose}><X className="size-4" /></Button>
         </DialogHeader>
@@ -236,7 +236,7 @@ export function CampusesAndNetworksScreen() {
         <TabsContent value="networks">
           <Card className="min-w-0 shadow-none">
             <CardHeader>
-              <CardTitle className="text-lg">Networks</CardTitle>
+              <CardTitle className="text-base">Networks</CardTitle>
               <CardDescription>Networks group campuses for reports. Shared by MYF and MYA.</CardDescription>
               <CardAction><Button type="button" onClick={() => setNameDialog({ kind: "add-network" })}><IconPlus />Add network</Button></CardAction>
             </CardHeader>
@@ -248,7 +248,7 @@ export function CampusesAndNetworksScreen() {
                     <section key={network.id} className="flex min-w-0 flex-col overflow-hidden rounded-xl border">
                       <div className="flex items-start justify-between gap-6 p-4">
                         <div className="flex flex-col gap-1">
-                          <h3 className="text-base font-semibold leading-none">{network.name}</h3>
+                          <h3 className="text-base font-bold leading-none">{network.name}</h3>
                           <p className="text-sm text-muted-foreground tabular-nums">{plural(members.length, "campus")}</p>
                         </div>
                         <MoreMenu label={`More actions for ${network.name}`}>
@@ -274,7 +274,7 @@ export function CampusesAndNetworksScreen() {
         <TabsContent value="campuses">
           <Card className="min-w-0 shadow-none">
             <CardHeader>
-              <CardTitle className="text-lg">Campuses</CardTitle>
+              <CardTitle className="text-base">Campuses</CardTitle>
               <CardDescription>Every campus campers can choose when they register. Changes apply to every report.</CardDescription>
               <CardAction><Button type="button" onClick={() => setNameDialog({ kind: "add-campus" })}><IconPlus />Add campus</Button></CardAction>
             </CardHeader>

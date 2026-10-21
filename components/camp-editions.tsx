@@ -33,7 +33,7 @@ function EditionDialog({ edition, names, pending, onClose, onSave }: { edition: 
     <Dialog open onOpenChange={(next) => { if (!next) onClose() }}>
       <DialogContent showCloseButton={false} className="gap-4 p-4 sm:max-w-lg sm:p-6">
         <DialogHeader className="relative space-y-1 text-left">
-          <DialogTitle className="text-base font-semibold leading-none tracking-tight">{edition ? "Rename edition" : "New edition"}</DialogTitle>
+          <DialogTitle className="text-base font-bold leading-none tracking-tight">{edition ? "Rename edition" : "New edition"}</DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">Name it however you plan your camps, such as Easter 2026 or December 2026. Camp dates are set in each camp's own setup card.</DialogDescription>
           <Button type="button" variant="ghost" size="icon" aria-label="Close edition dialog" className="absolute right-0 top-0" onClick={onClose}><X className="size-4" /></Button>
         </DialogHeader>
@@ -80,7 +80,7 @@ export function EditionsCard({ canEdit = true }: { canEdit?: boolean }) {
   return (
     <Card className="min-w-0 shadow-none">
       <CardHeader>
-        <CardTitle className="text-lg">Camp editions</CardTitle>
+        <CardTitle className="text-base">Camp editions</CardTitle>
         <CardDescription>One run of the camps. Registrations, payments and waivers belong to the edition they were made in.</CardDescription>
         {canEdit && <CardAction><Button type="button" variant="outline" onClick={() => setEditing("new")}>New edition</Button></CardAction>}
       </CardHeader>
@@ -155,7 +155,7 @@ export function EditionsCard({ canEdit = true }: { canEdit?: boolean }) {
       <Dialog open={switching !== null} onOpenChange={(next) => { if (!next) setSwitching(null) }}>
         <DialogContent showCloseButton={false} className="gap-0 sm:max-w-lg">
           <DialogHeader className="relative space-y-1 text-left">
-            <DialogTitle className="flex items-center gap-2 pr-10 text-lg font-semibold leading-none tracking-tight"><AlertCircle className="text-destructive" />Open {switching?.name} and close {openOne?.name}?</DialogTitle>
+            <DialogTitle className="flex items-center gap-2 pr-10 text-base font-bold leading-none tracking-tight"><AlertCircle className="text-destructive" />Open {switching?.name} and close {openOne?.name}?</DialogTitle>
             <DialogDescription className="text-sm text-muted-foreground">
               Only one edition is open at a time. <strong className="text-foreground">{openOne?.name}</strong> becomes read-only: registration, check-in, waivers and payment verification stop for it. Its records stay in Reports.
             </DialogDescription>
@@ -171,7 +171,7 @@ export function EditionsCard({ canEdit = true }: { canEdit?: boolean }) {
       <Dialog open={closing !== null} onOpenChange={(next) => { if (!next) setClosing(null) }}>
         <DialogContent showCloseButton={false} className="gap-0 sm:max-w-lg">
           <DialogHeader className="relative space-y-1 text-left">
-            <DialogTitle className="flex items-center gap-2 pr-10 text-lg font-semibold leading-none tracking-tight"><AlertCircle className="text-destructive" />Close {closing?.name}?</DialogTitle>
+            <DialogTitle className="flex items-center gap-2 pr-10 text-base font-bold leading-none tracking-tight"><AlertCircle className="text-destructive" />Close {closing?.name}?</DialogTitle>
             <DialogDescription className="text-sm text-muted-foreground">
               <strong className="text-foreground">{closing?.name}</strong> becomes read-only. Registration, check-in, waivers and payment verification stop for it, and its welcome page link stops taking sign-ups. Its records stay in Reports, and you can reopen it later.
             </DialogDescription>

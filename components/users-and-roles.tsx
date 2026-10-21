@@ -32,7 +32,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/tabs"
 function DialogTop({ title, description, onClose, closeLabel }: { title: React.ReactNode; description: React.ReactNode; onClose: () => void; closeLabel: string }) {
   return (
     <DialogHeader className="relative space-y-1 text-left">
-      <DialogTitle className="text-base font-semibold leading-none tracking-tight">{title}</DialogTitle>
+      <DialogTitle className="text-base font-bold leading-none tracking-tight">{title}</DialogTitle>
       <DialogDescription className="text-sm text-muted-foreground">{description}</DialogDescription>
       <Button type="button" variant="ghost" size="icon" aria-label={closeLabel} className="absolute right-0 top-0" onClick={onClose}><X className="size-4" /></Button>
     </DialogHeader>
@@ -45,7 +45,7 @@ function ConfirmDialog({ open, title, description, confirmLabel, showCancel = tr
     <Dialog open={open} onOpenChange={(next) => !next && onCancel()}>
       <DialogContent showCloseButton={false} className="gap-0 sm:max-w-lg">
         <DialogHeader className="relative space-y-1 text-left">
-          <DialogTitle className="flex items-center gap-2 pr-8 text-lg font-semibold leading-none tracking-tight"><AlertCircle className="text-destructive" />{title}</DialogTitle>
+          <DialogTitle className="flex items-center gap-2 pr-8 text-base font-bold leading-none tracking-tight"><AlertCircle className="text-destructive" />{title}</DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">{description}</DialogDescription>
           <Button type="button" variant="ghost" size="icon" aria-label="Close confirmation" className="absolute right-0 top-0" onClick={onCancel}><X className="size-4" /></Button>
         </DialogHeader>
@@ -241,7 +241,7 @@ export function UsersAndRolesScreen() {
         <TabsContent value="users">
           <Card className="min-w-0 shadow-none">
             <CardHeader>
-              <CardTitle className="text-lg">Users</CardTitle>
+              <CardTitle className="text-base">Users</CardTitle>
               <CardDescription>Everyone with an account. Deactivating a user blocks sign in but keeps their history.</CardDescription>
               <CardAction><Button type="button" onClick={() => setInviteOpen(true)}><IconUserPlus />Invite user</Button></CardAction>
             </CardHeader>
@@ -361,7 +361,7 @@ export function UsersAndRolesScreen() {
         <TabsContent value="roles" className="flex flex-col gap-4">
           <Card className="min-w-0 shadow-none">
             <CardHeader>
-              <CardTitle className="text-lg">Roles</CardTitle>
+              <CardTitle className="text-base">Roles</CardTitle>
               <CardDescription>Roles with system access can sign in. The others only tag people, like teams.</CardDescription>
               <CardAction><Button type="button" onClick={() => setRoleDialog({ role: null })}><IconPlus />Add role</Button></CardAction>
             </CardHeader>
@@ -432,7 +432,7 @@ export function UsersAndRolesScreen() {
 
           <Card className="min-w-0 shadow-none">
             <CardHeader>
-              <CardTitle className="text-lg">Permissions by role</CardTitle>
+              <CardTitle className="text-base">Permissions by role</CardTitle>
               <CardDescription>Only roles with system access appear here. Ticks save straight away.</CardDescription>
             </CardHeader>
             <CardContent>

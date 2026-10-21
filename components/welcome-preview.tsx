@@ -95,7 +95,7 @@ export function WelcomePreviewDialog({ open, camps, onClose }: { open: boolean; 
     <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
       <DialogContent showCloseButton={false} className="max-h-[calc(100dvh-2rem)] grid-cols-1 grid-rows-[auto_minmax(0,1fr)] gap-4 p-4 sm:max-w-4xl sm:p-6">
         <DialogHeader className="relative space-y-1 pr-10 text-left">
-          <DialogTitle className="text-base font-semibold leading-none tracking-tight">Preview welcome page</DialogTitle>
+          <DialogTitle className="text-base font-bold leading-none tracking-tight">Preview welcome page</DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">How campers will see it, using what is typed here. Nothing is saved until you save.</DialogDescription>
           <Button type="button" variant="ghost" size="icon" aria-label="Close preview" className="absolute right-0 top-0" onClick={onClose}><X className="size-4" /></Button>
         </DialogHeader>

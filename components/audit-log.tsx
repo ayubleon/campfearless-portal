@@ -158,7 +158,7 @@ export function AuditLogScreen({ initialQuery = "", initialCamp = "all", initial
     <main className="flex min-w-0 flex-1 flex-col gap-4 p-4 lg:p-6">
       <Card className="min-w-0 shadow-none">
         <CardHeader className="gap-1">
-          <CardTitle className="text-lg">System activity</CardTitle>
+          <CardTitle className="text-base">System activity</CardTitle>
           <CardDescription>Every change made in the portal, newest first; entries can't be edited or deleted.</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
@@ -259,7 +259,7 @@ export function AuditLogScreen({ initialQuery = "", initialCamp = "all", initial
       <Dialog open={open !== null} onOpenChange={(next) => !next && setOpen(null)}>
         <DialogContent showCloseButton={false} className="gap-0 sm:max-w-lg">
           <DialogHeader className="relative space-y-1 text-left">
-            <DialogTitle className="text-base font-semibold leading-none tracking-tight">{open?.action}</DialogTitle>
+            <DialogTitle className="text-base font-bold leading-none tracking-tight">{open?.action}</DialogTitle>
             <DialogDescription className="text-sm text-muted-foreground">
               <strong className="text-foreground">{open?.subject}</strong> by {open?.user}{open?.removed ? " (removed)" : ""}, <span className="tabular-nums">{open ? formatDateTime(open.at) : ""}</span>
             </DialogDescription>

@@ -51,7 +51,7 @@ export function AccountScreen() {
     <main className="flex min-w-0 flex-1 flex-col gap-4 p-4 lg:p-6">
       <Card className="shadow-none">
         <CardHeader>
-          <CardTitle className="text-lg">Profile</CardTitle>
+          <CardTitle className="text-base">Profile</CardTitle>
           <CardDescription>Your details as other people see them in the portal.</CardDescription>
           {!editing && <CardAction><Button variant="outline" onClick={() => setDraft({ ...saved })}>Edit</Button></CardAction>}
         </CardHeader>
@@ -94,7 +94,7 @@ export function AccountScreen() {
 
       <Card className="shadow-none">
         <CardHeader>
-          <CardTitle className="text-lg">Password</CardTitle>
+          <CardTitle className="text-base">Password</CardTitle>
           <CardDescription>Use a password you don't use anywhere else.</CardDescription>
           <CardAction><Button variant="outline" onClick={() => setChangingPassword(true)}>Change password</Button></CardAction>
         </CardHeader>
@@ -106,7 +106,7 @@ export function AccountScreen() {
       <Dialog open={reviewing} onOpenChange={setReviewing}>
         <DialogContent showCloseButton={false} className="sm:max-w-lg">
           <DialogHeader className="relative space-y-1 text-left">
-            <DialogTitle className="text-base font-semibold leading-none tracking-tight">Review profile changes</DialogTitle>
+            <DialogTitle className="text-base font-bold leading-none tracking-tight">Review profile changes</DialogTitle>
             <DialogDescription className="text-sm text-muted-foreground">Check these changes before you save them.</DialogDescription>
             <Button type="button" variant="ghost" size="icon" aria-label="Close review dialog" className="absolute right-0 top-0" onClick={() => setReviewing(false)}><X className="size-4" /></Button>
           </DialogHeader>
@@ -155,7 +155,7 @@ function PasswordDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent showCloseButton={false} className="gap-4 p-4 sm:max-w-lg sm:p-6">
         <DialogHeader className="relative space-y-1 text-left">
-          <DialogTitle className="text-base font-semibold leading-none tracking-tight">Change password</DialogTitle>
+          <DialogTitle className="text-base font-bold leading-none tracking-tight">Change password</DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">Enter your current password, then choose a new one.</DialogDescription>
           <Button type="button" variant="ghost" size="icon" aria-label="Close change password" className="absolute right-0 top-0" onClick={() => onOpenChange(false)}><X className="size-4" /></Button>
         </DialogHeader>

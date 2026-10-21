@@ -70,7 +70,7 @@ function IssueDialog({ open, pending, onClose, onIssue }: { open: boolean; pendi
     <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
       <DialogContent showCloseButton={false} className="max-h-[calc(100dvh-2rem)] grid-rows-[auto_minmax(0,1fr)] gap-4 bg-background p-4 sm:max-w-4xl sm:p-6">
         <DialogHeader className="relative space-y-1 text-left">
-          <DialogTitle className="text-base font-semibold leading-none tracking-tight">Issue full waiver</DialogTitle>
+          <DialogTitle className="text-base font-bold leading-none tracking-tight">Issue full waiver</DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">The camper is registered with a fee of KES 0. Check them in now if they are at the desk.</DialogDescription>
           <Button type="button" variant="ghost" size="icon" aria-label="Close issue waiver" className="absolute right-0 top-0" onClick={onClose}><X className="size-4" /></Button>
         </DialogHeader>
@@ -83,11 +83,11 @@ function IssueDialog({ open, pending, onClose, onIssue }: { open: boolean; pendi
               </TabsList>
             </Tabs>
             <section className="pt-2">
-              <h3 className="mb-3 text-base font-semibold">Camper details</h3>
+              <h3 className="mb-3 text-base font-bold">Camper details</h3>
               <CamperFields camp={camp} camper={camper} id="waiver-camper" onChange={(patch) => setCamper((current) => ({ ...current, ...patch }))} />
             </section>
             <section className="pt-6">
-              <h3 className="mb-3 text-base font-semibold">Emergency contact</h3>
+              <h3 className="mb-3 text-base font-bold">Emergency contact</h3>
               <ContactFields camp={camp} contact={contact} campers={1} onChange={(patch) => setContact((current) => ({ ...current, ...patch }))} />
             </section>
             <label className="mt-2 flex cursor-pointer flex-col gap-2 rounded-2xl border bg-muted/30 p-4 text-sm">
@@ -165,7 +165,7 @@ export function WaiversScreen() {
       <EditionScope>
       <Card className="min-w-0 shadow-none">
         <CardHeader>
-          <CardTitle className="text-lg">Full waivers</CardTitle>
+          <CardTitle className="text-base">Full waivers</CardTitle>
           <CardDescription>Register campers with a fee of KES 0, at the desk or in advance.</CardDescription>
           <CardAction><Button type="button" onClick={() => setIssuing(true)}><IconTicket />Issue waiver</Button></CardAction>
         </CardHeader>

@@ -97,7 +97,7 @@ export function LoginForm({
     <Dialog open={resetOpen} onOpenChange={setResetOpen}>
       <DialogContent showCloseButton={false} className="sm:max-w-lg">
         <DialogHeader className="relative space-y-1 text-left">
-          <DialogTitle className="text-base font-semibold leading-none tracking-tight">Reset your password</DialogTitle>
+          <DialogTitle className="text-base font-bold leading-none tracking-tight">Reset your password</DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">Enter your email and we'll send you a link to choose a new password.</DialogDescription>
           <Button type="button" variant="ghost" size="icon" aria-label="Close reset password" className="absolute right-0 top-0" onClick={() => setResetOpen(false)}><X className="size-4" /></Button>
         </DialogHeader>

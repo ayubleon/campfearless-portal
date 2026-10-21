@@ -24,7 +24,7 @@ export function UndoOverlay({ title, description, onUndo, onDone, duration = 500
     <Dialog open onOpenChange={(open) => { if (!open) onDone() }}>
       <DialogContent showCloseButton={false} className="sm:max-w-lg">
         <DialogHeader className="relative space-y-1 pr-10 text-left">
-          <DialogTitle className="text-base font-semibold leading-none tracking-tight">{title}</DialogTitle>
+          <DialogTitle className="text-base font-bold leading-none tracking-tight">{title}</DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">{description}</DialogDescription>
           <Button type="button" variant="ghost" size="icon" aria-label="Dismiss confirmation" className="absolute right-0 top-0" onClick={onDone}><X className="size-4" /></Button>
         </DialogHeader>

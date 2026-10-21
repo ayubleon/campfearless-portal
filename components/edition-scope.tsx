@@ -13,7 +13,7 @@ export function EditionScope({ children }: { children: React.ReactNode }) {
     return (
       <Card className="shadow-none">
         <CardHeader>
-          <CardTitle className="text-lg">No edition is open</CardTitle>
+          <CardTitle className="text-base">No edition is open</CardTitle>
           <CardDescription>Open or create an edition in Camp setup to register campers, issue waivers and verify payments.</CardDescription>
           <CardAction>
             <Button asChild variant="outline">

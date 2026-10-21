@@ -189,7 +189,7 @@ export function SummaryImageDialog({ open, items, scopeLabel, onClose }: { open:
     <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
       <DialogContent showCloseButton={false} className="max-h-[calc(100dvh-2rem)] grid-cols-1 grid-rows-[auto_minmax(0,1fr)] gap-4 p-4 sm:max-w-3xl sm:p-6">
         <DialogHeader className="relative space-y-1 pr-10 text-left">
-          <DialogTitle className="text-base font-semibold leading-none tracking-tight">Quick summary image</DialogTitle>
+          <DialogTitle className="text-base font-bold leading-none tracking-tight">Quick summary image</DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">A snapshot you can save or share. It shows when it was created.</DialogDescription>
           <Button type="button" variant="ghost" size="icon" aria-label="Close summary image" className="absolute right-0 top-0" onClick={onClose}><X className="size-4" /></Button>
         </DialogHeader>

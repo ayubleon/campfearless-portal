@@ -12,7 +12,7 @@ function LeaveDialog({ href, unsaved, onStay, onLeave }: { href: string | null; 
     <Dialog open={href !== null} onOpenChange={(open) => !open && onStay()}>
       <DialogContent showCloseButton={false} className="gap-0 sm:max-w-lg">
         <DialogHeader className="relative space-y-1 text-left">
-          <DialogTitle className="flex items-center gap-2 text-lg font-semibold leading-none tracking-tight"><AlertCircle className="text-destructive" />Leave without saving?</DialogTitle>
+          <DialogTitle className="flex items-center gap-2 text-base font-bold leading-none tracking-tight"><AlertCircle className="text-destructive" />Leave without saving?</DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">You have unsaved changes to <strong className="text-foreground">{unsaved.join(" and ")}</strong>. Leaving this page will discard them.</DialogDescription>
           <Button type="button" variant="ghost" size="icon" aria-label="Close leave page dialog" className="absolute right-0 top-0" onClick={onStay}><X className="size-4" /></Button>
         </DialogHeader>

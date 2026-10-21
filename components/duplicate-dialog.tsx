@@ -17,7 +17,7 @@ export function DuplicateDialog({ state, onClose }: { state: DuplicateState | nu
     <Dialog open={state !== null} onOpenChange={(next) => { if (!next) onClose() }}>
       <DialogContent showCloseButton={false} className="gap-0 sm:max-w-lg">
         <DialogHeader className="relative space-y-1 text-left">
-          <DialogTitle className="flex items-center gap-2 pr-10 text-lg font-semibold leading-none tracking-tight"><AlertCircle className="text-destructive" />{blocked ? "Already registered" : "Possible duplicate"}</DialogTitle>
+          <DialogTitle className="flex items-center gap-2 pr-10 text-base font-bold leading-none tracking-tight"><AlertCircle className="text-destructive" />{blocked ? "Already registered" : "Possible duplicate"}</DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">
             {blocked ? "The same person can't be registered twice in one edition. Check the existing record instead." : "Check these before you continue. If it is a different person, you can register them."}
           </DialogDescription>

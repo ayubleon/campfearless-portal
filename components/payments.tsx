@@ -128,7 +128,7 @@ export function PaymentsScreen() {
       <EditionScope>
       <Card className="min-w-0 shadow-none">
         <CardHeader>
-          <CardTitle className="text-lg">Verify M-Pesa payments</CardTitle>
+          <CardTitle className="text-base">Verify M-Pesa payments</CardTitle>
           <CardDescription>Type the amount from each M-Pesa message, then verify it when it matches.</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
@@ -266,7 +266,7 @@ export function PaymentsScreen() {
       <Dialog open={verifying !== null} onOpenChange={(open) => !open && setVerifying(null)}>
         <DialogContent showCloseButton={false} className="gap-0 sm:max-w-lg">
           <DialogHeader className="relative space-y-1 text-left">
-            <DialogTitle className="text-base font-semibold leading-none tracking-tight">Verify payment?</DialogTitle>
+            <DialogTitle className="text-base font-bold leading-none tracking-tight">Verify payment?</DialogTitle>
             <DialogDescription className="text-sm text-muted-foreground">
               <strong className="text-foreground">{verifying?.code}</strong> for {verifying?.people.map((person) => person.name).join(", ")} will be marked <strong className="text-foreground">Verified</strong> at KES {verifying ? formatNumber(verifying.expected) : 0}. You can reopen it later.
             </DialogDescription>

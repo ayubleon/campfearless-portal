@@ -144,7 +144,7 @@ export function CamperFields({ camp, camper, id, onChange }: { camp: Camp; campe
     </div>
 
     <section className="pt-6">
-      <h3 className="text-base font-semibold">Church campus</h3>
+      <h3 className="text-base font-bold">Church campus</h3>
       <p className="mb-3 text-sm text-muted-foreground">Drives the campus and network breakdowns</p>
       <div className="grid gap-4 sm:grid-cols-3">
         <Choice label="Are you from Mavuno?" options={["Yes", "No"]} value={camper.fromMavuno} onChange={(fromMavuno) => onChange({ fromMavuno, campus: "", church: "" })} />
@@ -162,7 +162,7 @@ export function CamperFields({ camp, camper, id, onChange }: { camp: Camp; campe
     </section>
 
     <section className="pt-6">
-      <h3 className="text-base font-semibold">Medical and special needs</h3>
+      <h3 className="text-base font-bold">Medical and special needs</h3>
       <p className="mb-3 text-sm text-muted-foreground">{medicalSubtitle}</p>
       <div className="flex flex-col gap-4">
         <OptionCard
@@ -197,7 +197,7 @@ function CamperCard({ camp, camper, number, total, onChange }: { camp: Camp; cam
   return (
     <Card className="min-w-0 shadow-none">
       <CardHeader>
-        <CardTitle className="text-lg">Camper details</CardTitle>
+        <CardTitle className="text-base">Camper details</CardTitle>
         <CardDescription>Fill in the details as on their legal documents. Only medical and special needs are optional.</CardDescription>
         <CardAction><span className="text-sm text-attention tabular-nums">Camper {number}/{total}</span></CardAction>
       </CardHeader>
@@ -321,7 +321,7 @@ export function RegistrationScreen() {
         <div className="flex min-w-0 flex-col gap-4">
           <Card className="min-w-0 shadow-none">
             <CardHeader>
-              <CardTitle className="text-lg">Select number of campers</CardTitle>
+              <CardTitle className="text-base">Select number of campers</CardTitle>
               <CardDescription>How many attendees are you registering in this batch?</CardDescription>
               <CardAction>
                 <div className="flex items-center gap-2">
@@ -337,7 +337,7 @@ export function RegistrationScreen() {
 
           <Card className="min-w-0 shadow-none">
             <CardHeader>
-              <CardTitle className="text-lg">Emergency contact</CardTitle>
+              <CardTitle className="text-base">Emergency contact</CardTitle>
               <CardDescription>Held in case of an emergency on site</CardDescription>
             </CardHeader>
             <CardContent>
@@ -348,7 +348,7 @@ export function RegistrationScreen() {
 
         <Card className="min-w-0 shadow-none @7xl:sticky @7xl:top-4">
           <CardHeader>
-            <CardTitle className="text-lg">Payment</CardTitle>
+            <CardTitle className="text-base">Payment</CardTitle>
             <CardDescription>Finish your registration by sending payment via M-Pesa. You&apos;ll get a confirmation code via SMS.</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">

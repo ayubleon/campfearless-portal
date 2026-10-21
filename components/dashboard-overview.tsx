@@ -130,7 +130,7 @@ function DonutCard({
   return (
     <Card className="min-w-0">
       <CardHeader>
-        <CardTitle className="text-lg">{title}</CardTitle>
+        <CardTitle className="text-base">{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent>
@@ -168,7 +168,7 @@ function QuickSummary({ scope, editionId }: { scope: CampScope; editionId: strin
   return (
     <Card className="min-w-0 overflow-hidden">
       <CardHeader>
-        <CardTitle className="text-lg">Quick summary</CardTitle>
+        <CardTitle className="text-base">Quick summary</CardTitle>
         <CardDescription>{scope === "all" ? "A summary of campers data" : `A summary of ${scope} campers data`}</CardDescription>
         <CardAction>
           <Tooltip>
@@ -415,7 +415,7 @@ export function DashboardOverview() {
         <Dialog open={checkInOpen} onOpenChange={setCheckInOpen}>
           <DialogContent showCloseButton={false} className="gap-0 p-4 sm:max-w-xl">
             <DialogHeader className="relative space-y-1 text-left">
-              <DialogTitle className="text-base font-semibold leading-none tracking-tight">Check-in online registrant</DialogTitle>
+              <DialogTitle className="text-base font-bold leading-none tracking-tight">Check-in online registrant</DialogTitle>
               <DialogDescription className="text-sm text-muted-foreground">
                 Search string:{" "}
                 <span className="ml-1 rounded bg-muted px-3 py-1 text-muted-foreground">{checkInSearch || "All registrations"}</span>
@@ -555,7 +555,7 @@ export function DashboardOverview() {
           <section className={cn("grid gap-4", can("check-in") && can("register") && "lg:grid-cols-2")}>
             {can("check-in") && <Card className="flex flex-col shadow-none">
               <CardHeader>
-                <CardTitle className="text-lg">Check-in online registrant</CardTitle>
+                <CardTitle className="text-base">Check-in online registrant</CardTitle>
                 <CardDescription>Lookup camper&apos;s name, M-Pesa code or phone number to instantly check them in.</CardDescription>
               </CardHeader>
               <CardContent className="mt-auto flex items-center gap-3">
@@ -577,7 +577,7 @@ export function DashboardOverview() {
             </Card>}
             {can("register") && <Card className="flex flex-col shadow-none">
               <CardHeader>
-                <CardTitle className="text-lg">Walk-in registration</CardTitle>
+                <CardTitle className="text-base">Walk-in registration</CardTitle>
                 <CardDescription>
                   Capture full camper details. Walk-ins are auto-checked in as present upon payment verification.
                 </CardDescription>
@@ -591,7 +591,7 @@ export function DashboardOverview() {
           </section>
           <Card className="shadow-none">
             <CardHeader className="gap-1">
-              <CardTitle className="text-lg">Camp roster &amp; status monitor</CardTitle>
+              <CardTitle className="text-base">Camp roster &amp; status monitor</CardTitle>
               <CardDescription>Manage attendees, filter by campus or status, or process early exit permits.</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
@@ -755,7 +755,7 @@ export function DashboardOverview() {
         ) : (
           <Card className="shadow-none">
             <CardHeader>
-              <CardTitle className="text-lg">{editionLabel(editionId)} is closed</CardTitle>
+              <CardTitle className="text-base">{editionLabel(editionId)} is closed</CardTitle>
               <CardDescription>Check-in, walk-in registration and exit permits are off. Its records stay in Reports.</CardDescription>
               <CardAction>
                 <Button asChild variant="outline">
@@ -768,7 +768,7 @@ export function DashboardOverview() {
         <Dialog open={undoing !== null} onOpenChange={(open) => !open && setUndoing(null)}>
           <DialogContent showCloseButton={false} className="gap-0 sm:max-w-lg">
             <DialogHeader className="relative space-y-1 text-left">
-              <DialogTitle className="flex items-center gap-2 pr-10 text-lg font-semibold leading-none tracking-tight"><AlertCircle className="text-destructive" />{undoing?.kind === "check-out" ? "Undo check out?" : "Undo check in?"}</DialogTitle>
+              <DialogTitle className="flex items-center gap-2 pr-10 text-base font-bold leading-none tracking-tight"><AlertCircle className="text-destructive" />{undoing?.kind === "check-out" ? "Undo check out?" : "Undo check in?"}</DialogTitle>
               <DialogDescription className="text-sm text-muted-foreground">
                 {undoing?.kind === "check-out"
                   ? <><strong className="text-foreground">{undoing.camper.name}</strong> left with an exit permit{exitPermitTimes[undoing.camper.id] ? ` at ${exitPermitTimes[undoing.camper.id]}` : ""}. This marks them as on site again.</>
@@ -799,7 +799,7 @@ export function DashboardOverview() {
         <Dialog open={cancelling !== null} onOpenChange={(open) => !open && setCancelling(null)}>
           <DialogContent showCloseButton={false} className="gap-0 sm:max-w-lg">
             <DialogHeader className="relative space-y-1 text-left">
-              <DialogTitle className="flex items-center gap-2 pr-10 text-lg font-semibold leading-none tracking-tight"><AlertCircle className="text-destructive" />Cancel registration?</DialogTitle>
+              <DialogTitle className="flex items-center gap-2 pr-10 text-base font-bold leading-none tracking-tight"><AlertCircle className="text-destructive" />Cancel registration?</DialogTitle>
               <DialogDescription className="text-sm text-muted-foreground">
                 <strong className="text-foreground">{cancelling?.name}</strong> is removed from the roster and their spot is freed. Their payment stays on record for follow-up.
               </DialogDescription>
@@ -817,7 +817,7 @@ export function DashboardOverview() {
             className="max-h-[calc(100dvh-2rem)] grid-rows-[auto_minmax(0,1fr)] gap-4 bg-background p-4 sm:max-w-4xl sm:p-6"
           >
             <DialogHeader className="relative space-y-1 text-left">
-              <DialogTitle className="text-base font-semibold leading-none tracking-tight">Edit camper details</DialogTitle>
+              <DialogTitle className="text-base font-bold leading-none tracking-tight">Edit camper details</DialogTitle>
               <DialogDescription className="text-sm text-muted-foreground">
                 Fill in your details as per your legal documents
               </DialogDescription>
@@ -912,7 +912,7 @@ export function DashboardOverview() {
                     </div>
                   </div>
                   <section className="pt-6">
-                    <h3 className="text-base font-semibold">Medical and special needs</h3>
+                    <h3 className="text-base font-bold">Medical and special needs</h3>
                     <p className="mb-3 text-sm text-muted-foreground">{medicalSubtitle}</p>
                     <div className="flex flex-col gap-4">
                       <label className="flex cursor-pointer flex-col gap-2 rounded-2xl border bg-muted/30 p-4 text-sm transition-colors focus-within:border-ring focus-within:ring-1 focus-within:ring-ring/20">
@@ -1022,7 +1022,7 @@ export function DashboardOverview() {
         <Dialog open={Boolean(exitPermitCamper)} onOpenChange={(open) => !open && setExitPermitCamper(null)}>
           <DialogContent showCloseButton={false} className="gap-0 sm:max-w-lg">
             <DialogHeader className="gap-3 text-left">
-              <DialogTitle className="flex items-center gap-2 text-lg">
+              <DialogTitle className="flex items-center gap-2 text-base font-bold">
                 <AlertCircle className="text-destructive" data-icon="inline-start" />
                 Issue early exit permit
               </DialogTitle>

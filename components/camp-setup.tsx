@@ -169,7 +169,7 @@ function ReviewDialog({ open, title, changes, warnings, pending, onCancel, onCon
     <Dialog open={open} onOpenChange={(next) => !next && onCancel()}>
       <DialogContent showCloseButton={false} className="gap-0 sm:max-w-lg">
         <DialogHeader className="relative space-y-1 text-left">
-          <DialogTitle className="text-base font-semibold leading-none tracking-tight">{title}</DialogTitle>
+          <DialogTitle className="text-base font-bold leading-none tracking-tight">{title}</DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">Check these changes before you save them.</DialogDescription>
           <Button type="button" variant="ghost" size="icon" aria-label="Close review changes" className="absolute right-0 top-0" onClick={onCancel}><X className="size-4" /></Button>
         </DialogHeader>
@@ -234,7 +234,7 @@ export function SetupCard<T>({ title, description, saved, fields, saveLabel, suc
   return (
     <Card className="shadow-none">
       <CardHeader>
-        <CardTitle className="text-lg">{title}</CardTitle>
+        <CardTitle className="text-base">{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
         {headerExtra}
         {(headerAction || (canEdit && !editing)) && (

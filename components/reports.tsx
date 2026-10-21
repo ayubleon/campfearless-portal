@@ -158,7 +158,7 @@ function TitleCard({ title, onTitle, count, total, onPreview, children }: { titl
   return (
     <Card className="min-w-0 shadow-none print:hidden">
       <CardHeader>
-        <CardTitle className="text-lg">Report title</CardTitle>
+        <CardTitle className="text-base">Report title</CardTitle>
         <CardDescription>Built from your filters. Edit it before printing.</CardDescription>
         {can("print-records") && <CardAction><Button type="button" disabled={count === 0} onClick={onPreview}><IconPrinter />Print report</Button></CardAction>}
       </CardHeader>
@@ -236,7 +236,7 @@ function PrintPreview({ open, data, onClose }: { open: boolean; data: PrintData;
       <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
         <DialogContent showCloseButton={false} className="max-h-[calc(100dvh-2rem)] grid-cols-1 grid-rows-[auto_minmax(0,1fr)] gap-4 bg-background p-4 sm:max-w-6xl sm:p-6 print:hidden">
           <DialogHeader className="relative space-y-1 text-left">
-            <DialogTitle className="text-base font-semibold leading-none tracking-tight">Print preview</DialogTitle>
+            <DialogTitle className="text-base font-bold leading-none tracking-tight">Print preview</DialogTitle>
             <DialogDescription className="text-sm text-muted-foreground">Check the report before you print it. Long values wrap onto a second line on paper.</DialogDescription>
             <Button type="button" variant="ghost" size="icon" aria-label="Close print preview" className="absolute right-0 top-0" onClick={onClose}><X className="size-4" /></Button>
           </DialogHeader>
@@ -337,7 +337,7 @@ function CampersReport() {
     <>
       <Card className="min-w-0 shadow-none print:hidden">
         <CardHeader>
-          <CardTitle className="text-lg">Camp roster & status monitor</CardTitle>
+          <CardTitle className="text-base">Camp roster & status monitor</CardTitle>
           <CardDescription>Filter, review and print camper records.</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
@@ -524,7 +524,7 @@ function AgeReport() {
     <>
       <Card className="min-w-0 shadow-none print:hidden">
         <CardHeader>
-          <CardTitle className="text-lg">Age and gender</CardTitle>
+          <CardTitle className="text-base">Age and gender</CardTitle>
           <CardDescription>List campers by age, gender, campus and camp.</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
@@ -748,7 +748,7 @@ function FacilitatorsReport() {
     <>
       <Card className="min-w-0 shadow-none print:hidden">
         <CardHeader>
-          <CardTitle className="text-lg">Facilitator roster & status monitor</CardTitle>
+          <CardTitle className="text-base">Facilitator roster & status monitor</CardTitle>
           <CardDescription>Filter, review and print facilitator records by team.</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
