@@ -6,6 +6,8 @@ import {
   SidebarProvider,
 } from '@/ui/sidebar'
 
+export const metadata = { title: 'Audit log' }
+
 export default async function Page({ searchParams }: { searchParams: Promise<{ q?: string; camp?: string; area?: string }> }) {
   const { q, camp, area } = await searchParams
 

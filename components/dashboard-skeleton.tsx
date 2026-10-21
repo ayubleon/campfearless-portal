@@ -70,7 +70,7 @@ export function DashboardSkeleton() {
           </div>
           <div className="overflow-hidden rounded-lg border">
             <div className="h-12 border-b bg-muted/50" />
-            {Array.from({ length: 6 }, (_, index) => (
+            {Array.from({ length: 9 }, (_, index) => (
               <div key={index} className="flex items-center gap-4 border-b px-4 py-3 last:border-b-0">
                 <div className="flex flex-1 flex-col gap-2">
                   <Skeleton className="h-4 w-32" />

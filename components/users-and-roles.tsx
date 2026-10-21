@@ -6,6 +6,7 @@ import { AlertCircle, X } from "lucide-react"
 import { IconDotsVertical, IconPlus, IconUserPlus } from "@tabler/icons-react"
 import { toast } from "sonner"
 
+import { currentUser } from "@/lib/session"
 import { cn } from "@/lib/utils"
 import { statusClass } from "@/lib/status"
 import { Field } from "@/components/field"
@@ -22,7 +23,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/tabs"
 
 // Until sign-in exists, the signed-in user is hardcoded like the sidebar's.
-const currentUserEmail = "john@mavuno.org"
 
 type CampAccess = "Both" | "MYF only" | "MYA only"
 type UserStatus = "active" | "inactive" | "pending"
@@ -215,7 +215,7 @@ export function UsersAndRolesScreen() {
   const usersIn = (roleId: string) => users.filter((user) => user.roleId === roleId).length
   const signInRoles = roles.filter((role) => role.canSignIn)
   const superAdmins = users.filter((user) => user.roleId === "super-admin" && user.status === "active").length
-  const isProtected = (user: User) => user.email === currentUserEmail || (user.roleId === "super-admin" && user.status === "active" && superAdmins <= 1)
+  const isProtected = (user: User) => user.email === currentUser.email || (user.roleId === "super-admin" && user.status === "active" && superAdmins <= 1)
   const updateUser = (id: string, patch: Partial<User>) => setUsers((current) => current.map((user) => (user.id === id ? { ...user, ...patch } : user)))
   const closeConfirm = () => setConfirm(null)
 
@@ -279,7 +279,7 @@ export function UsersAndRolesScreen() {
                   </TableHeader>
                   <TableBody>
                     {users.map((user) => {
-                      const you = user.email === currentUserEmail
+                      const you = user.email === currentUser.email
                       const locked = isProtected(user)
                       return (
                         <TableRow key={user.id} className="hover:bg-muted/50">
@@ -325,7 +325,7 @@ export function UsersAndRolesScreen() {
                               />
                             )}
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="whitespace-nowrap">
                             <MoreMenu>
                               {user.status === "pending" ? (
                                 <>
@@ -405,7 +405,7 @@ export function UsersAndRolesScreen() {
                           <TableCell className="whitespace-nowrap"><Badge variant="outline" className={cn("whitespace-nowrap", statusClass(access))}>{access}</Badge></TableCell>
                           <TableCell className="whitespace-nowrap tabular-nums">{count}</TableCell>
                           <TableCell className="whitespace-nowrap tabular-nums">{role.canSignIn ? `${role.permissions.length} of ${permissions.length}` : "-"}</TableCell>
-                          <TableCell>
+                          <TableCell className="whitespace-nowrap">
                             <MoreMenu>
                               <DropdownMenuItem disabled={role.locked} onSelect={() => setRoleDialog({ role })}>Edit role</DropdownMenuItem>
                               <DropdownMenuSeparator />

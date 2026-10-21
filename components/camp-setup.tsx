@@ -7,8 +7,9 @@ import { AlertCircle, X } from "lucide-react"
 import { IconCalendar, IconInfoCircle } from "@tabler/icons-react"
 import { toast } from "sonner"
 
+import { currentUser } from "@/lib/session"
 import { cn } from "@/lib/utils"
-import { formatDateTime } from "@/lib/format"
+import { formatDateTime, formatNumber } from "@/lib/format"
 import { statusClass } from "@/lib/status"
 import { Badge } from "@/ui/badge"
 import { UndoOverlay } from "@/components/undo-overlay"
@@ -22,7 +23,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover"
 import { Progress } from "@/ui/progress"
 
 // Until Users and roles exists, the signed-in user's name is hardcoded like the sidebar's.
-const currentUser = "John Doe"
 
 type CampId = "MYF" | "MYA"
 
@@ -52,12 +52,45 @@ type SharedSettings = { facilitatorFee: number }
 type FieldSpec<T> = { key: keyof T; label: string; format: (value: never) => string }
 
 const initialCamps: Camp[] = [
-  { id: "MYF", description: "Mavuno Young and Fearless, ages 14 to 17", spotsUsed: 320, link: "register.mavuno.org/myf-2026-x7k2", paused: false, lastSaved: { by: "John Doe", at: new Date(2026, 9, 18, 14, 2) }, details: { editionName: "MYF Camp 2026", campStart: new Date(2026, 11, 1), campEnd: new Date(2026, 11, 6), camperLimit: 1000, onlineFee: 1000, walkInFee: 2000, opens: new Date(2026, 9, 1), closes: new Date(2026, 10, 30) } },
-  { id: "MYA", description: "Mavuno Young Adults, age 18 and above", spotsUsed: 470, link: "register.mavuno.org/mya-2026-p4m9", paused: true, lastSaved: { by: "John Doe", at: new Date(2026, 9, 16, 9, 45) }, details: { editionName: "MYA Camp 2026", campStart: new Date(2026, 11, 1), campEnd: new Date(2026, 11, 6), camperLimit: 1000, onlineFee: 1000, walkInFee: 2000, opens: new Date(2026, 9, 1), closes: new Date(2026, 10, 30) } },
+  {
+    id: "MYF",
+    description: "Mavuno Young and Fearless, ages 14 to 17",
+    spotsUsed: 320,
+    link: "register.mavuno.org/myf-2026-x7k2",
+    paused: false,
+    lastSaved: { by: "John Doe", at: new Date(2026, 9, 18, 14, 2) },
+    details: {
+      editionName: "MYF Camp 2026",
+      campStart: new Date(2026, 11, 1),
+      campEnd: new Date(2026, 11, 6),
+      camperLimit: 1000,
+      onlineFee: 1000,
+      walkInFee: 2000,
+      opens: new Date(2026, 9, 1),
+      closes: new Date(2026, 10, 30),
+    },
+  },
+  {
+    id: "MYA",
+    description: "Mavuno Young Adults, age 18 and above",
+    spotsUsed: 470,
+    link: "register.mavuno.org/mya-2026-p4m9",
+    paused: true,
+    lastSaved: { by: "John Doe", at: new Date(2026, 9, 16, 9, 45) },
+    details: {
+      editionName: "MYA Camp 2026",
+      campStart: new Date(2026, 11, 1),
+      campEnd: new Date(2026, 11, 6),
+      camperLimit: 1000,
+      onlineFee: 1000,
+      walkInFee: 2000,
+      opens: new Date(2026, 9, 1),
+      closes: new Date(2026, 10, 30),
+    },
+  },
 ]
 
 const formatDate = (value: Date) => format(value, "dd/MM/yyyy")
-const formatNumber = (value: number) => value.toLocaleString("en-US")
 const formatMoney = (value: number) => `KES ${formatNumber(value)}`
 
 const campFields: FieldSpec<CampDetails>[] = [
@@ -110,22 +143,22 @@ function ValueBox({ children }: { children: React.ReactNode }) {
   return <div className="flex h-8 min-w-0 items-center rounded-lg border bg-muted/20 px-2.5 text-sm font-normal tabular-nums"><span className="truncate">{children}</span></div>
 }
 
-function Field({ label, editing, children }: { label: string; editing: boolean; children: React.ReactNode }) {
+function SetupField({ label, editing, children }: { label: string; editing: boolean; children: React.ReactNode }) {
   const Wrapper = editing ? "label" : "div"
   return <Wrapper className="flex min-w-0 flex-col gap-2 text-sm font-medium">{label}{children}</Wrapper>
 }
 
 function TextField({ label, value, editing, onChange }: { label: string; value: string; editing: boolean; onChange: (value: string) => void }) {
   return (
-    <Field label={label} editing={editing}>
+    <SetupField label={label} editing={editing}>
       {editing ? <Input className="bg-muted/40" value={value} onChange={(event) => onChange(event.target.value)} /> : <ValueBox>{value}</ValueBox>}
-    </Field>
+    </SetupField>
   )
 }
 
 function NumberField({ label, value, editing, money, onChange }: { label: string; value: number; editing: boolean; money?: boolean; onChange: (value: number) => void }) {
   return (
-    <Field label={label} editing={editing}>
+    <SetupField label={label} editing={editing}>
       {editing ? (
         <span className="relative">
           {money && <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-sm font-normal text-muted-foreground">KES</span>}
@@ -134,14 +167,14 @@ function NumberField({ label, value, editing, money, onChange }: { label: string
       ) : (
         <ValueBox>{money ? formatMoney(value) : formatNumber(value)}</ValueBox>
       )}
-    </Field>
+    </SetupField>
   )
 }
 
 function DateField({ label, value, editing, onChange, disabled }: { label: string; value: Date; editing: boolean; onChange: (value: Date) => void; disabled?: React.ComponentProps<typeof Calendar>["disabled"] }) {
   const [open, setOpen] = React.useState(false)
   return (
-    <Field label={label} editing={editing}>
+    <SetupField label={label} editing={editing}>
       {editing ? (
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
@@ -150,14 +183,14 @@ function DateField({ label, value, editing, onChange, disabled }: { label: strin
               <IconCalendar className="text-muted-foreground" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto overflow-hidden p-0" align="start">
+          <PopoverContent aria-label={`Choose ${label.toLowerCase()}`} className="w-auto overflow-hidden p-0" align="start">
             <Calendar mode="single" selected={value} defaultMonth={value} disabled={disabled} onSelect={(date) => { if (date) { onChange(date); setOpen(false) } }} />
           </PopoverContent>
         </Popover>
       ) : (
         <ValueBox>{formatDate(value)}</ValueBox>
       )}
-    </Field>
+    </SetupField>
   )
 }
 
@@ -169,7 +202,7 @@ function SpotsInfo() {
           <IconInfoCircle />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-64 text-sm" align="start" collisionPadding={16}>
+      <PopoverContent aria-label="How camper spots are counted" className="w-64 text-sm" align="start" collisionPadding={16}>
         Facilitators and waived campers are counted. Cancelled registrations free up a spot.
       </PopoverContent>
     </Popover>
@@ -332,12 +365,12 @@ function CampCard({ camp, canEdit, onDirtyChange, onSave, onTogglePause }: { cam
             </section>
             <section className="flex min-w-0 flex-col gap-4 md:col-span-2 xl:col-span-1">
               <h3 className="text-sm text-muted-foreground">Registration link</h3>
-              <Field label="Registration link" editing={false}>
+              <SetupField label="Registration link" editing={false}>
                 <span className="flex items-center gap-3">
                   <span className="min-w-0 flex-1"><ValueBox><span className="text-muted-foreground">{camp.link}</span></ValueBox></span>
                   <Badge variant="outline" className={cn("whitespace-nowrap", statusClass(status))}>{status}</Badge>
                 </span>
-              </Field>
+              </SetupField>
               <div className="flex flex-col gap-2">
                 <div className="grid grid-cols-2 gap-4">
                   <DateField label="Opens" value={details.opens} editing={editing} onChange={(opens) => update({ opens, closes: details.closes < opens ? opens : details.closes })} />
@@ -391,7 +424,7 @@ export function CampSetupScreen({ canEdit = true }: { canEdit?: boolean }) {
           camp={camp}
           canEdit={canEdit}
           onDirtyChange={dirtyHandlers[`${camp.id} setup`]}
-          onSave={(details) => updateCamp(camp.id, () => ({ details, lastSaved: { by: currentUser, at: new Date() } }))}
+          onSave={(details) => updateCamp(camp.id, () => ({ details, lastSaved: { by: currentUser.name, at: new Date() } }))}
           onTogglePause={() => { updateCamp(camp.id, (current) => ({ paused: !current.paused })); setPauseNotice(camp.id) }}
         />
       ))}
@@ -406,7 +439,7 @@ export function CampSetupScreen({ canEdit = true }: { canEdit?: boolean }) {
         auditHref="/audit-log?camp=system&area=camp-setup"
         canEdit={canEdit}
         onDirtyChange={dirtyHandlers["Shared settings"]}
-        onSave={(settings) => setShared({ settings, lastSaved: { by: currentUser, at: new Date() } })}
+        onSave={(settings) => setShared({ settings, lastSaved: { by: currentUser.name, at: new Date() } })}
         validate={() => true}
         warnings={() => ["This fee applies to both MYF and MYA. Facilitators already registered keep what they paid."]}
       >

@@ -74,7 +74,7 @@
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
+  --muted-foreground: oklch(0.5 0 0);
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
@@ -100,14 +100,14 @@
   --status-checked-in: #dcfce7;
   --status-checked-in-foreground: #15803d;
   --status-registered: #ffedd5;
-  --status-registered-foreground: #ea580c;
+  --status-registered-foreground: #c2410c;
   --status-paused: #fff7ed;
-  --status-paused-foreground: #ea580c;
+  --status-paused-foreground: #c2410c;
   --status-scheduled: #dbeafe;
   --status-scheduled-foreground: #1d4ed8;
   --status-flagged: #fee2e2;
   --status-flagged-foreground: #b91c1c;
-  --attention: #ea580c;
+  --attention: #c2410c;
   --brand: #336699;
   --brand-hover: #2b5985;
   --brand-foreground: #ffffff;

@@ -6,8 +6,9 @@ import { AlertCircle, X } from "lucide-react"
 import { IconDotsVertical, IconSearch, IconTicket } from "@tabler/icons-react"
 import { toast } from "sonner"
 
+import { currentUser } from "@/lib/session"
 import { CamperFields, ContactFields, DoneOverlay, camperValid, camps, contactValid, emptyCamper, emptyContact, type Camp, type CamperForm, type ContactForm } from "@/components/registration"
-import { formatDateTime } from "@/lib/format"
+import { formatDateTime, formatNumber } from "@/lib/format"
 import { statusClass } from "@/lib/status"
 import { cn } from "@/lib/utils"
 import { Badge } from "@/ui/badge"
@@ -22,7 +23,6 @@ import { Tabs, TabsList, TabsTrigger } from "@/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/ui/table"
 
 // Until sign-in exists, the signed-in user is hardcoded like the sidebar's.
-const currentUser = "John Doe"
 
 type Waiver = { id: string; name: string; age: string; gender: string; phone: string; camp: Camp; campus: string; baptised: string; status: "Waived" | "Reversed"; arrived: boolean; issuedAt: Date; issuedBy: string }
 
@@ -88,7 +88,7 @@ function IssueDialog({ open, onClose, onIssue }: { open: boolean; onClose: () =>
 }
 
 function ReverseDialog({ waiver, onCancel, onConfirm }: { waiver: Waiver | null; onCancel: () => void; onConfirm: () => void }) {
-  const fee = waiver ? camps[waiver.camp].walkInFee.toLocaleString("en-US") : ""
+  const fee = waiver ? formatNumber(camps[waiver.camp].walkInFee) : ""
   return (
     <Dialog open={waiver !== null} onOpenChange={(next) => !next && onCancel()}>
       <DialogContent showCloseButton={false} className="gap-0 sm:max-w-lg">
@@ -122,7 +122,7 @@ export function WaiversScreen() {
     (statusFilter === "all" || (statusFilter === "not-arrived" ? waiver.status === "Waived" && !waiver.arrived : waiver.status === statusFilter)))
 
   const issue = (camp: Camp, camper: CamperForm, _contact: ContactForm, checkIn: boolean) => {
-    const waiver: Waiver = { id: `w-${Date.now()}`, name: `${camper.firstName.trim()} ${camper.lastName.trim()}`, age: camper.age, gender: camper.gender, phone: camper.phone, camp, campus: camper.fromMavuno === "Yes" ? camper.campus : camper.church.trim() || "Not Mavuno", baptised: camper.baptised, status: "Waived", arrived: checkIn, issuedAt: new Date(), issuedBy: currentUser }
+    const waiver: Waiver = { id: `w-${Date.now()}`, name: `${camper.firstName.trim()} ${camper.lastName.trim()}`, age: camper.age, gender: camper.gender, phone: camper.phone, camp, campus: camper.fromMavuno === "Yes" ? camper.campus : camper.church.trim() || "Not Mavuno", baptised: camper.baptised, status: "Waived", arrived: checkIn, issuedAt: new Date(), issuedBy: currentUser.name }
     setWaivers((current) => [waiver, ...current])
     setIssuing(false)
     if (checkIn) setCheckedIn({ waiver, isNew: true })
@@ -142,7 +142,7 @@ export function WaiversScreen() {
           <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
             <div className="relative max-w-md flex-1">
               <IconSearch className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-              <Input className="border bg-muted/50 pl-8" placeholder="Search by name, phone, campus" value={query} onChange={(event) => setQuery(event.target.value)} />
+              <Input className="border bg-muted/50 pl-8" aria-label="Search by name, phone, campus" placeholder="Search by name, phone, campus" value={query} onChange={(event) => setQuery(event.target.value)} />
             </div>
             <div className="flex gap-2">
               <Select value={campFilter} onValueChange={setCampFilter}>
@@ -190,7 +190,7 @@ export function WaiversScreen() {
                     <TableCell className="whitespace-nowrap text-muted-foreground tabular-nums">{formatDateTime(waiver.issuedAt)}</TableCell>
                     <TableCell className="whitespace-nowrap">{waiver.issuedBy}</TableCell>
                     <TableCell className="whitespace-nowrap">{waiver.baptised}</TableCell>
-                    <TableCell>
+                    <TableCell className="whitespace-nowrap">
                       <DropdownMenu>
                         <DropdownMenuTrigger type="button" className={buttonVariants({ variant: "ghost", size: "icon" })} aria-label="More actions"><IconDotsVertical /></DropdownMenuTrigger>
                         <DropdownMenuContent align="end" sideOffset={6} className="min-w-44">

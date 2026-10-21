@@ -1,9 +1,21 @@
-import { Card, CardContent, CardHeader } from "@/ui/card"
+import { Card, CardAction, CardContent, CardHeader } from "@/ui/card"
 import { Skeleton } from "@/ui/skeleton"
 
 export function ReportsSkeleton() {
   return (
     <main className="flex min-w-0 flex-1 flex-col gap-4 p-4 lg:p-6" aria-busy="true" aria-label="Loading reports">
+      <Skeleton className="h-8 w-full max-w-md" />
+      <Card className="min-w-0 shadow-none">
+        <CardHeader>
+          <Skeleton className="h-4 w-28" />
+          <Skeleton className="h-4 w-64 max-w-full" />
+          <CardAction><Skeleton className="h-8 w-32" /></CardAction>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+          <Skeleton className="h-8 w-full max-w-md" />
+          <Skeleton className="h-4 w-32" />
+        </CardContent>
+      </Card>
       <Card className="min-w-0 shadow-none">
         <CardHeader className="gap-1">
           <Skeleton className="h-4 w-32" />
@@ -12,20 +24,20 @@ export function ReportsSkeleton() {
         <CardContent className="flex flex-col gap-4">
           <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
             <Skeleton className="h-8 max-w-md flex-1" />
-            <div className="flex gap-2">
-              <Skeleton className="h-8 w-36" />
-              <Skeleton className="h-8 w-36" />
-              <Skeleton className="h-8 w-44" />
+            <div className="flex flex-wrap gap-2">
+              {Array.from({ length: 5 }, (_, index) => <Skeleton key={index} className="h-8 w-32" />)}
             </div>
           </div>
           <div className="overflow-hidden rounded-lg border">
             <div className="h-10 border-b bg-muted/50" />
-            {Array.from({ length: 10 }, (_, index) => (
+            {Array.from({ length: 36 }, (_, index) => (
               <div key={index} className="flex items-center gap-4 border-b px-4 py-3 last:border-b-0">
-                <Skeleton className="h-4 w-32" />
-                <Skeleton className="h-4 w-28" />
-                <Skeleton className="h-5 w-28 rounded-full" />
+                <div className="flex flex-1 flex-col gap-2">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-4 w-24" />
+                </div>
                 <Skeleton className="hidden h-4 flex-1 md:block" />
+                <Skeleton className="h-5 w-24 rounded-full" />
                 <Skeleton className="h-4 w-10" />
               </div>
             ))}

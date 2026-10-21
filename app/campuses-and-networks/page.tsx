@@ -6,6 +6,8 @@ import {
   SidebarProvider,
 } from '@/ui/sidebar'
 
+export const metadata = { title: 'Campuses and networks' }
+
 export default function Page() {
   return (
     <SidebarProvider

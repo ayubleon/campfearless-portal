@@ -42,8 +42,8 @@ function SetupCardSkeleton({ columns }: { columns: number[] }) {
 export function CampSetupSkeleton() {
   return (
     <main className="flex min-w-0 flex-1 flex-col gap-4 p-4 lg:p-6" aria-busy="true" aria-label="Loading camp setup">
-      <SetupCardSkeleton columns={[3, 2, 3]} />
-      <SetupCardSkeleton columns={[3, 2, 3]} />
+      <SetupCardSkeleton columns={[3, 2, 4]} />
+      <SetupCardSkeleton columns={[3, 2, 4]} />
       <SetupCardSkeleton columns={[1]} />
     </main>
   )

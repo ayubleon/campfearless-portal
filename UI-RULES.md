@@ -217,6 +217,17 @@ Actions inside a tab (Invite user, Add role) go in the `CardAction` of the card 
 - Removed users keep their name with "(removed)". Entries never get edit, delete or row menus.
 - A screen with a "Last saved by …" line links it to the audit log, pre-filtered with `?camp=`, `?area=` or `?q=`.
 
+## Shared helpers and page metadata
+
+- The signed-in user comes from `currentUser` in `lib/session.ts` (name, email, role), never a hard-coded string in a screen.
+- Numbers with thousands commas use `formatNumber` from `lib/format.ts`; dates use `formatDateTime`. Never define a local copy.
+- Every route's `page.tsx` exports `metadata = { title: "<Page name>" }`; the root layout adds " · Camp Fearless". Never leave the default title.
+- The theme (light or dark) is saved in `localStorage` under `theme` and applied by an inline script in `app/layout.tsx` before first paint. Never set the theme class from a `useEffect` alone.
+- `SidebarInset` has `min-w-0` so wide tables scroll inside their own wrapper instead of stretching the page. Don't remove it.
+- Every search input has an `aria-label` equal to its placeholder, and every `PopoverContent` has an `aria-label` ("Choose camp start", "How camper spots are counted").
+- Light-mode text must pass 4.5:1 contrast on its background: use `text-muted-foreground`, the `status-*` pairs and `text-attention` as defined, never a lighter shade.
+- Each `loading.tsx` skeleton should be within about 10% of the real page's height (rows and cards included) so nothing jumps when content arrives.
+
 ## Error pages
 
 - `app/not-found.tsx` and `app/error.tsx` are the only error pages: centred `text-base font-semibold` title, one muted sentence, and a **Go to dashboard** button (plus **Try again** on errors).

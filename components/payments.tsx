@@ -5,6 +5,7 @@ import { X } from "lucide-react"
 import { IconSearch } from "@tabler/icons-react"
 import { toast } from "sonner"
 
+import { formatNumber } from "@/lib/format"
 import { statusClass } from "@/lib/status"
 import { cn } from "@/lib/utils"
 import { Badge } from "@/ui/badge"
@@ -45,7 +46,6 @@ const initialPayments: Payment[] = [
   { id: "p14", code: "PLM5OKN6IJ", people: [{ name: "Hannah Kamau", age: 16 }], camp: "MYF", expected: 1000, amount: "", status: "pending", registeredBy: "Faith Akinyi" },
 ]
 
-const formatNumber = (value: number) => value.toLocaleString("en-US")
 
 type Check = { kind: "enter" } | { kind: "matched" } | { kind: "short" | "over"; difference: number }
 function checkOf(payment: Payment): Check {
@@ -90,7 +90,7 @@ export function PaymentsScreen() {
           <div className="flex flex-col gap-2 md:flex-row md:items-center">
             <div className="relative max-w-md flex-1">
               <IconSearch className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-              <Input className="border bg-muted/50 pl-8" placeholder="Search by system user / camper name, M-Pesa code" value={query} onChange={(event) => setQuery(event.target.value)} />
+              <Input className="border bg-muted/50 pl-8" aria-label="Search by system user / camper name, M-Pesa code" placeholder="Search by system user / camper name, M-Pesa code" value={query} onChange={(event) => setQuery(event.target.value)} />
             </div>
             <div className="flex flex-wrap gap-2">
               <Select value={camp} onValueChange={setCamp}>

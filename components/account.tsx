@@ -4,6 +4,7 @@ import * as React from "react"
 import { X } from "lucide-react"
 import { toast } from "sonner"
 
+import { currentUser } from "@/lib/session"
 import { LeaveGuard } from "@/components/leave-guard"
 import { Button } from "@/ui/button"
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/ui/card"
@@ -15,7 +16,7 @@ const readOnlyField = "flex h-8 min-w-0 items-center rounded-lg border bg-muted/
 type Profile = { name: string; phone: string }
 
 export function AccountScreen() {
-  const [saved, setSaved] = React.useState<Profile>({ name: "John Doe", phone: "0712345678" })
+  const [saved, setSaved] = React.useState<Profile>({ name: currentUser.name, phone: "0712345678" })
   const [draft, setDraft] = React.useState<Profile | null>(null)
   const [reviewing, setReviewing] = React.useState(false)
   const [changingPassword, setChangingPassword] = React.useState(false)
@@ -66,8 +67,8 @@ export function AccountScreen() {
                 <div className="flex flex-col gap-2 text-sm font-medium">Phone<div className={`${readOnlyField} tabular-nums`}>{saved.phone || "-"}</div></div>
               </>
             )}
-            <div className="flex flex-col gap-2 text-sm font-medium">Email<div className={readOnlyField}>john.doe@campfearless.org</div></div>
-            <div className="flex flex-col gap-2 text-sm font-medium">Role<div className={readOnlyField}>Super admin</div></div>
+            <div className="flex flex-col gap-2 text-sm font-medium">Email<div className={readOnlyField}>{currentUser.email}</div></div>
+            <div className="flex flex-col gap-2 text-sm font-medium">Role<div className={readOnlyField}>{currentUser.role}</div></div>
           </div>
           <p className="text-sm text-muted-foreground">Your email and role are set by a Super admin in Users and roles.</p>
           {editing && (

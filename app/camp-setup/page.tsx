@@ -6,6 +6,8 @@ import {
   SidebarProvider,
 } from '@/ui/sidebar'
 
+export const metadata = { title: 'Camp setup' }
+
 export default function Page() {
   return (
     <SidebarProvider

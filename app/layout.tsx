@@ -5,10 +5,12 @@ import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/ui/sonner'
 import { TooltipProvider } from '@/ui/tooltip'
 
+// Runs before first paint so the saved (or system) theme never flashes the wrong colours.
+const themeScript = `try{var t=localStorage.getItem('theme');if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.classList.add(t)}catch(e){}`
+
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
-  generator: 'v0.app',
+  title: { default: 'Camp Fearless portal', template: '%s · Camp Fearless' },
+  description: 'Registration, check-in and payments for Camp Fearless.',
   icons: {
     icon: [
       {
@@ -43,6 +45,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body className="antialiased">
         <ThemeProvider>
           <TooltipProvider>{children}</TooltipProvider>

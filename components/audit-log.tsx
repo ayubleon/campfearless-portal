@@ -54,6 +54,9 @@ const entries: Entry[] = [
   { id: "a41", at: at(10, 16, 10, 12), user: "John Doe", action: "Invite resent", area: "users", camp: null, subject: "grace@mavuno.org" },
   { id: "a42", at: at(10, 16, 10, 5), user: "John Doe", action: "Invite cancelled", area: "users", camp: null, subject: "tom@mavuno.org" },
   { id: "a43", at: at(10, 21, 9, 44), user: "Dennis Otieno", action: "Check-in undone", area: "campers", camp: "MYA", subject: "Esther Achieng" },
+  { id: "a44", at: at(10, 21, 8, 5), user: "John Doe", action: "Link resumed", area: "camp-setup", camp: "MYF", subject: "MYF registration link" },
+  { id: "a45", at: at(10, 20, 18, 30), user: "John Doe", action: "Signed out", area: "sign-in", camp: null, subject: "john@mavuno.org" },
+  { id: "a46", at: at(10, 19, 8, 12), user: "Dennis Otieno", action: "Password reset requested", area: "sign-in", camp: null, subject: "dennis@mavuno.org" },
   { id: "a29", at: at(10, 20, 13, 5), user: "Mercy Chebet", action: "Payment flagged", area: "waivers-payments", camp: "MYF", subject: "Ann Njeri", summary: "M-Pesa RTP9X2LM4A · Short KES 200" },
   { id: "a31", at: at(10, 20, 18, 2), user: "John Doe", action: "Profile updated", area: "users", camp: null, subject: "John Doe", changes: [{ label: "Phone", from: "0711000000", to: "0712345678" }] },
   { id: "a32", at: at(10, 20, 18, 4), user: "John Doe", action: "Password changed", area: "users", camp: null, subject: "John Doe" },
@@ -132,7 +135,7 @@ export function AuditLogScreen({ initialQuery = "", initialCamp = "all", initial
           <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
             <div className="relative max-w-md flex-1">
               <IconSearch className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-              <Input className="border bg-muted/50 pl-8" placeholder="Search by user, camper name, action" value={query} onChange={(event) => setQuery(event.target.value)} />
+              <Input className="border bg-muted/50 pl-8" aria-label="Search by user, camper name, action" placeholder="Search by user, camper name, action" value={query} onChange={(event) => setQuery(event.target.value)} />
             </div>
             <div className="flex flex-wrap gap-2">
               <Select value={camp} onValueChange={setCamp}>
@@ -162,7 +165,7 @@ export function AuditLogScreen({ initialQuery = "", initialCamp = "all", initial
                       <IconCalendar className="text-muted-foreground" />
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto overflow-hidden p-0" align="end">
+                  <PopoverContent aria-label="Choose date range" className="w-auto overflow-hidden p-0" align="end">
                     <Calendar mode="range" selected={range} onSelect={setRange} defaultMonth={range?.from ?? new Date()} disabled={{ after: new Date() }} />
                   </PopoverContent>
                 </Popover>

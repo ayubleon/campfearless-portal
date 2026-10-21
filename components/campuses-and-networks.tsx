@@ -265,7 +265,7 @@ export function CampusesAndNetworksScreen() {
               <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                 <div className="relative max-w-md flex-1">
                   <IconSearch className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input className="border bg-muted/50 pl-8" placeholder="Search by campus name" value={query} onChange={(event) => setQuery(event.target.value)} />
+                  <Input className="border bg-muted/50 pl-8" aria-label="Search by campus name" placeholder="Search by campus name" value={query} onChange={(event) => setQuery(event.target.value)} />
                 </div>
                 <Select value={networkFilter} onValueChange={setNetworkFilter}>
                   <SelectTrigger className="w-40" aria-label="Network"><SelectValue /></SelectTrigger>
@@ -292,7 +292,7 @@ export function CampusesAndNetworksScreen() {
                         {members.map((campus) => (
                           <TableRow key={campus.id} className="hover:bg-muted/50">
                             <TableCell className="w-full whitespace-nowrap font-medium">{campus.name}</TableCell>
-                            <TableCell>
+                            <TableCell className="whitespace-nowrap">
                               <MoreMenu label="More actions">
                                 <DropdownMenuItem onSelect={() => setNameDialog({ kind: "rename-campus", campus })}>Rename campus</DropdownMenuItem>
                                 <DropdownMenuItem onSelect={() => setMoving(campus)}>Move to network…</DropdownMenuItem>

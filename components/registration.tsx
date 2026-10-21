@@ -4,6 +4,7 @@ import * as React from "react"
 import { IconMinus, IconPlus } from "@tabler/icons-react"
 import { toast } from "sonner"
 
+import { formatNumber } from "@/lib/format"
 import { campusesByNetwork } from "@/lib/campuses"
 import { cn } from "@/lib/utils"
 import { LeaveGuard } from "@/components/leave-guard"
@@ -50,7 +51,6 @@ const paybill = { number: "400200", account: "CAMPFEARLESS" }
 export const emptyCamper = (): CamperForm => ({ firstName: "", lastName: "", age: "", gender: "", phone: "", baptised: "", fromMavuno: "Yes", campus: "", church: "", medical: false, medicalDetails: "", specialNeeds: false, specialNeedsDetails: "" })
 export const emptyContact = (): ContactForm => ({ firstName: "", lastName: "", phone: "", relationship: "" })
 
-const formatNumber = (value: number) => value.toLocaleString("en-US")
 export const phoneValid = (value: string) => /^0[17]\d{8}$/.test(value.replace(/\s/g, ""))
 const codeValid = (value: string) => /^[A-Z0-9]{10}$/.test(value)
 const ageValid = (camp: Camp, age: string) => (camp === "MYF" ? ["14", "15", "16", "17"].includes(age) : /^\d{2}$/.test(age) && Number(age) >= 18)
@@ -145,8 +145,28 @@ export function CamperFields({ camp, camper, id, onChange }: { camp: Camp; campe
     <section className="pt-6">
       <h3 className="mb-3 text-base font-semibold">Medical and special needs</h3>
       <div className="flex flex-col gap-4">
-        <OptionCard name={`${id}-medical`} checked={camper.medical} title="Medical condition / Severe allergies" helper="Check if this camper has acute health conditions requiring medical staff awareness." detailsLabel="Specify medical condition (15 words)" placeholder="e.g Asthma, Peanuts allergy, Epilepsy, Diabetes" details={camper.medicalDetails} onToggle={() => onChange({ medical: !camper.medical })} onDetails={(medicalDetails) => onChange({ medicalDetails })} />
-        <OptionCard name={`${id}-special-needs`} checked={camper.specialNeeds} title="Special needs / Accessibility support" helper="Check if this camper requires physical, sensory, or mobility accommodations." detailsLabel="Specify special needs and accommodations (15 words)" placeholder="e.g Deaf, Autism spectrum, Anxiety" details={camper.specialNeedsDetails} onToggle={() => onChange({ specialNeeds: !camper.specialNeeds })} onDetails={(specialNeedsDetails) => onChange({ specialNeedsDetails })} />
+        <OptionCard
+          name={`${id}-medical`}
+          checked={camper.medical}
+          title="Medical condition / Severe allergies"
+          helper="Check if this camper has acute health conditions requiring medical staff awareness."
+          detailsLabel="Specify medical condition (15 words)"
+          placeholder="e.g Asthma, Peanuts allergy, Epilepsy, Diabetes"
+          details={camper.medicalDetails}
+          onToggle={() => onChange({ medical: !camper.medical })}
+          onDetails={(medicalDetails) => onChange({ medicalDetails })}
+        />
+        <OptionCard
+          name={`${id}-special-needs`}
+          checked={camper.specialNeeds}
+          title="Special needs / Accessibility support"
+          helper="Check if this camper requires physical, sensory, or mobility accommodations."
+          detailsLabel="Specify special needs and accommodations (15 words)"
+          placeholder="e.g Deaf, Autism spectrum, Anxiety"
+          details={camper.specialNeedsDetails}
+          onToggle={() => onChange({ specialNeeds: !camper.specialNeeds })}
+          onDetails={(specialNeedsDetails) => onChange({ specialNeedsDetails })}
+        />
       </div>
     </section>
     </>

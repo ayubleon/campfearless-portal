@@ -10,18 +10,18 @@ const ThemeContext = createContext<ThemeContextValue | null>(null)
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>('light')
 
+  // The inline script in the root layout has already set the class; read it back.
   useEffect(() => {
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    const nextTheme = prefersDark ? 'dark' : 'light'
-    setTheme(nextTheme)
-    document.documentElement.classList.remove('light', 'dark')
-    document.documentElement.classList.add(nextTheme)
+    setTheme(document.documentElement.classList.contains('dark') ? 'dark' : 'light')
   }, [])
 
   const updateTheme = (nextTheme: Theme) => {
     setTheme(nextTheme)
     document.documentElement.classList.remove('light', 'dark')
     document.documentElement.classList.add(nextTheme)
+    try {
+      localStorage.setItem('theme', nextTheme)
+    } catch {}
   }
 
   return <ThemeContext.Provider value={{ theme, setTheme: updateTheme }}>{children}</ThemeContext.Provider>

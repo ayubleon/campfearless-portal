@@ -15,6 +15,7 @@ import {
   UsersRound,
 } from "lucide-react"
 
+import { currentUser } from "@/lib/session"
 import { NavUser } from '@/components/nav-user'
 import {
   Sidebar,
@@ -29,12 +30,10 @@ import {
   SidebarMenuItem,
 } from '@/ui/sidebar'
 
-const roleName = "Super admin"
-
 const data = {
   user: {
-    name: "John Doe",
-    email: roleName,
+    name: currentUser.name,
+    email: currentUser.role,
     avatar: "",
   },
   sections: [
@@ -78,7 +77,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               asChild
               className="h-auto gap-3 p-0 hover:bg-transparent"
             >
-              <a href="#">
+              <Link href="/dashboard">
                 <span className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-card p-1.5">
                   <img
                     src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Frame%201000005756-Snn0NVpYSU5MruXfptoDy95BACFSkJ.png"
@@ -88,9 +87,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </span>
                 <span className="grid gap-0.5">
                   <span className="text-base font-bold tracking-tight">CAMP FEARLESS</span>
-                  <span className="text-xs font-normal text-muted-foreground">{roleName}</span>
+                  <span className="text-xs font-normal text-muted-foreground">{currentUser.role}</span>
                 </span>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

@@ -1,6 +1,8 @@
 import { LoginForm } from "@/components/login-form"
 import { ThemeToggle } from "@/components/site-header"
 
+export const metadata = { title: 'Log in' }
+
 export default function LoginPage() {
   return (
     <div className="grid min-h-svh lg:grid-cols-2">
