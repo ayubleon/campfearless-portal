@@ -306,6 +306,10 @@ Actions inside a tab (Invite user, Add role) go in the `CardAction` of the card 
 
 - The Camp Fearless logo is always the SVG, never a PNG: black on light backgrounds (`dark:invert` where the theme can be dark), white on a dark picture, orange when the summary image tints it. Portal: `public/camp-fearless-logo.svg`; welcome site: `camp-fearless-logo-dark.svg` (light pages) and `camp-fearless-logo.svg` (registration hero).
 
+## Welcome page type
+
+- The public welcome page (and its copy in the portal's Welcome page preview) has its own scale: the page heading 30px; camp names (MYF and MYA) `text-lg font-bold` (18px); the "Camp requirements" dialog title `text-base font-bold` (16px); "What to bring", "What to expect" and "Good to know" `text-sm font-semibold` (14px). Keep `components/welcome-preview.tsx` in step with `campfearless-welcome`.
+
 ## Error pages
 
 - `app/not-found.tsx` and `app/error.tsx` are the only error pages: centred `text-base font-semibold` title, one muted sentence, and a **Go to dashboard** button (plus **Try again** on errors).

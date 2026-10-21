@@ -35,7 +35,7 @@ const cardBringCount = 3
 function Section({ title, items }: { title: string; items: string[] }) {
   return (
     <section className="flex flex-col gap-2">
-      <h3 className="text-sm font-medium">{title}</h3>
+      <h3 className="text-sm font-semibold">{title}</h3>
       <ul className="flex list-disc flex-col gap-1.5 pl-5 text-sm text-muted-foreground marker:text-foreground/40">
         {items.map((item) => <li key={item}>{item}</li>)}
       </ul>
@@ -53,12 +53,12 @@ function PreviewCard({ camp, onSeeList }: { camp: PreviewCamp; onSeeList: (id: C
       </div>
       <CardContent className="flex flex-1 flex-col gap-4 p-4 sm:p-6">
         <div className="flex flex-col gap-2">
-          <h2 className="text-lg font-semibold leading-tight">{camp.name}</h2>
+          <h2 className="text-lg font-bold leading-tight">{camp.name}</h2>
           <p className="inline-flex items-center gap-1.5 text-sm font-medium tabular-nums"><IconCalendar className="size-4 text-muted-foreground" />{camp.dates}</p>
           <p className="text-sm text-muted-foreground">{camp.description}</p>
         </div>
         <div className="flex flex-col gap-2 rounded-lg border bg-muted/20 px-4 py-3">
-          <h3 className="text-sm font-medium">What to bring</h3>
+          <h3 className="text-sm font-semibold">What to bring</h3>
           <ul className="flex flex-col gap-1.5">
             {camp.bring.slice(0, cardBringCount).map((item) => (
               <li key={item} className="flex items-start gap-2 text-sm text-muted-foreground"><IconCheck className="mt-0.5 size-4 shrink-0" />{item}</li>
