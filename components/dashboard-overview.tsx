@@ -279,10 +279,8 @@ export function DashboardOverview() {
                         className="mt-0.5"
                       />
                       <span className="min-w-0 flex-1">
-                        <span className="block text-sm font-medium">
-                          {camper[0]} ({camper[1].match(/Age: (\d+)/)?.[1] ?? ""})
-                        </span>
-                        <span className="block text-sm text-muted-foreground">{camper[1].replace(/Age: /, "Age: ")}</span>
+                        <span className="block text-sm font-medium">{camper[0]}</span>
+                        <span className="block text-sm text-muted-foreground">{camper[1]}</span>
                       </span>
                       <Badge className={cn("shrink-0", statusClass(status))}>{status === "Checked in" ? "Checked in" : status}</Badge>
                     </label>
