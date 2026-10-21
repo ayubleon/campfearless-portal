@@ -43,6 +43,17 @@ const entries: Entry[] = [
   { id: "a6", at: at(10, 20, 14, 12), user: "John Doe", action: "User role changed", area: "users", camp: null, subject: "Kevin Mutua", changes: [{ label: "Role", from: "Lead registrar", to: "Registrar" }] },
   { id: "a7", at: at(10, 20, 11, 3), user: "John Doe", action: "User deactivated", area: "users", camp: null, subject: "Kevin Mutua" },
   { id: "a8", at: at(10, 19, 15, 20), user: "John Doe", action: "Waiver issued", area: "waivers-payments", camp: "MYF", subject: "Mary Wanjiku", summary: "Checked in" },
+  { id: "a33", at: at(10, 20, 12, 40), user: "John Doe", action: "Network added", area: "campuses", camp: null, subject: "Vision" },
+  { id: "a34", at: at(10, 20, 12, 25), user: "John Doe", action: "Network renamed", area: "campuses", camp: null, subject: "Vision", changes: [{ label: "Name", from: "Vison", to: "Vision" }] },
+  { id: "a35", at: at(10, 17, 9, 50), user: "John Doe", action: "Network deleted", area: "campuses", camp: null, subject: "Pilot network" },
+  { id: "a36", at: at(10, 17, 9, 30), user: "John Doe", action: "Campus renamed", area: "campuses", camp: null, subject: "Mashauri", changes: [{ label: "Name", from: "Mashuri", to: "Mashauri" }] },
+  { id: "a37", at: at(10, 17, 9, 10), user: "John Doe", action: "Campus deleted", area: "campuses", camp: null, subject: "Test campus", summary: "Limitless" },
+  { id: "a38", at: at(10, 16, 15, 5), user: "John Doe", action: "Role added", area: "roles", camp: null, subject: "Greeter" },
+  { id: "a39", at: at(10, 16, 15, 20), user: "John Doe", action: "Role deleted", area: "roles", camp: null, subject: "Temporary helper" },
+  { id: "a40", at: at(10, 16, 11, 0), user: "John Doe", action: "User activated", area: "users", camp: null, subject: "Kevin Mutua" },
+  { id: "a41", at: at(10, 16, 10, 12), user: "John Doe", action: "Invite resent", area: "users", camp: null, subject: "grace@mavuno.org" },
+  { id: "a42", at: at(10, 16, 10, 5), user: "John Doe", action: "Invite cancelled", area: "users", camp: null, subject: "tom@mavuno.org" },
+  { id: "a43", at: at(10, 21, 9, 44), user: "Dennis Otieno", action: "Check-in undone", area: "campers", camp: "MYA", subject: "Esther Achieng" },
   { id: "a29", at: at(10, 20, 13, 5), user: "Mercy Chebet", action: "Payment flagged", area: "waivers-payments", camp: "MYF", subject: "Ann Njeri", summary: "M-Pesa RTP9X2LM4A · Short KES 200" },
   { id: "a31", at: at(10, 20, 18, 2), user: "John Doe", action: "Profile updated", area: "users", camp: null, subject: "John Doe", changes: [{ label: "Phone", from: "0711000000", to: "0712345678" }] },
   { id: "a32", at: at(10, 20, 18, 4), user: "John Doe", action: "Password changed", area: "users", camp: null, subject: "John Doe" },
@@ -85,7 +96,7 @@ function Detail({ entry, onOpen }: { entry: Entry; onOpen: () => void }) {
       <span className="font-medium">{entry.subject}</span>
       {entry.summary && <span className="text-muted-foreground"> · {entry.summary}</span>}
       {changes.length === 1 && <span className="text-muted-foreground"> · {changes[0].label} {changes[0].from} → <span className="text-foreground">{changes[0].to}</span></span>}
-      {changes.length > 1 && <span className="text-muted-foreground"> · <button type="button" className="text-foreground underline underline-offset-4" onClick={onOpen}>{changes.length} changes</button></span>}
+      {changes.length > 1 && <span className="text-muted-foreground"> · <Button type="button" variant="link" className="h-auto p-0 text-foreground underline" onClick={onOpen}>{changes.length} changes</Button></span>}
     </span>
   )
 }

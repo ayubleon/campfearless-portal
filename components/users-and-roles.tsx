@@ -8,6 +8,7 @@ import { toast } from "sonner"
 
 import { cn } from "@/lib/utils"
 import { statusClass } from "@/lib/status"
+import { Field } from "@/components/field"
 import { Badge } from "@/ui/badge"
 import { Button, buttonVariants } from "@/ui/button"
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/ui/card"
@@ -103,10 +104,6 @@ function ConfirmDialog({ open, title, description, confirmLabel, showCancel = tr
       </DialogContent>
     </Dialog>
   )
-}
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return <label className="flex flex-col gap-2 text-sm font-medium">{label}{children}</label>
 }
 
 function InviteDialog({ open, roles, users, onClose, onInvite }: { open: boolean; roles: Role[]; users: User[]; onClose: () => void; onInvite: (user: Omit<User, "id" | "name" | "status">) => void }) {
@@ -403,7 +400,7 @@ export function UsersAndRolesScreen() {
                             <span className="flex items-center gap-2">{role.name}{role.locked && <Badge variant="outline" className={statusClass("Locked")}>Locked</Badge>}</span>
                           </TableCell>
                           <TableCell className="whitespace-nowrap text-muted-foreground">
-                            {role.description || (role.locked ? "-" : <button type="button" className="underline-offset-4 hover:text-foreground hover:underline" onClick={() => setRoleDialog({ role })}>Add description</button>)}
+                            {role.description || (role.locked ? "-" : <Button type="button" variant="link" className="h-auto p-0 font-normal text-muted-foreground hover:text-foreground" onClick={() => setRoleDialog({ role })}>Add description</Button>)}
                           </TableCell>
                           <TableCell className="whitespace-nowrap"><Badge variant="outline" className={cn("whitespace-nowrap", statusClass(access))}>{access}</Badge></TableCell>
                           <TableCell className="whitespace-nowrap tabular-nums">{count}</TableCell>

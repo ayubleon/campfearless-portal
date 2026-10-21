@@ -107,6 +107,7 @@
 
 ## Dialogs
 
+- Dialog and sheet backdrops are `bg-black/20` with `backdrop-blur-sm`, set once in `ui/dialog.tsx` and `ui/sheet.tsx`. Never restyle them per dialog.
 - Import from `@/ui/dialog`. Always pass `showCloseButton={false}` and render the close button inside the header:
   ```tsx
   <DialogHeader className="relative space-y-1 text-left">
@@ -121,7 +122,8 @@
 
 ## Forms
 
-- Field: label wraps the control.
+- Field: label wraps the control. Use `Field` from `components/field.tsx` for a label plus control.
+- Text links that act like buttons use `Button variant="link"`, never a raw `<button>`.
   ```tsx
   <label className="flex flex-col gap-2 text-sm font-medium">First name<Input className="bg-muted/40" /></label>
   ```
@@ -157,6 +159,7 @@
 - Every `TableHead` and `TableCell` has `whitespace-nowrap`.
 - Two-line cells: first line `font-medium` (or plain), second line `text-muted-foreground`, e.g. name + "Age: 24 - Female", contact + phone.
 - Empty values show `-`.
+- Payments: Verify opens a "Verify payment?" confirmation (code, campers, amount) before it takes effect.
 - A switch that revokes access (deactivate a user) opens a confirmation first. Turning something back on is instant, with a toast.
 - Destructive menu items always keep their normal label ("Delete network", "Remove user") and stay clickable. When the action isn't allowed yet, clicking opens the destructive dialog explaining why ("Can't delete Catalyst yet", "It still has 7 campuses…") with a button that helps fix it ("Show its campuses") or "Got it". Never put the reason in the menu label or grey the item out.
 - Last column (`w-10`) has no visible title, only `<span className="sr-only">More actions</span>` in its `TableHead`. It holds a row actions `DropdownMenu`. Trigger `buttonVariants({ variant: "ghost", size: "icon" })` with `IconDotsVertical` and `aria-label="More actions"`. Content `align="end" sideOffset={6} className="min-w-44"`. Destructive item last, after a `DropdownMenuSeparator`, styled `text-destructive focus:text-destructive`.
@@ -213,6 +216,10 @@ Actions inside a tab (Invite user, Add role) go in the `CardAction` of the card 
 - Detail: the subject first in `font-medium` (camper, user, role or setup), then ` · ` and the change in `text-muted-foreground`. One change reads "Label old → new". Several changes read "N changes", a button that opens the read-only details dialog listing each old → new.
 - Removed users keep their name with "(removed)". Entries never get edit, delete or row menus.
 - A screen with a "Last saved by …" line links it to the audit log, pre-filtered with `?camp=`, `?area=` or `?q=`.
+
+## Error pages
+
+- `app/not-found.tsx` and `app/error.tsx` are the only error pages: centred `text-base font-semibold` title, one muted sentence, and a **Go to dashboard** button (plus **Try again** on errors).
 
 ## Before finishing a screen
 

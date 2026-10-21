@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { X } from "lucide-react"
 import { toast } from "sonner"
@@ -41,7 +42,7 @@ export function LoginForm({
       {...props}
     >
       <div className="flex flex-col items-center space-y-1.5 text-center">
-        <img src="/camp-fearless-logo.png" alt="Camp Fearless logo" className="mb-4 h-16 w-auto dark:invert" />
+        <Image src="/camp-fearless-logo.png" alt="Camp Fearless logo" width={120} height={128} priority className="mb-4 h-16 w-auto dark:invert" />
         <h1 className="text-2xl font-bold">Log in to your account</h1>
         <p className="text-balance text-sm text-muted-foreground">
           Enter your email and password to open the camp portal.
@@ -55,9 +56,9 @@ export function LoginForm({
         <label className="flex flex-col gap-2 text-sm font-medium">
           <span className="flex items-center">
             Password
-            <button type="button" className="ml-auto text-sm font-normal text-muted-foreground underline-offset-4 hover:text-foreground hover:underline" onClick={() => { setResetEmail(email); setResetOpen(true) }}>
+            <Button type="button" variant="link" className="ml-auto h-auto p-0 text-sm font-normal text-muted-foreground hover:text-foreground" onClick={() => { setResetEmail(email); setResetOpen(true) }}>
               Forgot password?
-            </button>
+            </Button>
           </span>
           <Input type="password" autoComplete="current-password" className="bg-muted/40" value={password} onChange={(event) => setPassword(event.target.value)} required />
         </label>

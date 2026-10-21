@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { X } from "lucide-react"
 import { IconSearch } from "@tabler/icons-react"
 import { toast } from "sonner"
 
@@ -9,6 +10,7 @@ import { cn } from "@/lib/utils"
 import { Badge } from "@/ui/badge"
 import { Button } from "@/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/ui/card"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/ui/dialog"
 import { Input } from "@/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/ui/table"
@@ -61,6 +63,7 @@ export function PaymentsScreen() {
   const [query, setQuery] = React.useState("")
   const [camp, setCamp] = React.useState("all")
   const [status, setStatus] = React.useState("all")
+  const [verifying, setVerifying] = React.useState<Payment | null>(null)
 
   const update = (id: string, patch: Partial<Payment>) => setPayments((current) => current.map((payment) => (payment.id === id ? { ...payment, ...patch } : payment)))
   const decide = (payment: Payment, next: PaymentStatus, message: string) => { update(payment.id, { status: next }); toast.success(message) }
@@ -173,7 +176,7 @@ export function PaymentsScreen() {
                         <div className="flex justify-end gap-3">
                           {open ? (
                             check.kind === "matched" ? (
-                              <Button type="button" className="bg-brand text-brand-foreground hover:bg-brand-hover" onClick={() => decide(payment, "verified", "Payment successfully verified")}>Verify</Button>
+                              <Button type="button" className="bg-brand text-brand-foreground hover:bg-brand-hover" onClick={() => setVerifying(payment)}>Verify</Button>
                             ) : (
                               <Button type="button" variant="outline" onClick={() => decide(payment, "flagged", "Payment successfully flagged")}>Flag</Button>
                             )
@@ -195,6 +198,22 @@ export function PaymentsScreen() {
           </div>
         </CardContent>
       </Card>
+
+      <Dialog open={verifying !== null} onOpenChange={(open) => !open && setVerifying(null)}>
+        <DialogContent showCloseButton={false} className="sm:max-w-lg">
+          <DialogHeader className="relative space-y-1 text-left">
+            <DialogTitle className="text-base font-semibold leading-none tracking-tight">Verify payment?</DialogTitle>
+            <DialogDescription className="text-sm text-muted-foreground">
+              <strong className="text-foreground">{verifying?.code}</strong> for {verifying?.people.map((person) => person.name).join(", ")} will be marked <strong className="text-foreground">Verified</strong> at KES {verifying ? formatNumber(verifying.expected) : 0}. You can reopen it later.
+            </DialogDescription>
+            <Button type="button" variant="ghost" size="icon" aria-label="Close verify payment" className="absolute right-0 top-0" onClick={() => setVerifying(null)}><X className="size-4" /></Button>
+          </DialogHeader>
+          <DialogFooter className="mt-4 grid grid-cols-2 gap-3 sm:mt-6 sm:justify-stretch">
+            <Button type="button" variant="outline" onClick={() => setVerifying(null)}>Cancel</Button>
+            <Button type="button" onClick={() => { if (verifying) decide(verifying, "verified", "Payment successfully verified"); setVerifying(null) }}>Verify payment</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </main>
   )
 }

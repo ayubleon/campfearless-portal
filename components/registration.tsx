@@ -1,13 +1,13 @@
 "use client"
 
 import * as React from "react"
-import { X } from "lucide-react"
 import { IconMinus, IconPlus } from "@tabler/icons-react"
 import { toast } from "sonner"
 
 import { campusesByNetwork } from "@/lib/campuses"
 import { cn } from "@/lib/utils"
 import { LeaveGuard } from "@/components/leave-guard"
+import { Field } from "@/components/field"
 import { Button } from "@/ui/button"
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/ui/card"
 import { UndoOverlay } from "@/components/undo-overlay"
@@ -65,10 +65,6 @@ export function camperValid(camp: Camp, camper: CamperForm) {
     (camper.phone === "" || phoneValid(camper.phone)) &&
     (camper.fromMavuno === "No" || camper.campus !== "")
   )
-}
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return <label className="flex flex-col gap-2 text-sm font-medium">{label}{children}</label>
 }
 
 function FieldError({ children }: { children: React.ReactNode }) {

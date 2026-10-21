@@ -35,7 +35,7 @@ const data = {
   user: {
     name: "John Doe",
     email: roleName,
-    avatar: "/avatars/john-doe.jpg",
+    avatar: "",
   },
   sections: [
     {
