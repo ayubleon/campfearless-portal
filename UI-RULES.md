@@ -121,7 +121,7 @@
   ```
 - Width by purpose: confirmation `sm:max-w-lg`, list or selection `sm:max-w-xl` with `gap-0 p-4`, form `sm:max-w-4xl` with `gap-4 p-4 sm:p-6`.
 - Any dialog that can be taller than a phone screen (forms, long lists) must fit the viewport: `DialogContent className="max-h-[calc(100dvh-2rem)] grid-rows-[auto_minmax(0,1fr)] …"`, then after the header one `flex min-h-0 flex-col` wrapper holding a scroll area (`-mx-4 flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 pb-1 sm:-mx-6 sm:px-6`) and the `DialogFooter`. Header and footer stay visible; only the body scrolls. See the edit camper dialog in the dashboard.
-- Destructive or irreversible confirmation: the title includes `<AlertCircle className="text-destructive" />` and uses `text-lg`. The description names the subject in `<strong className="text-foreground">` and states the result ("This will transition their status to **Checked out**").
+- Destructive or irreversible confirmation: the title includes `<AlertCircle className="text-destructive" />` and stays 16px bold like every dialog title. The description names the subject in `<strong className="text-foreground">` and states the result ("This will transition their status to **Checked out**").
 
 ## Forms
 
@@ -130,7 +130,7 @@
   ```tsx
   <label className="flex flex-col gap-2 text-sm font-medium">First name<Input className="bg-muted/40" /></label>
   ```
-- Field grid: `grid gap-4 sm:grid-cols-3`. Form sections: `<section className="pt-6"><h3 className="mb-3 text-base font-semibold">…</h3>`.
+- Field grid: `grid gap-4 sm:grid-cols-3`. Form sections: `<section className="pt-6"><h3 className="mb-3 text-base font-bold">…</h3>`.
 - Search input: relative wrapper, `<IconSearch className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />`, `Input className="border bg-muted/50 pl-8"`. In-input icons are always `size-4` and vertically centered; the 24px tabler default overflows the 32px input. Placeholder style: "Search by name, phone, M-Pesa code". Filter searches update live as you type. Lookup searches that open a result dialog also run on Enter.
 - Expandable option card: `rounded-2xl border bg-muted/30 p-4 text-sm` with `focus-within:border-ring focus-within:ring-1 focus-within:ring-ring/20`. Reveal its details with the `grid-rows-[0fr]` → `grid-rows-[1fr]` + opacity transition (`duration-300 ease-out`), helper text indented `pl-6 text-muted-foreground`.
 - Native `<input type="checkbox">`, `<input type="radio">` and `<textarea>` are never used: use `Checkbox` (`@/ui/checkbox`) and `Textarea` (`@/ui/textarea`). A tick-to-reveal option card is a `Checkbox`, not a radio.
@@ -145,7 +145,7 @@
 
 ## Item cards (a header plus a list of chips)
 
-- Used for networks and their campuses. `<section className="flex min-w-0 flex-col overflow-hidden rounded-xl border">` with the header in `flex items-start justify-between gap-3 p-4` (title `text-base font-semibold leading-none`, count `text-sm text-muted-foreground`, row `MoreMenu` on the right) and the chips in a tinted tray: `flex flex-1 flex-wrap content-start gap-2 border-t bg-muted/40 p-4`. Chips are `rounded-md border bg-muted/50 px-2.5 py-1 text-sm`. No separator inset inside the padding.
+- Used for networks and their campuses. `<section className="flex min-w-0 flex-col overflow-hidden rounded-xl border">` with the header in `flex items-start justify-between gap-3 p-4` (title `text-base font-bold leading-none`, count `text-sm text-muted-foreground`, row `MoreMenu` on the right) and the chips in a tinted tray: `flex flex-1 flex-wrap content-start gap-2 border-t bg-muted/40 p-4`. Chips are `rounded-md border bg-muted/50 px-2.5 py-1 text-sm`. No separator inset inside the padding.
 
 ## Settings screens (editable cards)
 
@@ -156,7 +156,7 @@
 - Card footer meta: only `text-xs text-muted-foreground` "Last saved by <name>, 18 Oct 2026, 14:02". Don't add standing notes that restate the card title or a consequence the review dialog already shows; put consequences in the review dialog, where they appear only when they apply.
 - Explanations that would repeat in several cards (how a number is counted, what a rule means) go behind an info button at the end of the line they explain, not as repeated text: `<Button variant="ghost" size="icon-xs" aria-label="…" className="text-muted-foreground"><IconInfoCircle /></Button>` opening a `Popover` with `PopoverContent className="w-64 text-sm" align="start" collisionPadding={16}`. Use a popover, not a tooltip, so it opens on tap.
 - A setting shared by several cards gets its own card ("Shared settings") rather than living inside one of them.
-- Unsaved edits are guarded (use `LeaveGuard` from `components/leave-guard.tsx`; Camp setup, Account and Registration all do): internal link clicks open a destructive confirmation ("Leave without saving?", `text-lg` title with `AlertCircle`, buttons **Stay on page** and **Leave page**) naming the unsaved cards in `<strong className="text-foreground">`, and `beforeunload` covers reloads and closing the tab.
+- Unsaved edits are guarded (use `LeaveGuard` from `components/leave-guard.tsx`; Camp setup, Account and Registration all do): internal link clicks open a destructive confirmation ("Leave without saving?", 16px bold title with `AlertCircle`, buttons **Stay on page** and **Leave page**) naming the unsaved cards in `<strong className="text-foreground">`, and `beforeunload` covers reloads and closing the tab.
 
 ## Tables
 
