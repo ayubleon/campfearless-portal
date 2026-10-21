@@ -170,7 +170,7 @@ export function WaiversScreen() {
           <CardAction><Button type="button" onClick={() => setIssuing(true)}><IconTicket />Issue waiver</Button></CardAction>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex flex-col gap-2 xl:flex-row xl:items-center xl:justify-between">
             <div className="relative max-w-md flex-1">
               <IconSearch className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
               <Input className="border bg-muted/50 pl-8" aria-label="Search by name, phone, campus" placeholder="Search by name, phone, campus" value={query} onChange={(event) => setQuery(event.target.value)} />

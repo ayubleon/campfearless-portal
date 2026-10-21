@@ -897,7 +897,7 @@ export function DashboardOverview() {
                     <h3 className="text-base font-bold">Medical and special needs</h3>
                     <p className="mb-3 text-sm text-muted-foreground">{medicalSubtitle}</p>
                     <div className="flex flex-col gap-4">
-                      <label className="flex cursor-pointer flex-col gap-2 rounded-2xl border bg-muted/30 p-4 text-sm transition-colors focus-within:border-ring focus-within:ring-1 focus-within:ring-ring/20">
+                      <label className="flex cursor-pointer flex-col gap-1 rounded-2xl border bg-muted/30 p-4 text-sm transition-colors focus-within:border-ring focus-within:ring-1 focus-within:ring-ring/20">
                         <span className="flex items-start gap-2 font-medium">
                           <Checkbox
                             checked={editCamper.medical}
@@ -928,7 +928,7 @@ export function DashboardOverview() {
                           </span>
                         </span>
                       </label>
-                      <label className="flex cursor-pointer flex-col gap-2 rounded-2xl border bg-muted/30 p-4 text-sm transition-colors focus-within:border-ring focus-within:ring-1 focus-within:ring-ring/20">
+                      <label className="flex cursor-pointer flex-col gap-1 rounded-2xl border bg-muted/30 p-4 text-sm transition-colors focus-within:border-ring focus-within:ring-1 focus-within:ring-ring/20">
                         <span className="flex items-start gap-2 font-medium">
                           <Checkbox
                             checked={editCamper.specialNeeds}

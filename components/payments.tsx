@@ -132,8 +132,8 @@ export function PaymentsScreen() {
           <CardDescription>Type the amount from each M-Pesa message, then verify it when it matches.</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <div className="flex flex-col gap-2 lg:flex-row lg:items-center">
-            <div className="relative w-full max-w-md lg:min-w-48 lg:flex-1">
+          <div className="flex flex-col gap-2 xl:flex-row xl:items-center">
+            <div className="relative w-full max-w-md xl:min-w-48 xl:flex-1">
               <IconSearch className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
               <Input className="border bg-muted/50 pl-8" aria-label="Search by name or M-Pesa code" placeholder="Search by name or M-Pesa code" value={query} onChange={(event) => setQuery(event.target.value)} />
             </div>
