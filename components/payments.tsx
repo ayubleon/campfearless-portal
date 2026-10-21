@@ -5,6 +5,7 @@ import { currentEditionIds } from "@/lib/editions"
 import { campersOfPayment, expectedForPayment, facilitatorsOfPayment, fullName, payments as paymentRecords } from "@/lib/records"
 import { userName } from "@/lib/staff"
 import { LoadingButton } from "@/components/loading-button"
+import { checkAmount, type Check } from "@/lib/payment-check"
 import { useAction } from "@/lib/use-action"
 import { EditionScope } from "@/components/edition-scope"
 import * as React from "react"
@@ -62,13 +63,7 @@ const buildPayments = (): Payment[] => paymentRecords
     }]
   })
 
-type Check = { kind: "enter" } | { kind: "matched" } | { kind: "short" | "over"; difference: number }
-function checkOf(payment: Payment): Check {
-  if (payment.amount === "") return { kind: "enter" }
-  const amount = Number(payment.amount)
-  if (amount === payment.expected) return { kind: "matched" }
-  return amount < payment.expected ? { kind: "short", difference: payment.expected - amount } : { kind: "over", difference: amount - payment.expected }
-}
+const checkOf = (payment: Payment): Check => checkAmount(payment.amount, payment.expected)
 const checkLabel = (check: Check) => (check.kind === "enter" ? "Enter amount" : check.kind === "matched" ? "Matched" : `${check.kind === "short" ? "Short" : "Over"} ${formatNumber(check.difference)}`)
 
 const statusLabel: Record<PaymentStatus, string> = { pending: "Awaiting verification", verified: "Verified", flagged: "Flagged" }

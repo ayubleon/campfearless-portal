@@ -1,7 +1,7 @@
+import { pageCount } from "@/lib/paging"
 import { Button } from "@/ui/button"
 
-// The footer under a long table: which rows are showing, and Previous and Next. The caller slices its rows with `pageRange`.
-export const pageCount = (total: number, pageSize: number) => Math.max(1, Math.ceil(total / pageSize))
+// The footer under a long table: which rows are showing, and Previous and Next. `pageCount` is in lib/paging.ts.
 
 export function TablePagination({ page, pageSize, total, onPage }: { page: number; pageSize: number; total: number; onPage: (page: number) => void }) {
   const pages = pageCount(total, pageSize)

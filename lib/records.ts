@@ -191,17 +191,18 @@ export const payments: Payment[] = [...openPayments, ...pastPayments, ...pastFac
 export const campers: Camper[] = [...named, ...pastCampers]
 
 // What one camper owes: nothing for a waiver, otherwise the online or walk-in fee of their camp.
-export const feeFor = (camper: Camper) => {
+export type Fees = { onlineFee: number; walkInFee: number }
+export const feeFor = (camper: Camper, feesOf: (camp: CampId) => Fees = (camp) => campRecord(camp).details) => {
   if (camper.waiver) return 0
-  const details = campRecord(camper.camp).details
-  return camper.channel === "Online" ? details.onlineFee : details.walkInFee
+  const fees = feesOf(camper.camp)
+  return camper.channel === "Online" ? fees.onlineFee : fees.walkInFee
 }
 export const campersOfPayment = (paymentId: string) => campers.filter((camper) => camper.paymentId === paymentId)
 export const facilitatorsOfPayment = (paymentId: string) => facilitators.filter((facilitator) => facilitator.paymentId === paymentId)
 // What one code should add up to: each camper's fee plus each facilitator's fee (nothing for a waived one).
-export const expectedForPayment = (paymentId: string) =>
-  campersOfPayment(paymentId).reduce((total, camper) => total + feeFor(camper), 0) +
-  facilitatorsOfPayment(paymentId).reduce((total, facilitator) => total + (facilitator.feeWaived ? 0 : facilitatorFeeOf(facilitator.editionId)), 0)
+export const expectedTotal = (covered: Camper[], serving: Facilitator[], feesOf?: (camp: CampId) => Fees, facilitatorFee: (editionId: string) => number = facilitatorFeeOf) =>
+  covered.reduce((total, camper) => total + feeFor(camper, feesOf), 0) + serving.reduce((total, facilitator) => total + (facilitator.feeWaived ? 0 : facilitatorFee(facilitator.editionId)), 0)
+export const expectedForPayment = (paymentId: string) => expectedTotal(campersOfPayment(paymentId), facilitatorsOfPayment(paymentId))
 export const paymentOf = (person: { paymentId: string | null }) => payments.find((payment) => payment.id === person.paymentId) ?? null
 
 // Facilitator teams are the roles that can't sign in.
@@ -246,10 +247,11 @@ export type DuplicateMatch = { kind: "same" | "similar"; who: string; role: stri
 const norm = (value: string) => value.trim().toLowerCase().replace(/\s+/g, " ")
 const digitsOnly = (value: string) => value.replace(/\s/g, "")
 
-export function findDuplicates(candidate: DuplicateCandidate, editionId = openEdition): DuplicateMatch[] {
+export type DuplicateSource = { campers: Camper[]; facilitators: Facilitator[] }
+export function findDuplicates(candidate: DuplicateCandidate, editionId = openEdition, source: DuplicateSource = { campers, facilitators }): DuplicateMatch[] {
   const people = [
-    ...campers.filter((camper) => camper.editionId === editionId).map((camper) => ({ name: fullName(camper), age: camper.age, phone: camper.phone, campus: camper.campus, role: `${camper.camp} camper` })),
-    ...facilitators.filter((facilitator) => facilitator.editionId === editionId).map((facilitator) => ({ name: fullName(facilitator), age: facilitator.age, phone: facilitator.phone, campus: facilitator.campus, role: "facilitator" })),
+    ...source.campers.filter((camper) => camper.editionId === editionId).map((camper) => ({ name: fullName(camper), age: camper.age, phone: camper.phone, campus: camper.campus, role: `${camper.camp} camper` })),
+    ...source.facilitators.filter((facilitator) => facilitator.editionId === editionId).map((facilitator) => ({ name: fullName(facilitator), age: facilitator.age, phone: facilitator.phone, campus: facilitator.campus, role: "facilitator" })),
   ]
   const name = norm(fullName(candidate))
   return people.flatMap((person): DuplicateMatch[] => {

@@ -201,6 +201,10 @@ Each of these shows the real success toast and updates only its own screen's loc
 - **Audit log:** nothing writes to it yet. Every change in "Actions" above needs an audit row (see the audit section).
 - **Emails:** invites and password resets are not sent.
 
+### Tests that carry over
+
+`pnpm test` runs 56 checks on the rules the server must also enforce: phone, email and M-Pesa formats, the duplicate rule, the dashboard counts, the expected payment amount and Matched, Short and Over, role permissions, CSV safety, and camp overlap. They use their own made-up data, so they keep passing when the sample data goes. Use them as a reference for the same rules on the server. `tests/sample-data.test.ts` only checks the sample data; delete it when the real data arrives.
+
 ## Decisions (confirmed)
 
 1. Welcome page content is stored **per camp** and carries across editions. It can be edited at any time.

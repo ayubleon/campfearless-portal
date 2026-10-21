@@ -21,7 +21,8 @@ export function applySession(userId: string) {
 }
 
 export const permissionsOf = (roleId: string) => initialRoles.find((role) => role.id === roleId)?.permissions ?? []
-export const hasPermission = (roleId: string, permission: string) => permissionsOf(roleId).includes(permission)
+export const hasPermissionIn = (roles: { id: string; permissions: string[] }[], roleId: string, permission: string) => roles.find((role) => role.id === roleId)?.permissions.includes(permission) ?? false
+export const hasPermission = (roleId: string, permission: string) => hasPermissionIn(initialRoles, roleId, permission)
 export const can = (permission: string) => hasPermission(currentUser.roleId, permission)
 
 // Sample staff who can sign in (active users whose role can sign in), for the login screen and the "View as" menu.

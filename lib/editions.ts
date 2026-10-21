@@ -18,10 +18,10 @@ export function editionLabel(id: string) {
 }
 
 // "December 2026", "Easter 2026 and August 2026", "Easter 2026, August 2026 and December 2026", or "All editions".
-export function editionTitle(ids: string[]) {
-  const chosen = editions.filter((edition) => ids.includes(edition.id)).sort((a, b) => editionRank(b.id) - editionRank(a.id))
+export function editionTitle(ids: string[], list: Edition[] = editions) {
+  const chosen = list.filter((edition) => ids.includes(edition.id)).sort((a, b) => list.findIndex((edition) => edition.id === b.id) - list.findIndex((edition) => edition.id === a.id))
   if (chosen.length === 0) return "No editions"
-  if (chosen.length === editions.length && editions.length > 1) return "All editions"
+  if (chosen.length === list.length && list.length > 1) return "All editions"
   const names = chosen.map((edition) => edition.name)
   return names.length === 1 ? names[0] : `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`
 }

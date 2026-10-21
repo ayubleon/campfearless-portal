@@ -1,6 +1,7 @@
 "use client"
 
 import { useSession } from "@/components/session-provider"
+import { toCsv } from "@/lib/csv"
 import * as React from "react"
 import Link from "next/link"
 import { X } from "lucide-react"
@@ -219,10 +220,7 @@ function PrintDocument({ data }: { data: PrintData }) {
 }
 
 function exportCsv(data: PrintData) {
-  // A cell that starts with = + - @ (or a tab or return) would run as a formula in a spreadsheet, and names and notes come from public forms.
-  const safe = (value: string) => (/^[=+\-@\t\r]/.test(value) ? `'${value}` : value)
-  const quote = (value: string) => `"${safe(value).replace(/\n/g, " ").replace(/"/g, '""')}"`
-  const csv = [data.columns, ...data.rows].map((row) => row.map(quote).join(",")).join("\r\n")
+  const csv = toCsv(data.columns, data.rows)
   const link = document.createElement("a")
   link.href = URL.createObjectURL(new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" }))
   link.download = `${data.title.replace(/[^\w]+/g, "-").replace(/^-|-$/g, "").toLowerCase()}.csv`
