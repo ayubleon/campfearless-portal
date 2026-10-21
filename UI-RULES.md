@@ -312,3 +312,11 @@ Actions inside a tab (Invite user, Add role) go in the `CardAction` of the card 
 3. Check the route's `loading.tsx` skeleton matches the finished page.
 4. Run `pnpm build` (`npx -y pnpm@10 build`) and fix anything it reports. That is what Vercel runs.
 5. Search the new code for hex values, `className` passed to `toast`, `CardTitle` without `text-lg`, and any title-case labels. Fix what you find.
+
+## Shared links
+
+- A shared link shows Camp Fearless's own preview image (`app/opengraph-image.jpg` and `app/twitter-image.jpg`, 1200 x 630) and tab icons (`public/apple-icon.png`, `icon-light-32x32.png`, `icon-dark-32x32.png`): the orange Camp Fearless mark, never a template default. Keep the preview images under about 300 KB. `metadataBase` in `app/layout.tsx` points at the Vercel address so the preview image can be found.
+
+## Shared links
+
+- A shared link shows Camp Fearless's own preview image (`app/opengraph-image.jpg` and `app/twitter-image.jpg`, 1200 x 630) and tab icons (`public/apple-icon.png`, `icon-light-32x32.png`, `icon-dark-32x32.png`): the orange Camp Fearless mark, never a template default (the old black "v0" icon is gone). Keep the preview images under about 300 KB. `metadataBase` in `app/layout.tsx` points at https://campfearlessportal.vercel.app so the preview image can be found.

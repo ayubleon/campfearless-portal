@@ -10,6 +10,8 @@ import { TooltipProvider } from '@/ui/tooltip'
 const themeScript = `try{var t=localStorage.getItem('theme');if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.classList.add(t)}catch(e){}`
 
 export const metadata: Metadata = {
+  // Where the link-preview image is found when the link is shared.
+  metadataBase: new URL(process.env.VERCEL_ENV === 'production' ? 'https://campfearlessportal.vercel.app' : process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'),
   title: { default: 'Camp Fearless portal', template: '%s · Camp Fearless' },
   description: 'Registration, check-in and payments for Camp Fearless.',
   icons: {
@@ -21,10 +23,6 @@ export const metadata: Metadata = {
       {
         url: '/icon-dark-32x32.png',
         media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
       },
     ],
     apple: '/apple-icon.png',
