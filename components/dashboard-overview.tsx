@@ -662,9 +662,9 @@ export function DashboardOverview() {
                           <div className="font-medium">{camper.name}</div>
                           <div className="text-muted-foreground">
                             {camper.ageLine}
-                            {camper.role === "Facilitator" ? ` · Facilitator, ${camper.team}` : ""}
                             {camper.waived ? " · Fee waived" : ""}
                           </div>
+                          {camper.role === "Facilitator" && <div className="text-muted-foreground">Facilitator, {camper.team}</div>}
                         </TableCell>
                         {campus === "all" && <TableCell className="whitespace-nowrap">{camper.camp}</TableCell>}
                         <TableCell className="whitespace-nowrap">
