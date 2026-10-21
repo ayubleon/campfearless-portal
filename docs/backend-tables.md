@@ -144,7 +144,7 @@ Payments are verified by hand against the Paybill (number and account are settin
 | M-Pesa code, amount, verification | payments | Payments, Reports (Payment column and filter), Dashboard check-in lookup |
 | Fees, limit, dates, link, paused | edition_camps | Camp setup, Registration (fee and spots), Waivers, Welcome page, Dashboard (spots left) |
 | Age limits and camp names | camps | Registration validation, Reports age groups, tabs everywhere |
-| Edition list and open or closed | editions | Reports and Dashboard filters, Camp setup, the Registration, Waivers and Payments guard |
+| Edition list and open or closed | editions | Reports filter, Camp setup, the Registration, Waivers and Payments guard |
 | Campus and network lists | campuses, networks | Registration, Reports, Payments, Waivers, Campuses and networks |
 | Staff names ("Registered by", "Issued by", audit user, current user) | users | Payments, Waivers, Audit log, Account, sidebar |
 | Roles, permissions, facilitator teams | roles, role_permissions | Users and roles, Reports Team filter, route guards |

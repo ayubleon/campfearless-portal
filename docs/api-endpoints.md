@@ -22,7 +22,7 @@ Permissions are the ids in `backend-tables.md` (`register`, `check-in`, `check-o
 
 | Needs | Detail |
 |---|---|
-| Read: figures | for an edition and a camp (All, MYF, MYA): registered, walk-ins, online checked in, departed early, male and female present, baptism requests, facilitators, spots used and left. Worked out by the server from the tables |
+| Read: figures | for the open edition and a camp (All, MYF, MYA): registered, walk-ins, online checked in, departed early, male and female present, baptism requests, facilitators, spots used and left. Worked out by the server from the tables |
 | Read: roster | campers and facilitators of the open edition: name, age, gender, role (Camper or Facilitator), team, camp, campus (or Invited), status, medical, special needs, emergency contact, fee waived. Filters: edition, camp, campus, role, status, search (name, phone, M-Pesa code). Sort by a column. **Paged** (the screen pages ten at a time) |
 | Read: check-in lookup | search by name, phone, emergency contact phone or M-Pesa code (never medical details); returns matches with their status |
 | Write | `check-in` (one or several people); `undo-check-in`; `exit-permit` (marks checked out, with a time); `undo-check-out`; `edit` a camper (first and last name, age, gender, phone, baptism, medical, special needs; age must fit the camp); `cancel-registration` (frees the spot, leaves the payment). Each one is audited |

@@ -10,6 +10,7 @@ import { Badge } from "@/ui/badge"
 import { Button, buttonVariants } from "@/ui/button"
 import { cn } from "@/lib/utils"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/tooltip"
+import { EditionScope } from "@/components/edition-scope"
 import { SortableHead } from "@/components/sortable-head"
 import { campRecord } from "@/lib/camp-data"
 import { campusLabel } from "@/lib/campuses"
@@ -18,7 +19,7 @@ import { nameMaxChars, phoneError, phoneValid } from "@/lib/validation"
 import { campers as campersRecords, facilitators as facilitatorRecords, fullName, paymentOf } from "@/lib/records"
 import { byRank, byText, useSortedRows } from "@/lib/sort"
 import { campSpotsUsed, statsFor, statsForEdition, type CampKey, type CampScope } from "@/lib/dashboard-stats"
-import { currentEditionIds, editionLabel, editions } from "@/lib/editions"
+import { currentEditionIds, editionLabel } from "@/lib/editions"
 import { LoadingButton } from "@/components/loading-button"
 import { useSession } from "@/components/session-provider"
 import { TablePagination } from "@/components/table-pagination"
@@ -246,8 +247,8 @@ export function DashboardOverview() {
   const baseCampers = React.useMemo(buildCampers, [])
   const [edits, setEdits] = React.useState<Record<string, Partial<RosterCamper>>>({})
   const campers = React.useMemo(() => baseCampers.map((camper) => ({ ...camper, ...edits[camper.id] })), [baseCampers, edits])
-  const [editionId, setEditionId] = React.useState(currentEditionIds[0])
-  const editionOpen = editions.find((edition) => edition.id === editionId)?.open ?? false
+  // The dashboard is the live screen for the open edition. Past editions are read in Reports.
+  const editionId = currentEditionIds[0] ?? ""
   const stats = statsFor(scope, statsForEdition(editionId))
   const [search, setSearch] = React.useState("")
   const [campusFilter, setCampusFilter] = React.useState("all")
@@ -412,6 +413,7 @@ export function DashboardOverview() {
         />
       )}
       <main className="flex min-w-0 flex-1 flex-col gap-4 p-4 lg:p-6">
+      <EditionScope>
         <Dialog open={checkInOpen} onOpenChange={setCheckInOpen}>
           <DialogContent showCloseButton={false} className="gap-0 p-4 sm:max-w-xl">
             <DialogHeader className="relative space-y-1 text-left">
@@ -502,12 +504,6 @@ export function DashboardOverview() {
           </DialogContent>
         </Dialog>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <Select value={editionId} onValueChange={setEditionId}>
-            <SelectTrigger className="w-full sm:w-52" aria-label="Edition"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              {editions.map((edition) => <SelectItem key={edition.id} value={edition.id}>{edition.name}{edition.open ? "" : " (closed)"}</SelectItem>)}
-            </SelectContent>
-          </Select>
           <Tabs value={campus} onValueChange={setCampus} className="w-fit">
             <TabsList className="grid w-full max-w-md grid-cols-3">
               <TabsTrigger className="w-full" value="all">
@@ -550,8 +546,7 @@ export function DashboardOverview() {
             <QuickSummary scope={scope} editionId={editionId} />
           </div>
         </section>
-        {editionOpen ? (
-          <>
+        <>
           <section className={cn("grid gap-4", can("check-in") && can("register") && "lg:grid-cols-2")}>
             {can("check-in") && <Card className="flex flex-col shadow-none">
               <CardHeader>
@@ -751,20 +746,7 @@ export function DashboardOverview() {
               <TablePagination page={currentRosterPage} pageSize={rosterPageSize} total={sortedRows.length} onPage={setRosterPage} />
             </CardContent>
           </Card>
-          </>
-        ) : (
-          <Card className="shadow-none">
-            <CardHeader>
-              <CardTitle className="text-base">{editionLabel(editionId)} is closed</CardTitle>
-              <CardDescription>Check-in, walk-in registration and exit permits are off. Its records stay in Reports.</CardDescription>
-              <CardAction>
-                <Button asChild variant="outline">
-                  <Link href="/reports">View in Reports</Link>
-                </Button>
-              </CardAction>
-            </CardHeader>
-          </Card>
-        )}
+        </>
         <Dialog open={undoing !== null} onOpenChange={(open) => !open && setUndoing(null)}>
           <DialogContent showCloseButton={false} className="gap-0 sm:max-w-lg">
             <DialogHeader className="relative space-y-1 text-left">
@@ -1085,6 +1067,7 @@ export function DashboardOverview() {
             </Button>
           </DialogContent>
         </Dialog>
+      </EditionScope>
       </main>
     </>
   )
