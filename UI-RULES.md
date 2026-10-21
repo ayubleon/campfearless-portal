@@ -209,6 +209,17 @@ Actions inside a tab (Invite user, Add role) go in the `CardAction` of the card 
 - Login's "Forgot password?" opens a small dialog (email, **Send reset link**) with the toast "Password reset link successfully sent". It is a button, never `href="#"`.
 - Audit log: "Profile updated" and "Password changed" (area Users).
 
+## Welcome page card (Camp setup)
+
+- The first card on Camp setup. It holds the public welcome page's content, not its facts: per camp (MYF and MYA tabs) a description of up to 160 characters (typing or pasting past the limit keeps what fits; a character limit cannot be dodged by typing without spaces), the camp image, and the lists What to bring, What to expect and Good to know (one item per line). Camp names, dates, fees and links come from each camp's own card.
+- The welcome page link (fixed address) has **Copy link** and **Open page**. The MYF and MYA cards keep their own **Copy link** and **Pause link**, with the hint that the link sends campers straight to that camp.
+- Every camp always has an image. `/camps/myf.webp` and `/camps/mya.webp` are the defaults and can't be removed: **Replace image** swaps in a custom one (an image under 5 MB) and **Use default image** goes back. The image field is a hidden `Input type="file"` opened by the button; never `sr-only` (it keeps its full width and overflows the page).
+- Built with `SetupCard` and the shared setup helpers exported from `components/camp-setup.tsx`; the review dialog lists only changed fields, and saving fires "Welcome page successfully saved" and the audit action "Welcome page saved".
+
+## Medical and special needs
+
+- The Medical and special needs section (registration, waivers, Edit camper) has the subtitle "Only add information that affects the camper during the camp." Each details box holds at most 80 characters (`medicalMaxChars`, kept short because these notes print in lists) and shows "12 of 80 characters" beneath it.
+
 ## Audit log
 
 - Every action a screen adds that changes data, or opens sensitive records (print, export, medical details), needs an audit log entry. Add its sample row to `components/audit-log.tsx`.

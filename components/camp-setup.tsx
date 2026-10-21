@@ -14,6 +14,7 @@ import { statusClass } from "@/lib/status"
 import { Badge } from "@/ui/badge"
 import { UndoOverlay } from "@/components/undo-overlay"
 import { LeaveGuard } from "@/components/leave-guard"
+import { WelcomePageCard, initialWelcome } from "@/components/camp-setup-welcome"
 import { Button } from "@/ui/button"
 import { Calendar } from "@/ui/calendar"
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/ui/card"
@@ -24,7 +25,7 @@ import { Progress } from "@/ui/progress"
 
 // Until Users and roles exists, the signed-in user's name is hardcoded like the sidebar's.
 
-type CampId = "MYF" | "MYA"
+export type CampId = "MYF" | "MYA"
 
 type CampDetails = {
   editionName: string
@@ -49,7 +50,7 @@ type Camp = {
 
 type SharedSettings = { facilitatorFee: number }
 
-type FieldSpec<T> = { key: keyof T; label: string; format: (value: never) => string }
+export type FieldSpec<T> = { key: keyof T; label: string; format: (value: never) => string }
 
 const initialCamps: Camp[] = [
   {
@@ -139,11 +140,11 @@ function sameValues<T>(fields: FieldSpec<T>[], a: T, b: T) {
   return fields.every((field) => field.format(a[field.key] as never) === field.format(b[field.key] as never))
 }
 
-function ValueBox({ children }: { children: React.ReactNode }) {
+export function ValueBox({ children }: { children: React.ReactNode }) {
   return <div className="flex h-8 min-w-0 items-center rounded-lg border bg-muted/20 px-2.5 text-sm font-normal tabular-nums"><span className="truncate">{children}</span></div>
 }
 
-function SetupField({ label, editing, children }: { label: string; editing: boolean; children: React.ReactNode }) {
+export function SetupField({ label, editing, children }: { label: string; editing: boolean; children: React.ReactNode }) {
   const Wrapper = editing ? "label" : "div"
   return <Wrapper className="flex min-w-0 flex-col gap-2 text-sm font-medium">{label}{children}</Wrapper>
 }
@@ -209,7 +210,7 @@ function SpotsInfo() {
   )
 }
 
-function FieldError({ children }: { children: React.ReactNode }) {
+export function FieldError({ children }: { children: React.ReactNode }) {
   return <p className="text-sm text-destructive">{children}</p>
 }
 
@@ -246,7 +247,7 @@ function ReviewDialog({ open, title, changes, warnings, onCancel, onConfirm }: {
   )
 }
 
-function SetupCard<T>({ title, description, saved, fields, saveLabel, successMessage, lastSaved, auditHref, canEdit, onDirtyChange, onSave, validate, warnings, children }: {
+export function SetupCard<T>({ title, description, saved, fields, saveLabel, successMessage, lastSaved, auditHref, canEdit, onDirtyChange, onSave, validate, warnings, children }: {
   title: string
   description: string
   saved: T
@@ -371,6 +372,7 @@ function CampCard({ camp, canEdit, onDirtyChange, onSave, onTogglePause }: { cam
                   <Badge variant="outline" className={cn("whitespace-nowrap", statusClass(status))}>{status}</Badge>
                 </span>
               </SetupField>
+              <p className="text-sm text-muted-foreground">Sends campers straight to {camp.id} registration. The welcome page links here too.</p>
               <div className="flex flex-col gap-2">
                 <div className="grid grid-cols-2 gap-4">
                   <DateField label="Opens" value={details.opens} editing={editing} onChange={(opens) => update({ opens, closes: details.closes < opens ? opens : details.closes })} />
@@ -407,17 +409,25 @@ function PauseOverlay({ camp, onUndo, onDone }: { camp: Camp; onUndo: () => void
 export function CampSetupScreen({ canEdit = true }: { canEdit?: boolean }) {
   const [camps, setCamps] = React.useState(initialCamps)
   const [shared, setShared] = React.useState<{ settings: SharedSettings; lastSaved: { by: string; at: Date } }>({ settings: { facilitatorFee: 500 }, lastSaved: { by: "John Doe", at: new Date(2026, 9, 12, 11, 20) } })
+  const [welcome, setWelcome] = React.useState({ settings: initialWelcome, lastSaved: { by: "John Doe", at: new Date(2026, 9, 14, 16, 30) } })
   const [dirty, setDirty] = React.useState<Record<string, boolean>>({})
   const [pauseNotice, setPauseNotice] = React.useState<CampId | null>(null)
   const unsaved = Object.keys(dirty).filter((key) => dirty[key])
 
-  const dirtyHandlers = React.useMemo(() => Object.fromEntries(["MYF setup", "MYA setup", "Shared settings"].map((name) => [name, (value: boolean) => setDirty((current) => (current[name] === value ? current : { ...current, [name]: value }))])), [])
+  const dirtyHandlers = React.useMemo(() => Object.fromEntries(["Welcome page", "MYF setup", "MYA setup", "Shared settings"].map((name) => [name, (value: boolean) => setDirty((current) => (current[name] === value ? current : { ...current, [name]: value }))])), [])
   const updateCamp = (id: CampId, patch: (camp: Camp) => Partial<Camp>) => setCamps((current) => current.map((camp) => (camp.id === id ? { ...camp, ...patch(camp) } : camp)))
 
   const noticeCamp = camps.find((camp) => camp.id === pauseNotice)
 
   return (
     <main className="flex min-w-0 flex-1 flex-col gap-4 p-4 lg:p-6">
+      <WelcomePageCard
+        saved={welcome.settings}
+        lastSaved={welcome.lastSaved}
+        canEdit={canEdit}
+        onDirtyChange={dirtyHandlers["Welcome page"]}
+        onSave={(settings) => setWelcome({ settings, lastSaved: { by: currentUser.name, at: new Date() } })}
+      />
       {camps.map((camp) => (
         <CampCard
           key={camp.id}

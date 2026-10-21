@@ -9,6 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { Badge } from "@/ui/badge"
 import { Button, buttonVariants } from "@/ui/button"
 import { cn } from "@/lib/utils"
+import { limitMedical, medicalMaxChars } from "@/components/registration"
 import { formatDateTime } from "@/lib/format"
 import { statusClass } from "@/lib/status"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/ui/card"
@@ -667,7 +668,8 @@ export function DashboardOverview() {
                     </div>
                   </div>
                   <section className="pt-6">
-                    <h3 className="mb-3 text-base font-semibold">Medical and special needs</h3>
+                    <h3 className="text-base font-semibold">Medical and special needs</h3>
+                    <p className="mb-3 text-sm text-muted-foreground">Only add information that affects the camper during the camp.</p>
                     <div className="flex flex-col gap-4">
                       <label className="flex cursor-pointer flex-col gap-2 rounded-2xl border bg-muted/30 p-4 text-sm transition-colors focus-within:border-ring focus-within:ring-1 focus-within:ring-ring/20">
                         <span className="flex items-start gap-2 font-medium">
@@ -683,18 +685,19 @@ export function DashboardOverview() {
                         </span>
                         <span
                           className={cn(
-                            "grid overflow-hidden pl-0 pr-0 transition-[grid-template-rows,opacity,margin] duration-300 ease-out",
-                            editCamper.medical ? "grid-rows-[1fr] opacity-100" : "-mt-2 grid-rows-[0fr] opacity-0"
+                            "-mx-1 -mb-1 grid overflow-hidden transition-[grid-template-rows,opacity,margin] duration-300 ease-out",
+                            editCamper.medical ? "mt-2 grid-rows-[1fr] opacity-100" : "-mt-2 grid-rows-[0fr] opacity-0"
                           )}
                         >
-                          <span className="flex min-h-0 flex-col gap-2 pt-2">
-                            <span className="font-medium">Specify medical condition (15 words)</span>
+                          <span className="flex min-h-0 flex-col gap-2 px-1 pb-1">
+                            <span className="font-medium">Specify medical condition</span>
                             <Textarea
                               className="min-h-20 resize-none bg-background text-sm font-normal"
                               placeholder="e.g Asthma, Peanuts allergy, Epilepsy, Diabetes"
                               value={editCamper.medicalDetails}
-                              onChange={(event) => setEditCamper({ ...editCamper, medicalDetails: event.target.value })}
+                              onChange={(event) => setEditCamper({ ...editCamper, medicalDetails: limitMedical(event.target.value) })}
                             />
+                            <span className="text-xs font-normal tabular-nums text-muted-foreground">{editCamper.medicalDetails.length} of {medicalMaxChars} characters</span>
                           </span>
                         </span>
                       </label>
@@ -712,18 +715,19 @@ export function DashboardOverview() {
                         </span>
                         <span
                           className={cn(
-                            "grid overflow-hidden pl-0 pr-0 transition-[grid-template-rows,opacity,margin] duration-300 ease-out",
-                            editCamper.specialNeeds ? "grid-rows-[1fr] opacity-100" : "-mt-2 grid-rows-[0fr] opacity-0"
+                            "-mx-1 -mb-1 grid overflow-hidden transition-[grid-template-rows,opacity,margin] duration-300 ease-out",
+                            editCamper.specialNeeds ? "mt-2 grid-rows-[1fr] opacity-100" : "-mt-2 grid-rows-[0fr] opacity-0"
                           )}
                         >
-                          <span className="flex min-h-0 flex-col gap-2 pt-2">
-                            <span className="font-medium">Specify special needs and accommodations (15 words)</span>
+                          <span className="flex min-h-0 flex-col gap-2 px-1 pb-1">
+                            <span className="font-medium">Specify special needs and accommodations</span>
                             <Textarea
                               className="min-h-20 resize-none bg-background text-sm font-normal"
                               placeholder="e.g Deaf, Autism spectrum, Anxiety"
                               value={editCamper.specialNeedsDetails}
-                              onChange={(event) => setEditCamper({ ...editCamper, specialNeedsDetails: event.target.value })}
+                              onChange={(event) => setEditCamper({ ...editCamper, specialNeedsDetails: limitMedical(event.target.value) })}
                             />
+                            <span className="text-xs font-normal tabular-nums text-muted-foreground">{editCamper.specialNeedsDetails.length} of {medicalMaxChars} characters</span>
                           </span>
                         </span>
                       </label>

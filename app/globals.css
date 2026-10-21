@@ -151,14 +151,14 @@
   --status-checked-in: oklch(0.3 0.08 145);
   --status-checked-in-foreground: oklch(0.82 0.13 145);
   --status-registered: oklch(0.32 0.08 65);
-  --status-registered-foreground: oklch(0.86 0.14 60);
+  --status-registered-foreground: oklch(0.85 0.18 60);
   --status-paused: oklch(0.3 0.07 55);
-  --status-paused-foreground: oklch(0.84 0.14 55);
+  --status-paused-foreground: oklch(0.85 0.18 60);
   --status-scheduled: oklch(0.3 0.08 260);
   --status-scheduled-foreground: oklch(0.82 0.1 255);
   --status-flagged: oklch(0.3 0.1 25);
   --status-flagged-foreground: oklch(0.82 0.13 25);
-  --attention: oklch(0.75 0.16 50);
+  --attention: oklch(0.78 0.2 55);
 }
 
 @layer base {

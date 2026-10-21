@@ -48,6 +48,10 @@ const maxBatch = 10
 const allCampuses = Object.values(campusesByNetwork).flat().sort((a, b) => a.localeCompare(b))
 const paybill = { number: "400200", account: "CAMPFEARLESS" }
 
+// Medical and special needs notes end up on printed lists, so they stay short.
+export const medicalMaxChars = 80
+export const limitMedical = (value: string) => value.slice(0, medicalMaxChars)
+
 export const emptyCamper = (): CamperForm => ({ firstName: "", lastName: "", age: "", gender: "", phone: "", baptised: "", fromMavuno: "Yes", campus: "", church: "", medical: false, medicalDetails: "", specialNeeds: false, specialNeedsDetails: "" })
 export const emptyContact = (): ContactForm => ({ firstName: "", lastName: "", phone: "", relationship: "" })
 
@@ -87,10 +91,11 @@ function OptionCard({ name, checked, title, helper, detailsLabel, placeholder, d
     <label className="flex cursor-pointer flex-col gap-2 rounded-2xl border bg-muted/30 p-4 text-sm transition-colors focus-within:border-ring focus-within:ring-1 focus-within:ring-ring/20">
       <span className="flex items-start gap-2 font-medium"><Checkbox checked={checked} onCheckedChange={() => onToggle()} className="mt-0.5" />{title}</span>
       <span className="pl-6 text-muted-foreground">{helper}</span>
-      <span className={cn("grid overflow-hidden transition-[grid-template-rows,opacity,margin] duration-300 ease-out", checked ? "grid-rows-[1fr] opacity-100" : "-mt-2 grid-rows-[0fr] opacity-0")}>
-        <span className="flex min-h-0 flex-col gap-2 pt-2">
+      <span className={cn("-mx-1 -mb-1 grid overflow-hidden transition-[grid-template-rows,opacity,margin] duration-300 ease-out", checked ? "mt-2 grid-rows-[1fr] opacity-100" : "-mt-2 grid-rows-[0fr] opacity-0")}>
+        <span className="flex min-h-0 flex-col gap-2 px-1 pb-1">
           <span className="font-medium">{detailsLabel}</span>
-          <Textarea className="min-h-20 resize-none bg-background text-sm font-normal" placeholder={placeholder} value={details} onChange={(event) => onDetails(event.target.value)} />
+          <Textarea className="min-h-20 resize-none bg-background text-sm font-normal" placeholder={placeholder} value={details} onChange={(event) => onDetails(limitMedical(event.target.value))} />
+          <span className="text-xs font-normal tabular-nums text-muted-foreground">{details.length} of {medicalMaxChars} characters</span>
         </span>
       </span>
     </label>
@@ -143,14 +148,15 @@ export function CamperFields({ camp, camper, id, onChange }: { camp: Camp; campe
     </section>
 
     <section className="pt-6">
-      <h3 className="mb-3 text-base font-semibold">Medical and special needs</h3>
+      <h3 className="text-base font-semibold">Medical and special needs</h3>
+      <p className="mb-3 text-sm text-muted-foreground">Only add information that affects the camper during the camp.</p>
       <div className="flex flex-col gap-4">
         <OptionCard
           name={`${id}-medical`}
           checked={camper.medical}
           title="Medical condition / Severe allergies"
           helper="Check if this camper has acute health conditions requiring medical staff awareness."
-          detailsLabel="Specify medical condition (15 words)"
+          detailsLabel="Specify medical condition"
           placeholder="e.g Asthma, Peanuts allergy, Epilepsy, Diabetes"
           details={camper.medicalDetails}
           onToggle={() => onChange({ medical: !camper.medical })}
@@ -161,7 +167,7 @@ export function CamperFields({ camp, camper, id, onChange }: { camp: Camp; campe
           checked={camper.specialNeeds}
           title="Special needs / Accessibility support"
           helper="Check if this camper requires physical, sensory, or mobility accommodations."
-          detailsLabel="Specify special needs and accommodations (15 words)"
+          detailsLabel="Specify special needs and accommodations"
           placeholder="e.g Deaf, Autism spectrum, Anxiety"
           details={camper.specialNeedsDetails}
           onToggle={() => onChange({ specialNeeds: !camper.specialNeeds })}
