@@ -12,13 +12,13 @@ importers:
         specifier: ^1.5.0
         version: 1.8.0(@date-fns/tz@1.5.0)(@types/react@19.2.14)(date-fns@4.4.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@tabler/icons-react':
-        specifier: latest
+        specifier: ^3.49.0
         version: 3.49.0(react@19.2.4)
       '@vercel/analytics':
         specifier: 1.6.1
         version: 1.6.1(next@16.4.0(@babel/core@7.29.7)(@types/node@24.19.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)
       class-variance-authority:
-        specifier: latest
+        specifier: ^0.7.1
         version: 0.7.1
       clsx:
         specifier: ^2.1.1
@@ -27,14 +27,11 @@ importers:
         specifier: ^4.4.0
         version: 4.4.0
       lucide-react:
-        specifier: latest
+        specifier: ^1.60.0
         version: 1.60.0(@types/react@19.2.14)(react@19.2.4)
       next:
         specifier: 16.4.0
         version: 16.4.0(@babel/core@7.29.7)(@types/node@24.19.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      next-themes:
-        specifier: latest
-        version: 0.4.6(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       radix-ui:
         specifier: ^1.8.1
         version: 1.8.1(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -54,7 +51,7 @@ importers:
         specifier: ^4.11.0
         version: 4.22.0
       sonner:
-        specifier: latest
+        specifier: ^2.0.8
         version: 2.0.8(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       tailwind-merge:
         specifier: ^3.3.1
@@ -63,7 +60,7 @@ importers:
         specifier: ^1.4.0
         version: 1.4.0
       vaul:
-        specifier: latest
+        specifier: ^1.1.2
         version: 1.1.2(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
     devDependencies:
       '@tailwindcss/postcss':
@@ -2248,12 +2245,6 @@ packages:
   negotiator@1.1.0:
     resolution: {integrity: sha512-NMPBRMJgiQHjbd8phG3Vebdx4kZ1H121rbl5IkMqeOsahptB9BKo/d7oJ3zTXqTgagn2bWlNSXkh0QUGM31RYg==}
     engines: {node: '>=18'}
-
-  next-themes@0.4.6:
-    resolution: {integrity: sha512-pZvgD5L0IEvX5/9GWyHMf3m8BKiVQwsCMHfoFosXtXBMnaS0ZnIJ9ST4b4NqLVKDEm8QBxoNNGNaBv2JNF6XNA==}
-    peerDependencies:
-      react: ^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc
-      react-dom: ^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc
 
   next@16.4.0:
     resolution: {integrity: sha512-N2C+9q89Z/oLrsepSRS4jRMtwmUZAoZuAHU0e9T6+sAB5DdhADmrnOW+zjYijlrYFmVfmQhGVGy9eMFoB7UgKg==}
@@ -4920,11 +4911,6 @@ snapshots:
   negotiator@1.1.0:
     dependencies:
       content-type: 2.1.0
-
-  next-themes@0.4.6(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
-    dependencies:
-      react: 19.2.4
-      react-dom: 19.2.4(react@19.2.4)
 
   next@16.4.0(@babel/core@7.29.7)(@types/node@24.19.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
     dependencies:

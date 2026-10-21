@@ -47,6 +47,10 @@
   --color-status-flagged: var(--status-flagged);
   --color-status-flagged-foreground: var(--status-flagged-foreground);
   --color-attention: var(--attention);
+  --color-link: var(--link);
+  --color-camp-accent: var(--camp-accent);
+  --color-camp-accent-hover: var(--camp-accent-hover);
+  --color-camp-accent-foreground: var(--camp-accent-foreground);
   --color-nav-active: var(--nav-active);
   --color-nav-active-foreground: var(--nav-active-foreground);
   --color-brand: var(--brand);
@@ -89,6 +93,10 @@
   --radius: 0.625rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
+  --camp-accent: #f05a22;
+  --camp-accent-hover: #d84f1b;
+  --camp-accent-foreground: #ffffff;
+  --link: #1d4ed8;
   --nav-active: oklch(0.205 0 0);
   --nav-active-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.205 0 0);
@@ -140,6 +148,10 @@
   --chart-5: oklch(0.269 0 0);
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
+  --camp-accent: #f05a22;
+  --camp-accent-hover: #d84f1b;
+  --camp-accent-foreground: #ffffff;
+  --link: oklch(0.78 0.12 255);
   --nav-active: oklch(0 0 0);
   --nav-active-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.488 0.243 264.376);
@@ -161,6 +173,64 @@
   --attention: oklch(0.78 0.2 55);
 }
 
+/* The welcome page is always light, so its preview in Camp setup is too, even when the portal is dark. */
+.force-light {
+  color-scheme: light;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.5 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --camp-accent: #f05a22;
+  --camp-accent-hover: #d84f1b;
+  --camp-accent-foreground: #ffffff;
+  --nav-active: oklch(0.205 0 0);
+  --nav-active-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+  --status-checked-in: #dcfce7;
+  --status-checked-in-foreground: #15803d;
+  --status-registered: #ffedd5;
+  --status-registered-foreground: #c2410c;
+  --status-paused: #fff7ed;
+  --status-paused-foreground: #c2410c;
+  --status-scheduled: #dbeafe;
+  --status-scheduled-foreground: #1d4ed8;
+  --status-flagged: #fee2e2;
+  --status-flagged-foreground: #b91c1c;
+  --attention: #c2410c;
+  --brand: #336699;
+  --brand-hover: #2b5985;
+  --brand-foreground: #ffffff;
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -170,8 +240,21 @@
   }
 }
 
-/* Printed reports: only the page content, always in light colours. */
+/* Printed reports: only the page content, always in light colours. The paper size and orientation are left to the print dialog;
+   the table adapts to either: text wraps, the header row repeats on every page, and a row never splits across two pages. */
+@page {
+  margin: 12mm;
+}
 @media print {
+  [data-slot="table-container"] {
+    overflow: visible !important;
+  }
+  thead {
+    display: table-header-group;
+  }
+  tr {
+    break-inside: avoid;
+  }
   [data-slot="sidebar"],
   [data-slot="sidebar-gap"] {
     display: none !important;

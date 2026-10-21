@@ -1,6 +1,7 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
+import { SessionProvider } from '@/components/session-provider'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/ui/sonner'
 import { TooltipProvider } from '@/ui/tooltip'
@@ -50,9 +51,11 @@ export default function RootLayout({
       </head>
       <body className="antialiased">
         <ThemeProvider>
-          <TooltipProvider>{children}</TooltipProvider>
+          <SessionProvider>
+            <TooltipProvider>{children}</TooltipProvider>
+          </SessionProvider>
+          <Toaster />
         </ThemeProvider>
-        <Toaster />
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>

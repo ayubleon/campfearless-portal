@@ -1,6 +1,9 @@
 import { Card, CardContent, CardHeader } from "@/ui/card"
 import { Skeleton } from "@/ui/skeleton"
 
+// The roster shows ten campers a page.
+const rosterRows = 10
+
 function CardHeaderSkeleton() {
   return (
     <CardHeader>
@@ -70,7 +73,7 @@ export function DashboardSkeleton() {
           </div>
           <div className="overflow-hidden rounded-lg border">
             <div className="h-12 border-b bg-muted/50" />
-            {Array.from({ length: 9 }, (_, index) => (
+            {Array.from({ length: rosterRows }, (_, index) => (
               <div key={index} className="flex items-center gap-4 border-b px-4 py-3 last:border-b-0">
                 <div className="flex flex-1 flex-col gap-2">
                   <Skeleton className="h-4 w-32" />
@@ -81,6 +84,10 @@ export function DashboardSkeleton() {
                 <Skeleton className="h-8 w-24" />
               </div>
             ))}
+          </div>
+          <div className="flex items-center justify-between gap-3">
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-8 w-52" />
           </div>
         </CardContent>
       </Card>

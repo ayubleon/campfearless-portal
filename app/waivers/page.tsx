@@ -1,5 +1,6 @@
 import { AppSidebar } from '@/components/app-sidebar'
 import { WaiversScreen } from '@/components/waivers'
+import { RequirePermission } from '@/components/require-permission'
 import { SiteHeader } from '@/components/site-header'
 import {
   SidebarInset,
@@ -21,7 +22,7 @@ export default function Page() {
       <AppSidebar variant="inset" />
       <SidebarInset>
         <SiteHeader title="Waivers" />
-        <WaiversScreen />
+        <RequirePermission permission="issue-waivers"><WaiversScreen /></RequirePermission>
       </SidebarInset>
     </SidebarProvider>
   )

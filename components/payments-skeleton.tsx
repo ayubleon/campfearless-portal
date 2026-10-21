@@ -11,10 +11,11 @@ export function PaymentsSkeleton() {
           <Skeleton className="h-4 w-80 max-w-full" />
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <div className="flex flex-col gap-2 md:flex-row md:items-center">
-            <Skeleton className="h-8 max-w-md flex-1" />
+          <div className="flex flex-col gap-2 lg:flex-row lg:items-center">
+            <Skeleton className="h-8 w-full max-w-md lg:min-w-48 lg:flex-1" />
             <div className="flex flex-wrap gap-2">
               <Skeleton className="h-8 w-32" />
+              <Skeleton className="h-8 w-36" />
               <Skeleton className="h-8 w-48" />
             </div>
           </div>

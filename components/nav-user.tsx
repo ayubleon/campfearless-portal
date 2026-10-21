@@ -1,6 +1,11 @@
 "use client"
 
 import Link from "next/link"
+import { toast } from "sonner"
+
+import { useSession } from "@/components/session-provider"
+import { signInUsers } from "@/lib/session"
+import { initialRoles } from "@/lib/staff"
 import {
   IconDotsVertical,
   IconLogout,
@@ -28,6 +33,8 @@ import {
   useSidebar,
 } from '@/ui/sidebar'
 
+const roleName = (roleId: string) => initialRoles.find((role) => role.id === roleId)?.name ?? ""
+
 export function NavUser({
   user,
 }: {
@@ -38,6 +45,7 @@ export function NavUser({
   }
 }) {
   const { isMobile } = useSidebar()
+  const { signInAs, signOut } = useSession()
   const initials = user.name
     .trim()
     .split(/\s+/)
@@ -98,11 +106,23 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-              <a href="/login">
+            <DropdownMenuGroup>
+              <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">View as (demo)</DropdownMenuLabel>
+              {signInUsers.map((person) => (
+                <DropdownMenuItem key={person.id} onSelect={() => { signInAs(person.id); toast.success(`Now viewing as ${person.name}`) }}>
+                  <span className="flex min-w-0 flex-1 items-center justify-between gap-3">
+                    <span className="truncate">{person.name}</span>
+                    <span className="shrink-0 text-xs text-muted-foreground">{roleName(person.roleId)}</span>
+                  </span>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild onSelect={() => signOut()}>
+              <Link href="/login">
                 <IconLogout />
                 Log out
-              </a>
+              </Link>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

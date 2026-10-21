@@ -7,13 +7,18 @@ import { AlertCircle, X } from "lucide-react"
 import { IconCalendar, IconInfoCircle } from "@tabler/icons-react"
 import { toast } from "sonner"
 
+import { campOverlap, campRecords, type CampDetails, type CampId, type CampRecord } from "@/lib/camp-data"
 import { currentUser } from "@/lib/session"
 import { cn } from "@/lib/utils"
 import { formatDateTime, formatNumber } from "@/lib/format"
 import { statusClass } from "@/lib/status"
 import { Badge } from "@/ui/badge"
+import { LoadingButton } from "@/components/loading-button"
+import { useAction } from "@/lib/use-action"
 import { UndoOverlay } from "@/components/undo-overlay"
 import { LeaveGuard } from "@/components/leave-guard"
+import { editionLabel, facilitatorFeeOf } from "@/lib/editions"
+import { EditionsCard } from "@/components/camp-editions"
 import { WelcomePageCard, initialWelcome } from "@/components/camp-setup-welcome"
 import { Button } from "@/ui/button"
 import { Calendar } from "@/ui/calendar"
@@ -22,80 +27,23 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/ui/input"
 import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover"
 import { Progress } from "@/ui/progress"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/tabs"
 
 // Until Users and roles exists, the signed-in user's name is hardcoded like the sidebar's.
 
-export type CampId = "MYF" | "MYA"
-
-type CampDetails = {
-  editionName: string
-  campStart: Date
-  campEnd: Date
-  camperLimit: number
-  onlineFee: number
-  walkInFee: number
-  opens: Date
-  closes: Date
-}
-
-type Camp = {
-  id: CampId
-  description: string
-  spotsUsed: number
-  link: string
-  paused: boolean
-  details: CampDetails
-  lastSaved: { by: string; at: Date }
-}
+export type { CampId }
+type Camp = CampRecord
 
 type SharedSettings = { facilitatorFee: number }
 
 export type FieldSpec<T> = { key: keyof T; label: string; format: (value: never) => string }
 
-const initialCamps: Camp[] = [
-  {
-    id: "MYF",
-    description: "Mavuno Young and Fearless, ages 14 to 17",
-    spotsUsed: 320,
-    link: "register.mavuno.org/myf-2026-x7k2",
-    paused: false,
-    lastSaved: { by: "John Doe", at: new Date(2026, 9, 18, 14, 2) },
-    details: {
-      editionName: "MYF Camp 2026",
-      campStart: new Date(2026, 11, 1),
-      campEnd: new Date(2026, 11, 6),
-      camperLimit: 1000,
-      onlineFee: 1000,
-      walkInFee: 2000,
-      opens: new Date(2026, 9, 1),
-      closes: new Date(2026, 10, 30),
-    },
-  },
-  {
-    id: "MYA",
-    description: "Mavuno Young Adults, age 18 and above",
-    spotsUsed: 470,
-    link: "register.mavuno.org/mya-2026-p4m9",
-    paused: true,
-    lastSaved: { by: "John Doe", at: new Date(2026, 9, 16, 9, 45) },
-    details: {
-      editionName: "MYA Camp 2026",
-      campStart: new Date(2026, 11, 1),
-      campEnd: new Date(2026, 11, 6),
-      camperLimit: 1000,
-      onlineFee: 1000,
-      walkInFee: 2000,
-      opens: new Date(2026, 9, 1),
-      closes: new Date(2026, 10, 30),
-    },
-  },
-]
+const initialCamps: Camp[] = campRecords
 
 const formatDate = (value: Date) => format(value, "dd/MM/yyyy")
 const formatMoney = (value: number) => `KES ${formatNumber(value)}`
 
 const campFields: FieldSpec<CampDetails>[] = [
-  { key: "editionName", label: "Edition name", format: String },
   { key: "campStart", label: "Camp start", format: formatDate },
   { key: "campEnd", label: "Camp end", format: formatDate },
   { key: "camperLimit", label: "Camper limit", format: formatNumber },
@@ -216,7 +164,7 @@ export function FieldError({ children }: { children: React.ReactNode }) {
 
 type Change = { label: string; from: string; to: string }
 
-function ReviewDialog({ open, title, changes, warnings, onCancel, onConfirm }: { open: boolean; title: string; changes: Change[]; warnings: string[]; onCancel: () => void; onConfirm: () => void }) {
+function ReviewDialog({ open, title, changes, warnings, pending, onCancel, onConfirm }: { open: boolean; title: string; changes: Change[]; warnings: string[]; pending: boolean; onCancel: () => void; onConfirm: () => void }) {
   return (
     <Dialog open={open} onOpenChange={(next) => !next && onCancel()}>
       <DialogContent showCloseButton={false} className="gap-0 sm:max-w-lg">
@@ -239,15 +187,15 @@ function ReviewDialog({ open, title, changes, warnings, onCancel, onConfirm }: {
           </div>
         )}
         <DialogFooter className="mt-4 grid grid-cols-2 gap-3 sm:mt-6 sm:justify-stretch">
-          <Button type="button" variant="outline" onClick={onCancel}>Cancel</Button>
-          <Button type="button" onClick={onConfirm}>Save changes</Button>
+          <Button type="button" variant="outline" disabled={pending} onClick={onCancel}>Cancel</Button>
+          <LoadingButton type="button" pending={pending} loadingLabel="Saving..." onClick={onConfirm}>Save changes</LoadingButton>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   )
 }
 
-export function SetupCard<T>({ title, description, saved, fields, saveLabel, successMessage, lastSaved, auditHref, canEdit, onDirtyChange, onSave, validate, warnings, children }: {
+export function SetupCard<T>({ title, description, saved, fields, saveLabel, successMessage, lastSaved, auditHref, canEdit, onDirtyChange, onSave, validate, warnings, headerAction, headerExtra, children }: {
   title: string
   description: string
   saved: T
@@ -261,6 +209,8 @@ export function SetupCard<T>({ title, description, saved, fields, saveLabel, suc
   onSave: (value: T) => void
   validate: (value: T) => boolean
   warnings: (draft: T, saved: T) => string[]
+  headerAction?: (value: T) => React.ReactNode // beside Edit, e.g. a Preview button
+  headerExtra?: React.ReactNode // a line under the description, e.g. a share link
   children: (value: T, editing: boolean, update: (patch: Partial<T>) => void) => React.ReactNode
 }) {
   const [draft, setDraft] = React.useState<T | null>(null)
@@ -272,24 +222,29 @@ export function SetupCard<T>({ title, description, saved, fields, saveLabel, suc
 
   React.useEffect(() => onDirtyChange(dirty), [dirty, onDirtyChange])
 
-  const confirmSave = () => {
+  const { pending, run } = useAction()
+  const confirmSave = async () => {
     if (!draft) return
-    try {
-      onSave(draft)
-      setReviewing(false)
-      setDraft(null)
-      toast.success(successMessage)
-    } catch {
-      toast.error("Failed to save changes. Something went wrong on our end. Please try again.")
-    }
+    if (!(await run(() => onSave(draft), "save the changes"))) return
+    setReviewing(false)
+    setDraft(null)
+    toast.success(successMessage)
   }
 
   return (
     <Card className="shadow-none">
       <CardHeader>
-        <CardTitle className="text-base">{title}</CardTitle>
+        <CardTitle className="text-lg">{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
-        {canEdit && !editing && <CardAction><Button type="button" variant="outline" onClick={() => setDraft(saved)}>Edit</Button></CardAction>}
+        {headerExtra}
+        {(headerAction || (canEdit && !editing)) && (
+          <CardAction>
+            <div className="flex gap-3">
+              {headerAction?.(value)}
+              {canEdit && !editing && <Button type="button" variant="outline" onClick={() => setDraft(saved)}>Edit</Button>}
+            </div>
+          </CardAction>
+        )}
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         {children(value, editing, (patch) => setDraft((current) => ({ ...(current ?? saved), ...patch })))}
@@ -303,13 +258,17 @@ export function SetupCard<T>({ title, description, saved, fields, saveLabel, suc
           )}
         </div>
       </CardContent>
-      <ReviewDialog open={reviewing} title={`Review ${title} changes`} changes={changes} warnings={draft ? warnings(draft, saved) : []} onCancel={() => setReviewing(false)} onConfirm={confirmSave} />
+      <ReviewDialog open={reviewing} title={`Review ${title} changes`} changes={changes} warnings={draft ? warnings(draft, saved) : []} pending={pending} onCancel={() => setReviewing(false)} onConfirm={confirmSave} />
     </Card>
   )
 }
 
-function CampCard({ camp, canEdit, onDirtyChange, onSave, onTogglePause }: { camp: Camp; canEdit: boolean; onDirtyChange: (dirty: boolean) => void; onSave: (details: CampDetails) => void; onTogglePause: () => void }) {
+function CampCard({ camp, other, canEdit, onDirtyChange, onSave, onTogglePause }: { camp: Camp; other: Camp; canEdit: boolean; onDirtyChange: (dirty: boolean) => void; onSave: (details: CampDetails) => void; onTogglePause: () => void }) {
   const status = linkStatus(camp)
+  const overlapMessage = (details: CampDetails) => {
+    const overlap = campOverlap(details, other.details)
+    return overlap ? `MYF and MYA overlap from ${formatDate(overlap.start)} to ${formatDate(overlap.end)}. Camps should not run at the same time.` : null
+  }
 
   const copyLink = async () => {
     try {
@@ -333,11 +292,12 @@ function CampCard({ camp, canEdit, onDirtyChange, onSave, onTogglePause }: { cam
       canEdit={canEdit}
       onDirtyChange={onDirtyChange}
       onSave={onSave}
-      validate={(details) => details.editionName.trim() !== "" && details.camperLimit >= camp.spotsUsed && details.camperLimit > 0}
+      validate={(details) => details.camperLimit >= camp.spotsUsed && details.camperLimit > 0}
       warnings={(draft, saved) => [
         ...(draft.onlineFee !== saved.onlineFee || draft.walkInFee !== saved.walkInFee ? [`New fees apply to new registrations only. The ${formatNumber(camp.spotsUsed)} campers already registered keep what they paid.`] : []),
         ...(draft.closes < saved.closes && status !== "Inactive" ? [`Registration will now close on ${formatDate(draft.closes)}. Campers can't sign up after that date.`] : []),
         ...(draft.closes > draft.campStart ? ["Registration closes after the camp starts."] : []),
+        ...(overlapMessage(draft) ? [overlapMessage(draft)!] : []),
       ]}
     >
       {(details, editing, update) => {
@@ -347,11 +307,11 @@ function CampCard({ camp, canEdit, onDirtyChange, onSave, onTogglePause }: { cam
           <div className="grid gap-x-4 gap-y-6 md:grid-cols-2 xl:grid-cols-3">
             <section className="flex min-w-0 flex-col gap-4">
               <h3 className="text-sm text-muted-foreground">Dates</h3>
-              <TextField label="Edition name" value={details.editionName} editing={editing} onChange={(editionName) => update({ editionName })} />
               <div className="grid grid-cols-2 gap-4">
                 <DateField label="Camp start" value={details.campStart} editing={editing} onChange={(campStart) => update({ campStart, campEnd: details.campEnd < campStart ? campStart : details.campEnd })} />
                 <DateField label="Camp end" value={details.campEnd} editing={editing} disabled={{ before: details.campStart }} onChange={(campEnd) => update({ campEnd })} />
               </div>
+              {overlapMessage(details) && <FieldError>{overlapMessage(details)}</FieldError>}
               <div className="flex flex-col gap-2">
                 <NumberField label="Camper limit" value={details.camperLimit} editing={editing} onChange={(camperLimit) => update({ camperLimit })} />
                 <Progress value={usedPercent} aria-label="Camper spots used" className="h-1.5 bg-muted [&>div]:bg-emerald-500" />
@@ -408,9 +368,10 @@ function PauseOverlay({ camp, onUndo, onDone }: { camp: Camp; onUndo: () => void
 
 export function CampSetupScreen({ canEdit = true }: { canEdit?: boolean }) {
   const [camps, setCamps] = React.useState(initialCamps)
-  const [shared, setShared] = React.useState<{ settings: SharedSettings; lastSaved: { by: string; at: Date } }>({ settings: { facilitatorFee: 500 }, lastSaved: { by: "John Doe", at: new Date(2026, 9, 12, 11, 20) } })
+  const [shared, setShared] = React.useState<{ settings: SharedSettings; lastSaved: { by: string; at: Date } }>({ settings: { facilitatorFee: facilitatorFeeOf(campRecords[0].editionId) }, lastSaved: { by: "John Doe", at: new Date(2026, 9, 12, 11, 20) } })
   const [welcome, setWelcome] = React.useState({ settings: initialWelcome, lastSaved: { by: "John Doe", at: new Date(2026, 9, 14, 16, 30) } })
   const [dirty, setDirty] = React.useState<Record<string, boolean>>({})
+  const [tab, setTab] = React.useState("editions")
   const [pauseNotice, setPauseNotice] = React.useState<CampId | null>(null)
   const unsaved = Object.keys(dirty).filter((key) => dirty[key])
 
@@ -421,47 +382,63 @@ export function CampSetupScreen({ canEdit = true }: { canEdit?: boolean }) {
 
   return (
     <main className="flex min-w-0 flex-1 flex-col gap-4 p-4 lg:p-6">
-      <WelcomePageCard
-        saved={welcome.settings}
-        lastSaved={welcome.lastSaved}
-        canEdit={canEdit}
-        onDirtyChange={dirtyHandlers["Welcome page"]}
-        onSave={(settings) => setWelcome({ settings, lastSaved: { by: currentUser.name, at: new Date() } })}
-      />
-      {camps.map((camp) => (
-        <CampCard
-          key={camp.id}
-          camp={camp}
-          canEdit={canEdit}
-          onDirtyChange={dirtyHandlers[`${camp.id} setup`]}
-          onSave={(details) => updateCamp(camp.id, () => ({ details, lastSaved: { by: currentUser.name, at: new Date() } }))}
-          onTogglePause={() => { updateCamp(camp.id, (current) => ({ paused: !current.paused })); setPauseNotice(camp.id) }}
-        />
-      ))}
-      <SetupCard
-        title="Shared settings"
-        description="Fees that apply to both MYF and MYA."
-        saved={shared.settings}
-        fields={sharedFields}
-        saveLabel="Save shared settings"
-        successMessage="Shared settings successfully saved"
-        lastSaved={shared.lastSaved}
-        auditHref="/audit-log?camp=system&area=camp-setup"
-        canEdit={canEdit}
-        onDirtyChange={dirtyHandlers["Shared settings"]}
-        onSave={(settings) => setShared({ settings, lastSaved: { by: currentUser.name, at: new Date() } })}
-        validate={() => true}
-        warnings={() => ["This fee applies to both MYF and MYA. Facilitators already registered keep what they paid."]}
-      >
-        {(settings, editing, update) => (
-          <div className="grid gap-x-4 gap-y-6 md:grid-cols-2 xl:grid-cols-3">
-            <section className="flex min-w-0 flex-col gap-4">
-              <h3 className="text-sm text-muted-foreground">Fees, full payment only</h3>
-              <NumberField label="Facilitator registration" money value={settings.facilitatorFee} editing={editing} onChange={(facilitatorFee) => update({ facilitatorFee })} />
-            </section>
-          </div>
-        )}
-      </SetupCard>
+      <Tabs value={tab} onValueChange={setTab} className="gap-4">
+        <TabsList className="grid w-full max-w-md grid-cols-2">
+          <TabsTrigger className="w-full" value="editions">Editions</TabsTrigger>
+          <TabsTrigger className="w-full" value="setup">Camp settings</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="editions">
+          <EditionsCard canEdit={canEdit} />
+        </TabsContent>
+
+        {/* Kept mounted so a card with unsaved edits keeps them while someone looks at the editions. */}
+        <TabsContent value="setup" forceMount className="flex flex-col gap-4 data-[state=inactive]:hidden">
+          <p className="text-sm text-muted-foreground">Everything below applies to <strong className="text-foreground">{editionLabel(campRecords[0].editionId)}</strong>, the open edition.</p>
+          <WelcomePageCard
+            saved={welcome.settings}
+            lastSaved={welcome.lastSaved}
+            canEdit={canEdit}
+            onDirtyChange={dirtyHandlers["Welcome page"]}
+            onSave={(settings) => setWelcome({ settings, lastSaved: { by: currentUser.name, at: new Date() } })}
+          />
+          {camps.map((camp) => (
+            <CampCard
+              key={camp.id}
+              camp={camp}
+              other={camps.find((item) => item.id !== camp.id)!}
+              canEdit={canEdit}
+              onDirtyChange={dirtyHandlers[`${camp.id} setup`]}
+              onSave={(details) => updateCamp(camp.id, () => ({ details, lastSaved: { by: currentUser.name, at: new Date() } }))}
+              onTogglePause={() => { updateCamp(camp.id, (current) => ({ paused: !current.paused })); setPauseNotice(camp.id) }}
+            />
+          ))}
+          <SetupCard
+            title="Shared settings"
+            description="Fees that apply to both MYF and MYA."
+            saved={shared.settings}
+            fields={sharedFields}
+            saveLabel="Save shared settings"
+            successMessage="Shared settings successfully saved"
+            lastSaved={shared.lastSaved}
+            auditHref="/audit-log?camp=system&area=camp-setup"
+            canEdit={canEdit}
+            onDirtyChange={dirtyHandlers["Shared settings"]}
+            onSave={(settings) => setShared({ settings, lastSaved: { by: currentUser.name, at: new Date() } })}
+            validate={() => true}
+            warnings={() => ["This fee applies to both MYF and MYA. Facilitators already registered keep what they paid."]}
+          >
+            {(settings, editing, update) => (
+              <div className="grid gap-x-4 gap-y-6 md:grid-cols-2 xl:grid-cols-3">
+                <section className="flex min-w-0 flex-col gap-4">
+                  <h3 className="text-sm text-muted-foreground">Fees, full payment only</h3>
+                  <NumberField label="Facilitator registration" money value={settings.facilitatorFee} editing={editing} onChange={(facilitatorFee) => update({ facilitatorFee })} />
+                </section>
+              </div>
+            )}
+          </SetupCard>
+        </TabsContent>
+      </Tabs>
       {noticeCamp && <PauseOverlay key={`${noticeCamp.id}-${noticeCamp.paused}`} camp={noticeCamp} onUndo={() => { updateCamp(noticeCamp.id, (current) => ({ paused: !current.paused })); setPauseNotice(null) }} onDone={() => setPauseNotice(null)} />}
       <LeaveGuard active={unsaved.length > 0} unsaved={unsaved} />
     </main>

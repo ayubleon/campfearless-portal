@@ -1,5 +1,6 @@
 import { AppSidebar } from '@/components/app-sidebar'
 import { UsersAndRolesScreen } from '@/components/users-and-roles'
+import { RequirePermission } from '@/components/require-permission'
 import { SiteHeader } from '@/components/site-header'
 import {
   SidebarInset,
@@ -21,7 +22,7 @@ export default function Page() {
       <AppSidebar variant="inset" />
       <SidebarInset>
         <SiteHeader title="Users and roles" />
-        <UsersAndRolesScreen />
+        <RequirePermission permission="manage-users"><UsersAndRolesScreen /></RequirePermission>
       </SidebarInset>
     </SidebarProvider>
   )

@@ -11,8 +11,8 @@ export function AccountSkeleton() {
           <CardAction><Skeleton className="h-8 w-14" /></CardAction>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            {Array.from({ length: 4 }, (_, index) => (
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {Array.from({ length: 5 }, (_, index) => (
               <div key={index} className="flex flex-col gap-2">
                 <Skeleton className="h-4 w-20" />
                 <Skeleton className="h-8 w-full" />

@@ -1,21 +1,32 @@
 "use client"
 
+import { useSession } from "@/components/session-provider"
+import { LoadingButton } from "@/components/loading-button"
+import { useAction } from "@/lib/use-action"
+import { DuplicateDialog, type DuplicateState } from "@/components/duplicate-dialog"
+import { EditionScope } from "@/components/edition-scope"
 import * as React from "react"
 import Link from "next/link"
-import { AlertCircle, X } from "lucide-react"
+import { X } from "lucide-react"
 import { IconDotsVertical, IconSearch, IconTicket } from "@tabler/icons-react"
 import { toast } from "sonner"
 
+import { campusLabel, invitedCampus } from "@/lib/campuses"
+import { currentEditionIds } from "@/lib/editions"
+import { campers, findDuplicates, fullName } from "@/lib/records"
 import { currentUser } from "@/lib/session"
+import { userName } from "@/lib/staff"
 import { CamperFields, ContactFields, DoneOverlay, camperValid, camps, contactValid, emptyCamper, emptyContact, type Camp, type CamperForm, type ContactForm } from "@/components/registration"
-import { formatDateTime, formatNumber } from "@/lib/format"
+import { SortableHead } from "@/components/sortable-head"
+import { byDate, byRank, byText, useSortedRows } from "@/lib/sort"
+import { formatDateTime } from "@/lib/format"
 import { statusClass } from "@/lib/status"
 import { cn } from "@/lib/utils"
 import { Badge } from "@/ui/badge"
 import { Button, buttonVariants } from "@/ui/button"
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/ui/card"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/ui/dialog"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/ui/dropdown-menu"
 import { Input } from "@/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select"
 import { Switch } from "@/ui/switch"
@@ -24,23 +35,30 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 
 // Until sign-in exists, the signed-in user is hardcoded like the sidebar's.
 
-type Waiver = { id: string; name: string; age: string; gender: string; phone: string; camp: Camp; campus: string; baptised: string; status: "Waived" | "Reversed"; arrived: boolean; issuedAt: Date; issuedBy: string }
-
-const at = (month: number, day: number, hour: number, minute: number) => new Date(2026, month - 1, day, hour, minute)
+type Waiver = { id: string; name: string; age: string; gender: string; phone: string; camp: Camp; campus: string; baptised: string; source: "Walk-in" | "In advance"; arrived: boolean; issuedAt: Date; issuedBy: string }
 
 // At the desk during camp the camper is usually present; before camp a waiver is issued in advance.
 const duringCamp = (camp: Camp) => { const now = new Date(); return now >= camps[camp].campStart && now <= new Date(camps[camp].campEnd.getTime() + 86_400_000) }
 
-const initialWaivers: Waiver[] = [
-  { id: "w1", name: "Joy Atieno", age: "15", gender: "Female", phone: "0711203344", camp: "MYF", campus: "Mashariki", baptised: "No", status: "Waived", arrived: false, issuedAt: at(10, 20, 15, 40), issuedBy: "Sharon Wanjiru" },
-  { id: "w2", name: "Peter Njoroge", age: "22", gender: "Male", phone: "0722450918", camp: "MYA", campus: "Hill City", baptised: "Yes", status: "Waived", arrived: false, issuedAt: at(10, 19, 11, 5), issuedBy: "John Doe" },
-  { id: "w3", name: "Mary Wanjiku", age: "16", gender: "Female", phone: "", camp: "MYF", campus: "Kitengela", baptised: "Yes", status: "Waived", arrived: false, issuedAt: at(10, 18, 9, 30), issuedBy: "Sharon Wanjiru" },
-  { id: "w4", name: "Samuel Kiprono", age: "19", gender: "Male", phone: "0790112233", camp: "MYA", campus: "Juja", baptised: "No", status: "Reversed", arrived: false, issuedAt: at(10, 15, 14, 12), issuedBy: "John Doe" },
-  { id: "w5", name: "Grace Achieng", age: "14", gender: "Female", phone: "", camp: "MYF", campus: "Kisumu", baptised: "No", status: "Waived", arrived: false, issuedAt: at(10, 12, 10, 0), issuedBy: "Sharon Wanjiru" },
-  { id: "w6", name: "Dennis Kamau", age: "24", gender: "Male", phone: "0700987654", camp: "MYA", campus: "Downtown", baptised: "No", status: "Waived", arrived: false, issuedAt: at(10, 10, 16, 45), issuedBy: "John Doe" },
-]
+// The rows are the campers who hold a waiver (lib/records.ts), so a waived camper is the same person everywhere else.
+const initialWaivers: Waiver[] = campers
+  .filter((camper) => camper.waiver && currentEditionIds.includes(camper.editionId))
+  .map((camper) => ({
+    id: camper.id,
+    name: fullName(camper),
+    age: String(camper.age),
+    gender: camper.gender,
+    phone: camper.phone,
+    camp: camper.camp,
+    campus: camper.campus,
+    baptised: camper.baptised ? "Yes" : "No",
+    source: camper.waiver!.source,
+    arrived: camper.status !== "Registered",
+    issuedAt: camper.waiver!.issuedAt,
+    issuedBy: userName(camper.waiver!.issuedById),
+  }))
 
-function IssueDialog({ open, onClose, onIssue }: { open: boolean; onClose: () => void; onIssue: (camp: Camp, camper: CamperForm, contact: ContactForm, checkIn: boolean) => void }) {
+function IssueDialog({ open, pending, onClose, onIssue }: { open: boolean; pending: boolean; onClose: () => void; onIssue: (camp: Camp, camper: CamperForm, contact: ContactForm, checkIn: boolean) => void }) {
   const [camp, setCamp] = React.useState<Camp>("MYF")
   const [camper, setCamper] = React.useState<CamperForm>(emptyCamper())
   const [contact, setContact] = React.useState<ContactForm>(emptyContact())
@@ -79,7 +97,7 @@ function IssueDialog({ open, onClose, onIssue }: { open: boolean; onClose: () =>
           </div>
           <DialogFooter className="-mx-4 -mb-4 mt-4 shrink-0 flex-row justify-end gap-3 px-4 py-4 sm:-mx-6 sm:-mb-6 sm:mt-6 sm:px-6">
             <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
-            <Button type="button" disabled={!valid} onClick={() => onIssue(camp, camper, contact, checkIn)}>{checkIn ? "Issue waiver & check in" : "Issue waiver"}</Button>
+            <LoadingButton type="button" pending={pending} loadingLabel="Issuing..." disabled={!valid} onClick={() => onIssue(camp, camper, contact, checkIn)}>{checkIn ? "Issue waiver & check in" : "Issue waiver"}</LoadingButton>
           </DialogFooter>
         </div>
       </DialogContent>
@@ -87,42 +105,54 @@ function IssueDialog({ open, onClose, onIssue }: { open: boolean; onClose: () =>
   )
 }
 
-function ReverseDialog({ waiver, onCancel, onConfirm }: { waiver: Waiver | null; onCancel: () => void; onConfirm: () => void }) {
-  const fee = waiver ? formatNumber(camps[waiver.camp].walkInFee) : ""
-  return (
-    <Dialog open={waiver !== null} onOpenChange={(next) => !next && onCancel()}>
-      <DialogContent showCloseButton={false} className="gap-0 sm:max-w-lg">
-        <DialogHeader className="relative space-y-1 text-left">
-          <DialogTitle className="flex items-center gap-2 pr-8 text-lg font-semibold leading-none tracking-tight"><AlertCircle className="text-destructive" />Reverse waiver?</DialogTitle>
-          <DialogDescription className="text-sm text-muted-foreground"><strong className="text-foreground">{waiver?.name}</strong> stays registered but {waiver?.arrived ? "now owes" : "pays at check-in"} the full fee of <strong className="text-foreground">KES {fee}</strong>, the normal way.</DialogDescription>
-          <Button type="button" variant="ghost" size="icon" aria-label="Close reverse waiver" className="absolute right-0 top-0" onClick={onCancel}><X className="size-4" /></Button>
-        </DialogHeader>
-        <DialogFooter className="mt-4 grid grid-cols-2 gap-3 sm:mt-6 sm:justify-stretch">
-          <Button type="button" variant="outline" onClick={onCancel}>Cancel</Button>
-          <Button type="button" onClick={onConfirm}>Reverse waiver</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  )
-}
-
 export function WaiversScreen() {
+  const { can } = useSession()
   const [waivers, setWaivers] = React.useState(initialWaivers)
   const [query, setQuery] = React.useState("")
   const [campFilter, setCampFilter] = React.useState("all")
+  const [campusFilter, setCampusFilter] = React.useState("all")
   const [statusFilter, setStatusFilter] = React.useState("all")
   const [issuing, setIssuing] = React.useState(false)
-  const [reversing, setReversing] = React.useState<Waiver | null>(null)
   // The undo overlay covers both a new waiver checked in at the desk and a later check-in on arrival.
   const [checkedIn, setCheckedIn] = React.useState<{ waiver: Waiver; isNew: boolean } | null>(null)
 
+  const campusOptions = Array.from(new Set([...waivers.map((waiver) => waiver.campus), ...(campusFilter === "all" ? [] : [campusFilter])])).sort((a, b) => a.localeCompare(b))
   const filtered = waivers.filter((waiver) =>
     `${waiver.name} ${waiver.phone} ${waiver.campus}`.toLowerCase().includes(query.trim().toLowerCase()) &&
     (campFilter === "all" || waiver.camp === campFilter) &&
-    (statusFilter === "all" || (statusFilter === "not-arrived" ? waiver.status === "Waived" && !waiver.arrived : waiver.status === statusFilter)))
+    (campusFilter === "all" || waiver.campus === campusFilter) &&
+    (statusFilter === "all" || (statusFilter === "not-arrived" ? !waiver.arrived : waiver.arrived)))
 
-  const issue = (camp: Camp, camper: CamperForm, _contact: ContactForm, checkIn: boolean) => {
-    const waiver: Waiver = { id: `w-${Date.now()}`, name: `${camper.firstName.trim()} ${camper.lastName.trim()}`, age: camper.age, gender: camper.gender, phone: camper.phone, camp, campus: camper.fromMavuno === "Yes" ? camper.campus : camper.church.trim() || "Not Mavuno", baptised: camper.baptised, status: "Waived", arrived: checkIn, issuedAt: new Date(), issuedBy: currentUser.name }
+  // Heading clicks sort the list. Default: newest issued first.
+  const sourceRank = byRank(["Walk-in", "In advance"])
+  const baptismRank = byRank(["Yes", "No"])
+  const { rows: sortedWaivers, sort, toggle } = useSortedRows<Waiver>(
+    filtered,
+    {
+      camper: (a, b) => byText(a.name, b.name),
+      camp: (a, b) => byText(a.camp, b.camp),
+      campus: (a, b) => byText(a.campus, b.campus),
+      waiver: (a, b) => sourceRank(a.source, b.source),
+      arrival: (a, b) => Number(a.arrived) - Number(b.arrived), // not arrived first
+      issuedOn: (a, b) => byDate(a.issuedAt, b.issuedAt),
+      issuedBy: (a, b) => byText(a.issuedBy, b.issuedBy),
+      baptism: (a, b) => baptismRank(a.baptised, b.baptised),
+    },
+    (a, b) => byDate(b.issuedAt, a.issuedAt)
+  )
+  const [duplicate, setDuplicate] = React.useState<DuplicateState | null>(null)
+  const { pending, run } = useAction()
+  const issue = (camp: Camp, camper: CamperForm, contact: ContactForm, checkIn: boolean) => {
+    // The same person can't hold two registrations in an edition (a waiver is a registration that pays nothing).
+    const found = findDuplicates({ firstName: camper.firstName, lastName: camper.lastName, age: Number(camper.age), phone: camper.phone, campus: camper.fromMavuno === "Yes" ? camper.campus : invitedCampus })
+    const same = found.filter((match) => match.kind === "same")
+    const similar = found.filter((match) => match.kind === "similar")
+    if (same.length > 0 || similar.length > 0) { setDuplicate({ same, similar, proceed: () => save(camp, camper, checkIn) }); return }
+    save(camp, camper, checkIn)
+  }
+  const save = async (camp: Camp, camper: CamperForm, checkIn: boolean) => {
+    if (!(await run(() => undefined, "issue the waiver"))) return
+    const waiver: Waiver = { id: `w-${Date.now()}`, name: `${camper.firstName.trim()} ${camper.lastName.trim()}`, age: camper.age, gender: camper.gender, phone: camper.phone, camp, campus: camper.fromMavuno === "Yes" ? camper.campus : invitedCampus, baptised: camper.baptised, source: checkIn ? "Walk-in" : "In advance", arrived: checkIn, issuedAt: new Date(), issuedBy: currentUser.name }
     setWaivers((current) => [waiver, ...current])
     setIssuing(false)
     if (checkIn) setCheckedIn({ waiver, isNew: true })
@@ -132,14 +162,15 @@ export function WaiversScreen() {
 
   return (
     <main className="flex min-w-0 flex-1 flex-col gap-4 p-4 lg:p-6">
+      <EditionScope>
       <Card className="min-w-0 shadow-none">
         <CardHeader>
-          <CardTitle className="text-base">Full waivers</CardTitle>
-          <CardDescription>Waivers are full only. Issuing one registers the camper with a fee of KES 0, at the desk or in advance. Campers with a waiver check in with no payment. A reversed waiver means the camper pays the normal fee. Every change is logged.</CardDescription>
+          <CardTitle className="text-lg">Full waivers</CardTitle>
+          <CardDescription>Waivers are full only. Issuing one registers the camper with a fee of KES 0, at the desk or in advance. Campers with a waiver check in with no payment. Every change is logged.</CardDescription>
           <CardAction><Button type="button" onClick={() => setIssuing(true)}><IconTicket />Issue waiver</Button></CardAction>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+          <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
             <div className="relative max-w-md flex-1">
               <IconSearch className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
               <Input className="border bg-muted/50 pl-8" aria-label="Search by name, phone, campus" placeholder="Search by name, phone, campus" value={query} onChange={(event) => setQuery(event.target.value)} />
@@ -153,13 +184,19 @@ export function WaiversScreen() {
                   <SelectItem value="MYA">MYA</SelectItem>
                 </SelectContent>
               </Select>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-36" aria-label="Status"><SelectValue /></SelectTrigger>
+              <Select value={campusFilter} onValueChange={setCampusFilter}>
+                <SelectTrigger className="w-36" aria-label="Campus"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All statuses</SelectItem>
-                  <SelectItem value="Waived">Waived</SelectItem>
-                  <SelectItem value="Reversed">Reversed</SelectItem>
+                  <SelectItem value="all">All campuses</SelectItem>
+                  {campusOptions.map((campus) => <SelectItem key={campus} value={campus}>{campusLabel(campus)}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-36" aria-label="Arrival"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All arrivals</SelectItem>
                   <SelectItem value="not-arrived">Not arrived</SelectItem>
+                  <SelectItem value="checked-in">Checked in</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -168,24 +205,24 @@ export function WaiversScreen() {
             <Table>
               <TableHeader className="bg-muted/50">
                 <TableRow>
-                  <TableHead className="whitespace-nowrap">Camper</TableHead>
-                  <TableHead className="whitespace-nowrap">Camp</TableHead>
-                  <TableHead className="whitespace-nowrap">Campus</TableHead>
-                  <TableHead className="whitespace-nowrap">Status</TableHead>
-                  <TableHead className="whitespace-nowrap">Arrival</TableHead>
-                  <TableHead className="whitespace-nowrap">Issued on</TableHead>
-                  <TableHead className="whitespace-nowrap">Issued by</TableHead>
-                  <TableHead className="whitespace-nowrap">Baptism</TableHead>
+                  <SortableHead label="Camper" sortKey="camper" sort={sort} onSort={toggle} />
+                  <SortableHead label="Camp" sortKey="camp" sort={sort} onSort={toggle} />
+                  <SortableHead label="Campus" sortKey="campus" sort={sort} onSort={toggle} />
+                  <SortableHead label="Waiver" sortKey="waiver" sort={sort} onSort={toggle} />
+                  <SortableHead label="Arrival" sortKey="arrival" sort={sort} onSort={toggle} />
+                  <SortableHead label="Issued on" sortKey="issuedOn" sort={sort} onSort={toggle} />
+                  <SortableHead label="Issued by" sortKey="issuedBy" sort={sort} onSort={toggle} />
+                  <SortableHead label="Baptism" sortKey="baptism" sort={sort} onSort={toggle} />
                   <TableHead className="w-10"><span className="sr-only">More actions</span></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filtered.map((waiver) => (
+                {sortedWaivers.map((waiver) => (
                   <TableRow key={waiver.id} className="hover:bg-muted/50">
                     <TableCell className="whitespace-nowrap"><div className="font-medium">{waiver.name}</div><div className="text-muted-foreground">Age: {waiver.age} - {waiver.gender}</div></TableCell>
                     <TableCell className="whitespace-nowrap">{waiver.camp}</TableCell>
-                    <TableCell className="whitespace-nowrap">{waiver.campus}</TableCell>
-                    <TableCell className="whitespace-nowrap"><Badge variant="outline" className={cn("whitespace-nowrap", statusClass(waiver.status))}>{waiver.status}</Badge></TableCell>
+                    <TableCell className="whitespace-nowrap">{campusLabel(waiver.campus)}</TableCell>
+                    <TableCell className="whitespace-nowrap"><Badge variant="outline" className={cn("whitespace-nowrap", statusClass(waiver.source))}>{waiver.source}</Badge></TableCell>
                     <TableCell className={cn("whitespace-nowrap", !waiver.arrived && "text-muted-foreground")}>{waiver.arrived ? "Checked in" : "Not arrived"}</TableCell>
                     <TableCell className="whitespace-nowrap text-muted-foreground tabular-nums">{formatDateTime(waiver.issuedAt)}</TableCell>
                     <TableCell className="whitespace-nowrap">{waiver.issuedBy}</TableCell>
@@ -194,14 +231,8 @@ export function WaiversScreen() {
                       <DropdownMenu>
                         <DropdownMenuTrigger type="button" className={buttonVariants({ variant: "ghost", size: "icon" })} aria-label="More actions"><IconDotsVertical /></DropdownMenuTrigger>
                         <DropdownMenuContent align="end" sideOffset={6} className="min-w-44">
-                          {waiver.status === "Waived" && !waiver.arrived && <DropdownMenuItem onSelect={() => { setArrived(waiver.id, true); setCheckedIn({ waiver, isNew: false }) }}>Check in</DropdownMenuItem>}
+                          {!waiver.arrived && can("check-in") && <DropdownMenuItem onSelect={() => { setArrived(waiver.id, true); setCheckedIn({ waiver, isNew: false }) }}>Check in</DropdownMenuItem>}
                           <DropdownMenuItem asChild><Link href={`/audit-log?q=${encodeURIComponent(waiver.name)}`}>View activity</Link></DropdownMenuItem>
-                          {waiver.status === "Waived" && (
-                            <>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem className="text-destructive focus:text-destructive" onSelect={() => setReversing(waiver)}>Reverse waiver</DropdownMenuItem>
-                            </>
-                          )}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -218,12 +249,8 @@ export function WaiversScreen() {
         </CardContent>
       </Card>
 
-      <IssueDialog open={issuing} onClose={() => setIssuing(false)} onIssue={issue} />
-      <ReverseDialog
-        waiver={reversing}
-        onCancel={() => setReversing(null)}
-        onConfirm={() => { const id = reversing?.id; setWaivers((current) => current.map((waiver) => (waiver.id === id ? { ...waiver, status: "Reversed" } : waiver))); setReversing(null); toast.success("Waiver successfully reversed") }}
-      />
+      <DuplicateDialog state={duplicate} onClose={() => setDuplicate(null)} />
+      <IssueDialog open={issuing} pending={pending} onClose={() => setIssuing(false)} onIssue={issue} />
       {checkedIn && (
         <DoneOverlay
           title={checkedIn.isNew ? "Waiver issued and checked in" : "Successfully checked in"}
@@ -232,6 +259,7 @@ export function WaiversScreen() {
           onDone={() => { toast.success(checkedIn.isNew ? "Waiver successfully issued" : "Camper successfully checked in"); setCheckedIn(null) }}
         />
       )}
+      </EditionScope>
     </main>
   )
 }

@@ -1,5 +1,6 @@
 import { AppSidebar } from '@/components/app-sidebar'
 import { CampSetupScreen } from '@/components/camp-setup'
+import { RequirePermission } from '@/components/require-permission'
 import { SiteHeader } from '@/components/site-header'
 import {
   SidebarInset,
@@ -21,7 +22,7 @@ export default function Page() {
       <AppSidebar variant="inset" />
       <SidebarInset>
         <SiteHeader title="Camp setup" />
-        <CampSetupScreen />
+        <RequirePermission permission="edit-camp-setup"><CampSetupScreen /></RequirePermission>
       </SidebarInset>
     </SidebarProvider>
   )

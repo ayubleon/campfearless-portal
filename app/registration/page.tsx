@@ -1,5 +1,6 @@
 import { AppSidebar } from '@/components/app-sidebar'
 import { RegistrationScreen } from '@/components/registration'
+import { RequirePermission } from '@/components/require-permission'
 import { SiteHeader } from '@/components/site-header'
 import {
   SidebarInset,
@@ -21,7 +22,7 @@ export default function Page() {
       <AppSidebar variant="inset" />
       <SidebarInset>
         <SiteHeader title="Walk-in camper registration" />
-        <RegistrationScreen />
+        <RequirePermission permission="register"><RegistrationScreen /></RequirePermission>
       </SidebarInset>
     </SidebarProvider>
   )

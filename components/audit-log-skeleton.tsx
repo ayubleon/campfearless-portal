@@ -10,7 +10,7 @@ export function AuditLogSkeleton() {
           <Skeleton className="h-4 w-96 max-w-full" />
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+          <div className="flex flex-col gap-2 xl:flex-row xl:items-center xl:justify-between">
             <Skeleton className="h-8 max-w-md flex-1" />
             <div className="flex gap-2">
               <Skeleton className="h-8 w-36" />

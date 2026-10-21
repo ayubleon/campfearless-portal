@@ -1,11 +1,17 @@
 "use client"
 
+import { LoadingButton } from "@/components/loading-button"
+import { useAction } from "@/lib/use-action"
+import { isEmail, placeNameMaxChars } from "@/lib/validation"
+import { allPermissions, campAccessOptions, initialRoles, initialUsers, permissionGroups, permissions, type CampAccess, type Role, type User, type UserStatus } from "@/lib/staff"
 import * as React from "react"
 import Link from "next/link"
 import { AlertCircle, X } from "lucide-react"
 import { IconDotsVertical, IconPlus, IconUserPlus } from "@tabler/icons-react"
 import { toast } from "sonner"
 
+import { SortableHead } from "@/components/sortable-head"
+import { byNumber, byRank, byText, useSortedRows } from "@/lib/sort"
 import { currentUser } from "@/lib/session"
 import { cn } from "@/lib/utils"
 import { statusClass } from "@/lib/status"
@@ -22,61 +28,6 @@ import { Switch } from "@/ui/switch"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/tabs"
 
-// Until sign-in exists, the signed-in user is hardcoded like the sidebar's.
-
-type CampAccess = "Both" | "MYF only" | "MYA only"
-type UserStatus = "active" | "inactive" | "pending"
-type User = { id: string; name: string; email: string; roleId: string; access: CampAccess; status: UserStatus }
-type Role = { id: string; name: string; description: string; canSignIn: boolean; locked?: boolean; permissions: string[] }
-
-const permissionGroups = [
-  { label: "Campers", permissions: [
-    { id: "register", label: "Register campers" },
-    { id: "check-in", label: "Check in campers" },
-    { id: "check-out", label: "Check out campers" },
-  ] },
-  { label: "Waivers and payments", permissions: [
-    { id: "issue-waivers", label: "Issue waivers" },
-    { id: "verify-payments", label: "Verify payments" },
-  ] },
-  { label: "Records", permissions: [
-    { id: "view-records", label: "View records" },
-    { id: "print-records", label: "Print records", sensitive: true },
-    { id: "export-records", label: "Export records", sensitive: true },
-    { id: "view-medical", label: "View medical details", sensitive: true },
-  ] },
-  { label: "Administration", permissions: [
-    { id: "edit-camp-setup", label: "Edit camp setup" },
-    { id: "manage-campuses", label: "Manage campuses and networks" },
-    { id: "manage-users", label: "Manage users" },
-    { id: "view-audit-log", label: "View audit log", sensitive: true },
-  ] },
-]
-const permissions: { id: string; label: string; sensitive?: boolean }[] = permissionGroups.flatMap((group) => group.permissions)
-const allPermissions = permissions.map((permission) => permission.id)
-const campAccessOptions: CampAccess[] = ["Both", "MYF only", "MYA only"]
-
-const initialRoles: Role[] = [
-  { id: "super-admin", name: "Super admin", description: "Full access. Creates roles and manages everything.", canSignIn: true, locked: true, permissions: allPermissions },
-  { id: "lead-registrar", name: "Lead registrar", description: "Leads the registration desk.", canSignIn: true, permissions: ["register", "check-in", "check-out", "issue-waivers", "verify-payments", "view-records", "print-records", "export-records"] },
-  { id: "registrar", name: "Registrar", description: "Registers walk-ins and checks campers in.", canSignIn: true, permissions: ["register", "check-in", "view-records"] },
-  { id: "kitchen-crew", name: "Kitchen crew", description: "Facilitator team in the kitchen.", canSignIn: false, permissions: [] },
-  { id: "security", name: "Security", description: "Facilitator team for the gate and safety.", canSignIn: false, permissions: [] },
-  { id: "media-team", name: "Media team", description: "", canSignIn: false, permissions: [] },
-  { id: "worship-team", name: "Worship team", description: "", canSignIn: false, permissions: [] },
-]
-
-const initialUsers: User[] = [
-  { id: "u1", name: "John Doe", email: "john@mavuno.org", roleId: "super-admin", access: "Both", status: "active" },
-  { id: "u2", name: "Sharon Wanjiru", email: "sharon@mavuno.org", roleId: "lead-registrar", access: "Both", status: "active" },
-  { id: "u3", name: "Dennis Otieno", email: "dennis@mavuno.org", roleId: "registrar", access: "MYA only", status: "active" },
-  { id: "u4", name: "Faith Akinyi", email: "faith@mavuno.org", roleId: "registrar", access: "MYF only", status: "active" },
-  { id: "u5", name: "Mercy Chebet", email: "mercy@mavuno.org", roleId: "registrar", access: "Both", status: "active" },
-  { id: "u6", name: "Kevin Mutua", email: "kevin@mavuno.org", roleId: "registrar", access: "Both", status: "inactive" },
-  { id: "u7", name: "", email: "brian@mavuno.org", roleId: "registrar", access: "MYF only", status: "pending" },
-]
-
-const isEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())
 
 function DialogTop({ title, description, onClose, closeLabel }: { title: React.ReactNode; description: React.ReactNode; onClose: () => void; closeLabel: string }) {
   return (
@@ -89,6 +40,7 @@ function DialogTop({ title, description, onClose, closeLabel }: { title: React.R
 }
 
 function ConfirmDialog({ open, title, description, confirmLabel, showCancel = true, onCancel, onConfirm }: { open: boolean; title: string; description: React.ReactNode; confirmLabel: string; showCancel?: boolean; onCancel: () => void; onConfirm: () => void }) {
+  const { pending, run } = useAction()
   return (
     <Dialog open={open} onOpenChange={(next) => !next && onCancel()}>
       <DialogContent showCloseButton={false} className="gap-0 sm:max-w-lg">
@@ -98,8 +50,8 @@ function ConfirmDialog({ open, title, description, confirmLabel, showCancel = tr
           <Button type="button" variant="ghost" size="icon" aria-label="Close confirmation" className="absolute right-0 top-0" onClick={onCancel}><X className="size-4" /></Button>
         </DialogHeader>
         <DialogFooter className={cn("mt-4 gap-3 sm:mt-6", showCancel ? "grid grid-cols-2 sm:justify-stretch" : "flex-row justify-end")}>
-          {showCancel && <Button type="button" variant="outline" onClick={onCancel}>Cancel</Button>}
-          <Button type="button" onClick={onConfirm}>{confirmLabel}</Button>
+          {showCancel && <Button type="button" variant="outline" disabled={pending} onClick={onCancel}>Cancel</Button>}
+          <LoadingButton type="button" pending={pending} loadingLabel="Working..." onClick={() => (showCancel ? run(onConfirm, "complete the action") : onConfirm())}>{confirmLabel}</LoadingButton>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -107,6 +59,7 @@ function ConfirmDialog({ open, title, description, confirmLabel, showCancel = tr
 }
 
 function InviteDialog({ open, roles, users, onClose, onInvite }: { open: boolean; roles: Role[]; users: User[]; onClose: () => void; onInvite: (user: Omit<User, "id" | "name" | "status">) => void }) {
+  const { pending, run } = useAction()
   const [email, setEmail] = React.useState("")
   const [roleId, setRoleId] = React.useState("")
   const [access, setAccess] = React.useState("")
@@ -138,7 +91,7 @@ function InviteDialog({ open, roles, users, onClose, onInvite }: { open: boolean
         </div>
         <DialogFooter className="mt-4 grid grid-cols-2 gap-3 sm:mt-6 sm:justify-stretch">
           <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
-          <Button type="button" disabled={!valid} onClick={() => onInvite({ email: email.trim(), roleId, access: access as CampAccess })}>Send invite</Button>
+          <LoadingButton type="button" pending={pending} loadingLabel="Sending..." disabled={!valid} onClick={() => run(() => onInvite({ email: email.trim(), roleId, access: access as CampAccess }), "send the invite")}>Send invite</LoadingButton>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -148,6 +101,7 @@ function InviteDialog({ open, roles, users, onClose, onInvite }: { open: boolean
 type RoleDraft = { name: string; description: string; canSignIn: boolean; startFrom: string }
 
 function RoleDialog({ open, role, roles, userCount, onClose, onSave }: { open: boolean; role: Role | null; roles: Role[]; userCount: number; onClose: () => void; onSave: (draft: RoleDraft) => void }) {
+  const { pending, run } = useAction()
   const [draft, setDraft] = React.useState<RoleDraft>({ name: "", description: "", canSignIn: false, startFrom: "none" })
   React.useEffect(() => { if (open) setDraft({ name: role?.name ?? "", description: role?.description ?? "", canSignIn: role?.canSignIn ?? false, startFrom: "none" }) }, [open, role])
   const duplicate = roles.some((other) => other.id !== role?.id && other.name.toLowerCase() === draft.name.trim().toLowerCase())
@@ -160,7 +114,7 @@ function RoleDialog({ open, role, roles, userCount, onClose, onSave }: { open: b
         <DialogTop title={role ? "Edit role" : "Add role"} description="If it can sign in, you tick its permissions in the matrix right after saving." onClose={onClose} closeLabel={role ? "Close edit role" : "Close add role"} />
         <div className="flex flex-col gap-4 pt-4">
           <Field label="Role name">
-            <Input className="bg-muted/40" value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} />
+            <Input className="bg-muted/40" maxLength={placeNameMaxChars} value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} />
             {duplicate && <span className="text-sm font-normal text-destructive">A role with this name already exists.</span>}
           </Field>
           <Field label="What the role does">
@@ -187,7 +141,7 @@ function RoleDialog({ open, role, roles, userCount, onClose, onSave }: { open: b
         </div>
         <DialogFooter className="mt-4 grid grid-cols-2 gap-3 sm:mt-6 sm:justify-stretch">
           <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
-          <Button type="button" disabled={!valid} onClick={() => onSave({ ...draft, name: draft.name.trim(), description: draft.description.trim() })}>{role ? "Save changes" : "Save role"}</Button>
+          <LoadingButton type="button" pending={pending} loadingLabel="Saving..." disabled={!valid} onClick={() => run(() => onSave({ ...draft, name: draft.name.trim(), description: draft.description.trim() }), "save the role")}>{role ? "Save changes" : "Save role"}</LoadingButton>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -213,6 +167,32 @@ export function UsersAndRolesScreen() {
 
   const roleById = (id: string) => roles.find((role) => role.id === id)
   const usersIn = (roleId: string) => users.filter((user) => user.roleId === roleId).length
+
+  // Heading clicks sort the tables. Default: A to Z by first name for users, A to Z by role name for roles.
+  const roleNameOf = (id: string) => roles.find((role) => role.id === id)?.name ?? ""
+  const displayName = (user: User) => user.name || user.email
+  const statusRank = byRank(["active", "inactive", "pending"])
+  const { rows: sortedUsers, sort: userSort, toggle: toggleUserSort } = useSortedRows<User>(
+    users,
+    {
+      user: (a, b) => byText(displayName(a), displayName(b)),
+      role: (a, b) => byText(roleNameOf(a.roleId), roleNameOf(b.roleId)),
+      access: (a, b) => byText(a.access, b.access),
+      active: (a, b) => statusRank(a.status, b.status),
+    },
+    (a, b) => byText(displayName(a), displayName(b))
+  )
+  const { rows: sortedRoles, sort: roleSort, toggle: toggleRoleSort } = useSortedRows<Role>(
+    roles,
+    {
+      role: (a, b) => byText(a.name, b.name),
+      description: (a, b) => byText(a.description || "~", b.description || "~"),
+      access: (a, b) => Number(b.canSignIn) - Number(a.canSignIn), // can sign in first
+      users: (a, b) => byNumber(usersIn(a.id), usersIn(b.id)),
+      permissions: (a, b) => byNumber(a.canSignIn ? a.permissions.length : -1, b.canSignIn ? b.permissions.length : -1),
+    },
+    (a, b) => byText(a.name, b.name)
+  )
   const signInRoles = roles.filter((role) => role.canSignIn)
   const superAdmins = users.filter((user) => user.roleId === "super-admin" && user.status === "active").length
   const isProtected = (user: User) => user.email === currentUser.email || (user.roleId === "super-admin" && user.status === "active" && superAdmins <= 1)
@@ -261,7 +241,7 @@ export function UsersAndRolesScreen() {
         <TabsContent value="users">
           <Card className="min-w-0 shadow-none">
             <CardHeader>
-              <CardTitle className="text-base">Users</CardTitle>
+              <CardTitle className="text-lg">Users</CardTitle>
               <CardDescription>Everyone with an account. Deactivating a user blocks sign in but keeps their history.</CardDescription>
               <CardAction><Button type="button" onClick={() => setInviteOpen(true)}><IconUserPlus />Invite user</Button></CardAction>
             </CardHeader>
@@ -270,15 +250,15 @@ export function UsersAndRolesScreen() {
                 <Table>
                   <TableHeader className="bg-muted/50">
                     <TableRow>
-                      <TableHead className="whitespace-nowrap">User</TableHead>
-                      <TableHead className="whitespace-nowrap">Role</TableHead>
-                      <TableHead className="whitespace-nowrap">Camp access</TableHead>
-                      <TableHead className="whitespace-nowrap">Active</TableHead>
+                      <SortableHead label="User" sortKey="user" sort={userSort} onSort={toggleUserSort} />
+                      <SortableHead label="Role" sortKey="role" sort={userSort} onSort={toggleUserSort} />
+                      <SortableHead label="Camp access" sortKey="access" sort={userSort} onSort={toggleUserSort} />
+                      <SortableHead label="Active" sortKey="active" sort={userSort} onSort={toggleUserSort} />
                       <TableHead className="w-10"><span className="sr-only">More actions</span></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {users.map((user) => {
+                    {sortedUsers.map((user) => {
                       const you = user.email === currentUser.email
                       const locked = isProtected(user)
                       return (
@@ -331,7 +311,15 @@ export function UsersAndRolesScreen() {
                                 <>
                                   <DropdownMenuItem onSelect={() => toast.success("Invite successfully resent")}>Resend invite</DropdownMenuItem>
                                   <DropdownMenuSeparator />
-                                  <DropdownMenuItem className="text-destructive focus:text-destructive" onSelect={() => { setUsers((current) => current.filter((item) => item.id !== user.id)); toast.success("Invite successfully cancelled") }}>Cancel invite</DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    className="text-destructive focus:text-destructive"
+                                    onSelect={() => setConfirm({
+                                      title: "Cancel invite?",
+                                      description: <>The invite to <strong className="text-foreground">{user.email}</strong> stops working. You can invite them again later.</>,
+                                      confirmLabel: "Cancel invite",
+                                      onConfirm: () => { setUsers((current) => current.filter((item) => item.id !== user.id)); toast.success("Invite successfully cancelled"); closeConfirm() },
+                                    })}
+                                  >Cancel invite</DropdownMenuItem>
                                 </>
                               ) : (
                                 <>
@@ -373,7 +361,7 @@ export function UsersAndRolesScreen() {
         <TabsContent value="roles" className="flex flex-col gap-4">
           <Card className="min-w-0 shadow-none">
             <CardHeader>
-              <CardTitle className="text-base">Roles</CardTitle>
+              <CardTitle className="text-lg">Roles</CardTitle>
               <CardDescription>Roles with system access can sign in. The others only tag people, like teams.</CardDescription>
               <CardAction><Button type="button" onClick={() => setRoleDialog({ role: null })}><IconPlus />Add role</Button></CardAction>
             </CardHeader>
@@ -382,16 +370,16 @@ export function UsersAndRolesScreen() {
                 <Table>
                   <TableHeader className="bg-muted/50">
                     <TableRow>
-                      <TableHead className="whitespace-nowrap">Role</TableHead>
-                      <TableHead className="whitespace-nowrap">Description</TableHead>
-                      <TableHead className="whitespace-nowrap">System access</TableHead>
-                      <TableHead className="whitespace-nowrap">Users</TableHead>
-                      <TableHead className="whitespace-nowrap">Permissions</TableHead>
+                      <SortableHead label="Role" sortKey="role" sort={roleSort} onSort={toggleRoleSort} />
+                      <SortableHead label="Description" sortKey="description" sort={roleSort} onSort={toggleRoleSort} />
+                      <SortableHead label="System access" sortKey="access" sort={roleSort} onSort={toggleRoleSort} />
+                      <SortableHead label="Users" sortKey="users" sort={roleSort} onSort={toggleRoleSort} />
+                      <SortableHead label="Permissions" sortKey="permissions" sort={roleSort} onSort={toggleRoleSort} />
                       <TableHead className="w-10"><span className="sr-only">More actions</span></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {roles.map((role) => {
+                    {sortedRoles.map((role) => {
                       const count = usersIn(role.id)
                       const access = role.canSignIn ? "Can sign in" : "No access"
                       return (
@@ -444,7 +432,7 @@ export function UsersAndRolesScreen() {
 
           <Card className="min-w-0 shadow-none">
             <CardHeader>
-              <CardTitle className="text-base">Permissions by role</CardTitle>
+              <CardTitle className="text-lg">Permissions by role</CardTitle>
               <CardDescription>Only roles with system access appear here. Ticks save straight away.</CardDescription>
             </CardHeader>
             <CardContent>

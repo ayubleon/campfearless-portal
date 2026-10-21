@@ -1,5 +1,6 @@
 import { AppSidebar } from '@/components/app-sidebar'
 import { AuditLogScreen } from '@/components/audit-log'
+import { RequirePermission } from '@/components/require-permission'
 import { SiteHeader } from '@/components/site-header'
 import {
   SidebarInset,
@@ -23,7 +24,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ q
       <AppSidebar variant="inset" />
       <SidebarInset>
         <SiteHeader title="Audit log" />
-        <AuditLogScreen initialQuery={q} initialCamp={camp} initialArea={area} />
+        <RequirePermission permission="view-audit-log"><AuditLogScreen initialQuery={q} initialCamp={camp} initialArea={area} /></RequirePermission>
       </SidebarInset>
     </SidebarProvider>
   )

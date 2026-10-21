@@ -28,6 +28,8 @@ const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
 const SIDEBAR_WIDTH = "16rem"
 const SIDEBAR_WIDTH_MOBILE = "18rem"
+const SIDEBAR_SWIPE_EDGE = 48 // px from the left edge where a swipe can start
+const SIDEBAR_SWIPE_DISTANCE = 60 // px it must travel to the right
 const SIDEBAR_WIDTH_ICON = "3rem"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
 
@@ -107,6 +109,39 @@ function SidebarProvider({
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
   }, [toggleSidebar])
+
+  // On touch screens (phones and tablets), a swipe right that starts at the left edge opens the sidebar:
+  // the slide-over panel on phones, the docked sidebar when it is collapsed on tablets. It starts a little
+  // in from the edge because the very edge is reserved for the browser's own back gesture on some phones.
+  const sidebarShown = isMobile ? openMobile : open
+  React.useEffect(() => {
+    if (sidebarShown) return
+    let start: { x: number; y: number } | null = null
+
+    const onTouchStart = (event: TouchEvent) => {
+      const touch = event.touches[0]
+      const blocked = event.touches.length !== 1 || document.querySelector('[role="dialog"]')
+      start = !blocked && touch.clientX <= SIDEBAR_SWIPE_EDGE ? { x: touch.clientX, y: touch.clientY } : null
+    }
+    const onTouchEnd = (event: TouchEvent) => {
+      if (!start) return
+      const touch = event.changedTouches[0]
+      const dx = touch.clientX - start.x
+      const dy = Math.abs(touch.clientY - start.y)
+      start = null
+      if (dx >= SIDEBAR_SWIPE_DISTANCE && dx > dy * 1.5) (isMobile ? setOpenMobile : setOpen)(true)
+    }
+    const onTouchCancel = () => { start = null }
+
+    document.addEventListener("touchstart", onTouchStart, { passive: true })
+    document.addEventListener("touchend", onTouchEnd, { passive: true })
+    document.addEventListener("touchcancel", onTouchCancel, { passive: true })
+    return () => {
+      document.removeEventListener("touchstart", onTouchStart)
+      document.removeEventListener("touchend", onTouchEnd)
+      document.removeEventListener("touchcancel", onTouchCancel)
+    }
+  }, [sidebarShown, isMobile, setOpen, setOpenMobile])
 
   // We add a state so that we can do data-state="expanded" or "collapsed".
   // This makes it easier to style the sidebar with Tailwind classes.

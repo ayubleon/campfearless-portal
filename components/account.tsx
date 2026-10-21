@@ -1,5 +1,8 @@
 "use client"
 
+import { LoadingButton } from "@/components/loading-button"
+import { useAction } from "@/lib/use-action"
+import { nameMaxChars, phoneError, phoneValid } from "@/lib/validation"
 import * as React from "react"
 import { X } from "lucide-react"
 import { toast } from "sonner"
@@ -13,10 +16,11 @@ import { Input } from "@/ui/input"
 
 const readOnlyField = "flex h-8 min-w-0 items-center rounded-lg border bg-muted/20 px-2.5 text-sm font-normal"
 
-type Profile = { name: string; phone: string }
+type Profile = { firstName: string; lastName: string; phone: string }
+
 
 export function AccountScreen() {
-  const [saved, setSaved] = React.useState<Profile>({ name: currentUser.name, phone: "0712345678" })
+  const [saved, setSaved] = React.useState<Profile>({ firstName: currentUser.firstName, lastName: currentUser.lastName, phone: "0712345678" })
   const [draft, setDraft] = React.useState<Profile | null>(null)
   const [reviewing, setReviewing] = React.useState(false)
   const [changingPassword, setChangingPassword] = React.useState(false)
@@ -24,17 +28,20 @@ export function AccountScreen() {
   const editing = draft !== null
   const changes = draft
     ? ([
-        draft.name.trim() !== saved.name ? { label: "Name", from: saved.name, to: draft.name.trim() } : null,
+        draft.firstName.trim() !== saved.firstName ? { label: "First name", from: saved.firstName, to: draft.firstName.trim() } : null,
+        draft.lastName.trim() !== saved.lastName ? { label: "Last name", from: saved.lastName, to: draft.lastName.trim() } : null,
         draft.phone.trim() !== saved.phone ? { label: "Phone", from: saved.phone || "-", to: draft.phone.trim() || "-" } : null,
       ].filter(Boolean) as { label: string; from: string; to: string }[])
     : []
-  const nameError = draft && draft.name.trim() === "" ? "Enter your name." : ""
-  const phoneError = draft && draft.phone.trim() !== "" && !/^0\d{9}$/.test(draft.phone.trim()) ? "Enter a 10-digit number starting with 0, like 0712345678." : ""
-  const valid = changes.length > 0 && !nameError && !phoneError
+  const firstNameError = draft && draft.firstName.trim() === "" ? "Enter your first name." : ""
+  const lastNameError = draft && draft.lastName.trim() === "" ? "Enter your last name." : ""
+  const phoneMessage = draft && !phoneValid(draft.phone.trim()) ? phoneError : ""
+  const valid = changes.length > 0 && !firstNameError && !lastNameError && !phoneMessage
 
-  const confirmSave = () => {
+  const { pending, run } = useAction()
+  const confirmSave = async () => {
     if (!draft) return
-    setSaved({ name: draft.name.trim(), phone: draft.phone.trim() })
+    if (!(await run(() => setSaved({ firstName: draft.firstName.trim(), lastName: draft.lastName.trim(), phone: draft.phone.trim() }), "update your profile"))) return
     setDraft(null)
     setReviewing(false)
     toast.success("Profile successfully updated")
@@ -44,26 +51,31 @@ export function AccountScreen() {
     <main className="flex min-w-0 flex-1 flex-col gap-4 p-4 lg:p-6">
       <Card className="shadow-none">
         <CardHeader>
-          <CardTitle className="text-base">Profile</CardTitle>
+          <CardTitle className="text-lg">Profile</CardTitle>
           <CardDescription>Your details as other people see them in the portal.</CardDescription>
           {!editing && <CardAction><Button variant="outline" onClick={() => setDraft({ ...saved })}>Edit</Button></CardAction>}
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {editing && draft ? (
               <>
-                <label className="flex flex-col gap-2 text-sm font-medium">Name
-                  <Input className="bg-muted/40" value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} />
-                  {nameError && <p className="text-sm font-normal text-destructive">{nameError}</p>}
+                <label className="flex flex-col gap-2 text-sm font-medium">First name
+                  <Input className="bg-muted/40" autoComplete="given-name" value={draft.firstName} onChange={(event) => setDraft({ ...draft, firstName: event.target.value.slice(0, nameMaxChars) })} />
+                  {firstNameError && <p className="text-sm font-normal text-destructive">{firstNameError}</p>}
+                </label>
+                <label className="flex flex-col gap-2 text-sm font-medium">Last name
+                  <Input className="bg-muted/40" autoComplete="family-name" value={draft.lastName} onChange={(event) => setDraft({ ...draft, lastName: event.target.value.slice(0, nameMaxChars) })} />
+                  {lastNameError && <p className="text-sm font-normal text-destructive">{lastNameError}</p>}
                 </label>
                 <label className="flex flex-col gap-2 text-sm font-medium">Phone
                   <Input className="bg-muted/40 tabular-nums" inputMode="tel" value={draft.phone} onChange={(event) => setDraft({ ...draft, phone: event.target.value })} />
-                  {phoneError && <p className="text-sm font-normal text-destructive">{phoneError}</p>}
+                  {phoneMessage && <p className="text-sm font-normal text-destructive">{phoneMessage}</p>}
                 </label>
               </>
             ) : (
               <>
-                <div className="flex flex-col gap-2 text-sm font-medium">Name<div className={readOnlyField}>{saved.name}</div></div>
+                <div className="flex flex-col gap-2 text-sm font-medium">First name<div className={readOnlyField}>{saved.firstName}</div></div>
+                <div className="flex flex-col gap-2 text-sm font-medium">Last name<div className={readOnlyField}>{saved.lastName}</div></div>
                 <div className="flex flex-col gap-2 text-sm font-medium">Phone<div className={`${readOnlyField} tabular-nums`}>{saved.phone || "-"}</div></div>
               </>
             )}
@@ -82,7 +94,7 @@ export function AccountScreen() {
 
       <Card className="shadow-none">
         <CardHeader>
-          <CardTitle className="text-base">Password</CardTitle>
+          <CardTitle className="text-lg">Password</CardTitle>
           <CardDescription>Use a password you don't use anywhere else.</CardDescription>
           <CardAction><Button variant="outline" onClick={() => setChangingPassword(true)}>Change password</Button></CardAction>
         </CardHeader>
@@ -107,8 +119,8 @@ export function AccountScreen() {
             ))}
           </div>
           <DialogFooter className="mt-4 grid grid-cols-2 gap-3 sm:mt-6 sm:justify-stretch">
-            <Button variant="outline" onClick={() => setReviewing(false)}>Cancel</Button>
-            <Button onClick={confirmSave}>Save changes</Button>
+            <Button variant="outline" disabled={pending} onClick={() => setReviewing(false)}>Cancel</Button>
+            <LoadingButton pending={pending} loadingLabel="Saving..." onClick={confirmSave}>Save changes</LoadingButton>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -132,7 +144,9 @@ function PasswordDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (
   const confirmError = confirm !== "" && confirm !== next ? "The passwords don't match." : ""
   const valid = current !== "" && next.length >= 8 && next !== current && confirm === next
 
-  const submit = () => {
+  const { pending, run } = useAction()
+  const submit = async () => {
+    if (!(await run(() => undefined, "change your password"))) return
     onOpenChange(false)
     toast.success("Password successfully changed")
   }
@@ -159,8 +173,8 @@ function PasswordDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (
           </label>
         </div>
         <DialogFooter className="-mx-4 -mb-4 mt-4 shrink-0 flex-row justify-end gap-3 px-4 py-4 sm:-mx-6 sm:-mb-6 sm:mt-6 sm:px-6">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-          <Button disabled={!valid} onClick={submit}>Change password</Button>
+          <Button variant="outline" disabled={pending} onClick={() => onOpenChange(false)}>Cancel</Button>
+          <LoadingButton pending={pending} loadingLabel="Changing..." disabled={!valid} onClick={submit}>Change password</LoadingButton>
         </DialogFooter>
       </DialogContent>
     </Dialog>

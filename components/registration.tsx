@@ -1,14 +1,22 @@
 "use client"
 
+import { churchMaxChars, mpesaCodeValid, nameMaxChars, phoneError, phoneValid } from "@/lib/validation"
+import { LoadingButton } from "@/components/loading-button"
+import { useAction } from "@/lib/use-action"
+import { DuplicateDialog, type DuplicateState } from "@/components/duplicate-dialog"
+import { findDuplicates, mpesaCodeUsed, registerWalkIns, type DuplicateMatch } from "@/lib/records"
+import { currentUser } from "@/lib/session"
+import { EditionScope } from "@/components/edition-scope"
 import * as React from "react"
 import { IconMinus, IconPlus } from "@tabler/icons-react"
 import { toast } from "sonner"
 
 import { formatNumber } from "@/lib/format"
-import { campusesByNetwork } from "@/lib/campuses"
+import { activeCampuses, invitedCampus } from "@/lib/campuses"
 import { cn } from "@/lib/utils"
 import { LeaveGuard } from "@/components/leave-guard"
 import { Field } from "@/components/field"
+import { campRecord } from "@/lib/camp-data"
 import { Button } from "@/ui/button"
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/ui/card"
 import { UndoOverlay } from "@/components/undo-overlay"
@@ -38,26 +46,32 @@ export type CamperForm = {
 
 export type ContactForm = { firstName: string; lastName: string; phone: string; relationship: string }
 
-// Same sample numbers as Camp setup until registrations are real.
+// Name, dates, fee, limit and spots used come from the camp records (the same ones Camp setup edits).
+const fromRecord = (id: Camp, relationships: string[]) => {
+  const record = campRecord(id)
+  return { label: record.label, get spotsUsed() { return record.spotsUsed }, camperLimit: record.details.camperLimit, walkInFee: record.details.walkInFee, campStart: record.details.campStart, campEnd: record.details.campEnd, relationships }
+}
 export const camps: Record<Camp, { label: string; spotsUsed: number; camperLimit: number; walkInFee: number; campStart: Date; campEnd: Date; relationships: string[] }> = {
-  MYF: { label: "MYF (14 - 17)", spotsUsed: 320, camperLimit: 1000, walkInFee: 2000, campStart: new Date(2026, 11, 1), campEnd: new Date(2026, 11, 6), relationships: ["Parent", "Guardian", "Sibling", "Relative", "Other"] },
-  MYA: { label: "MYA (18+)", spotsUsed: 470, camperLimit: 1000, walkInFee: 2000, campStart: new Date(2026, 11, 1), campEnd: new Date(2026, 11, 6), relationships: ["Parent", "Spouse", "Sibling", "Relative", "Friend", "Other"] },
+  MYF: fromRecord("MYF", ["Parent", "Guardian", "Sibling", "Relative", "Other"]),
+  MYA: fromRecord("MYA", ["Parent", "Spouse", "Sibling", "Relative", "Friend", "Other"]),
 }
 const maxBatch = 10
-// One A–Z list: campers often don't know which network their campus belongs to.
-const allCampuses = Object.values(campusesByNetwork).flat().sort((a, b) => a.localeCompare(b))
 const paybill = { number: "400200", account: "CAMPFEARLESS" }
 
 // Medical and special needs notes end up on printed lists, so they stay short.
-export const medicalMaxChars = 80
+export const medicalMaxChars = 40
+// The subtitle of the Medical and special needs section, shared by Registration, Waivers and Edit camper.
+export const medicalSubtitle = "Only add brief information on what affects the camper during camp."
 export const limitMedical = (value: string) => value.slice(0, medicalMaxChars)
 
 export const emptyCamper = (): CamperForm => ({ firstName: "", lastName: "", age: "", gender: "", phone: "", baptised: "", fromMavuno: "Yes", campus: "", church: "", medical: false, medicalDetails: "", specialNeeds: false, specialNeedsDetails: "" })
 export const emptyContact = (): ContactForm => ({ firstName: "", lastName: "", phone: "", relationship: "" })
 
-export const phoneValid = (value: string) => /^0[17]\d{8}$/.test(value.replace(/\s/g, ""))
-const codeValid = (value: string) => /^[A-Z0-9]{10}$/.test(value)
-const ageValid = (camp: Camp, age: string) => (camp === "MYF" ? ["14", "15", "16", "17"].includes(age) : /^\d{2}$/.test(age) && Number(age) >= 18)
+export { phoneValid }
+const codeValid = mpesaCodeValid
+// A camp's age limits come from its record (Camp setup). With an upper limit the age is chosen from a list; without one it is typed.
+const ageLimits = (camp: Camp) => { const { ageMin, ageMax } = campRecord(camp); return { min: ageMin, max: ageMax } }
+export const ageValid = (camp: Camp, age: string) => { const { min, max } = ageLimits(camp); return /^\d{1,2}$/.test(age) && Number(age) >= min && (max === null || Number(age) <= max) }
 
 export function camperValid(camp: Camp, camper: CamperForm) {
   return (
@@ -66,8 +80,8 @@ export function camperValid(camp: Camp, camper: CamperForm) {
     ageValid(camp, camper.age) &&
     camper.gender !== "" &&
     camper.baptised !== "" &&
-    (camper.phone === "" || phoneValid(camper.phone)) &&
-    (camper.fromMavuno === "No" || camper.campus !== "")
+    phoneValid(camper.phone) &&
+    (camper.fromMavuno === "Yes" ? camper.campus !== "" : camper.church.trim() !== "")
   )
 }
 
@@ -94,7 +108,7 @@ function OptionCard({ name, checked, title, helper, detailsLabel, placeholder, d
       <span className={cn("-mx-1 -mb-1 grid overflow-hidden transition-[grid-template-rows,opacity,margin] duration-300 ease-out", checked ? "mt-2 grid-rows-[1fr] opacity-100" : "-mt-2 grid-rows-[0fr] opacity-0")}>
         <span className="flex min-h-0 flex-col gap-2 px-1 pb-1">
           <span className="font-medium">{detailsLabel}</span>
-          <Textarea className="min-h-20 resize-none bg-background text-sm font-normal" placeholder={placeholder} value={details} onChange={(event) => onDetails(limitMedical(event.target.value))} />
+          <Textarea className="min-h-16 resize-none bg-background text-sm font-normal" maxLength={medicalMaxChars} placeholder={placeholder} value={details} onChange={(event) => onDetails(limitMedical(event.target.value))} />
           <span className="text-xs font-normal tabular-nums text-muted-foreground">{details.length} of {medicalMaxChars} characters</span>
         </span>
       </span>
@@ -106,25 +120,25 @@ export function CamperFields({ camp, camper, id, onChange }: { camp: Camp; campe
   return (
     <>
     <div className="grid gap-4 sm:grid-cols-3">
-      <Field label="First name"><Input className="bg-muted/40" value={camper.firstName} onChange={(event) => onChange({ firstName: event.target.value })} /></Field>
-      <Field label="Last name"><Input className="bg-muted/40" value={camper.lastName} onChange={(event) => onChange({ lastName: event.target.value })} /></Field>
-      {camp === "MYF" ? (
+      <Field label="First name"><Input className="bg-muted/40" maxLength={nameMaxChars} value={camper.firstName} onChange={(event) => onChange({ firstName: event.target.value })} /></Field>
+      <Field label="Last name"><Input className="bg-muted/40" maxLength={nameMaxChars} value={camper.lastName} onChange={(event) => onChange({ lastName: event.target.value })} /></Field>
+      {ageLimits(camp).max !== null ? (
         <Field label="Age">
           <Select value={camper.age} onValueChange={(age) => onChange({ age })}>
             <SelectTrigger className="w-full bg-muted/40"><SelectValue placeholder="Choose age" /></SelectTrigger>
-            <SelectContent>{["14", "15", "16", "17"].map((age) => <SelectItem key={age} value={age}>{age}</SelectItem>)}</SelectContent>
+            <SelectContent>{Array.from({ length: (ageLimits(camp).max ?? 0) - ageLimits(camp).min + 1 }, (_, index) => String(ageLimits(camp).min + index)).map((age) => <SelectItem key={age} value={age}>{age}</SelectItem>)}</SelectContent>
           </Select>
         </Field>
       ) : (
         <Field label="Age">
           <Input inputMode="numeric" className="bg-muted/40 tabular-nums" value={camper.age} onChange={(event) => onChange({ age: event.target.value.replace(/\D/g, "").slice(0, 2) })} />
-          {camper.age !== "" && !ageValid(camp, camper.age) && <FieldError>MYA is for campers aged 18 and above.</FieldError>}
+          {camper.age !== "" && !ageValid(camp, camper.age) && <FieldError>{camp} is for campers aged {ageLimits(camp).min} and above.</FieldError>}
         </Field>
       )}
       <Choice label="Gender" options={["Male", "Female"]} value={camper.gender} onChange={(gender) => onChange({ gender })} />
       <Field label="Phone number">
-        <Input inputMode="tel" className="bg-muted/40 tabular-nums" placeholder="Optional" value={camper.phone} onChange={(event) => onChange({ phone: event.target.value })} />
-        {camper.phone !== "" && !phoneValid(camper.phone) && <FieldError>Enter a 10-digit number starting with 07 or 01.</FieldError>}
+        <Input inputMode="tel" className="bg-muted/40 tabular-nums" value={camper.phone} onChange={(event) => onChange({ phone: event.target.value })} />
+        {camper.phone !== "" && !phoneValid(camper.phone) && <FieldError>{phoneError}</FieldError>}
       </Field>
       <Choice label="Want to be baptised?" options={["Yes", "No"]} value={camper.baptised} onChange={(baptised) => onChange({ baptised })} />
     </div>
@@ -138,18 +152,18 @@ export function CamperFields({ camp, camper, id, onChange }: { camp: Camp; campe
           <Field label="Select campus">
             <Select value={camper.campus} onValueChange={(campus) => onChange({ campus })}>
               <SelectTrigger className="w-full bg-muted/40"><SelectValue placeholder="Choose campus" /></SelectTrigger>
-              <SelectContent>{allCampuses.map((campus) => <SelectItem key={campus} value={campus}>{campus}</SelectItem>)}</SelectContent>
+              <SelectContent>{activeCampuses().map((campus) => <SelectItem key={campus} value={campus}>{campus}</SelectItem>)}</SelectContent>
             </Select>
           </Field>
         ) : (
-          <Field label="Church or organisation"><Input className="bg-muted/40" placeholder="Optional" value={camper.church} onChange={(event) => onChange({ church: event.target.value })} /></Field>
+          <Field label="Church or organisation"><Input className="bg-muted/40" maxLength={churchMaxChars} value={camper.church} onChange={(event) => onChange({ church: event.target.value })} /></Field>
         )}
       </div>
     </section>
 
     <section className="pt-6">
       <h3 className="text-base font-semibold">Medical and special needs</h3>
-      <p className="mb-3 text-sm text-muted-foreground">Only add information that affects the camper during the camp.</p>
+      <p className="mb-3 text-sm text-muted-foreground">{medicalSubtitle}</p>
       <div className="flex flex-col gap-4">
         <OptionCard
           name={`${id}-medical`}
@@ -167,7 +181,7 @@ export function CamperFields({ camp, camper, id, onChange }: { camp: Camp; campe
           checked={camper.specialNeeds}
           title="Special needs / Accessibility support"
           helper="Check if this camper requires physical, sensory, or mobility accommodations."
-          detailsLabel="Specify special needs and accommodations"
+          detailsLabel="Specify special needs"
           placeholder="e.g Deaf, Autism spectrum, Anxiety"
           details={camper.specialNeedsDetails}
           onToggle={() => onChange({ specialNeeds: !camper.specialNeeds })}
@@ -183,8 +197,8 @@ function CamperCard({ camp, camper, number, total, onChange }: { camp: Camp; cam
   return (
     <Card className="min-w-0 shadow-none">
       <CardHeader>
-        <CardTitle className="text-base">Camper details</CardTitle>
-        <CardDescription>Fill in your details as per your legal documents</CardDescription>
+        <CardTitle className="text-lg">Camper details</CardTitle>
+        <CardDescription>Fill in your details as per your legal documents. Every field is required except medical and special needs.</CardDescription>
         <CardAction><span className="text-sm text-attention tabular-nums">Camper {number}/{total}</span></CardAction>
       </CardHeader>
       <CardContent className="flex flex-col">
@@ -201,11 +215,11 @@ export function ContactFields({ camp, contact, campers, onChange }: { camp: Camp
   const contactLabel = camp === "MYF" ? "Guardian" : "Contact"
   return (
     <div className="grid gap-4 sm:grid-cols-3">
-      <Field label={`${contactLabel} first name`}><Input className="bg-muted/40" value={contact.firstName} onChange={(event) => onChange({ firstName: event.target.value })} /></Field>
-      <Field label={`${contactLabel} last name`}><Input className="bg-muted/40" value={contact.lastName} onChange={(event) => onChange({ lastName: event.target.value })} /></Field>
+      <Field label={`${contactLabel} first name`}><Input className="bg-muted/40" maxLength={nameMaxChars} value={contact.firstName} onChange={(event) => onChange({ firstName: event.target.value })} /></Field>
+      <Field label={`${contactLabel} last name`}><Input className="bg-muted/40" maxLength={nameMaxChars} value={contact.lastName} onChange={(event) => onChange({ lastName: event.target.value })} /></Field>
       <Field label="Phone number">
         <Input inputMode="tel" className="bg-muted/40 tabular-nums" value={contact.phone} onChange={(event) => onChange({ phone: event.target.value })} />
-        {contact.phone !== "" && !phoneValid(contact.phone) && <FieldError>Enter a 10-digit number starting with 07 or 01.</FieldError>}
+        {contact.phone !== "" && !phoneValid(contact.phone) && <FieldError>{phoneError}</FieldError>}
       </Field>
       <div className="sm:col-span-3">
         <Field label={campers === 1 ? "Relationship to camper" : "Relationship to campers"}>
@@ -233,25 +247,66 @@ export function RegistrationScreen() {
   const settings = camps[camp]
   const spotsLeft = Math.max(settings.camperLimit - settings.spotsUsed, 0)
   const maxCount = Math.max(1, Math.min(maxBatch, spotsLeft))
+  // A full camp takes nobody more: the registration stays blocked until a spot frees up or the limit is raised in Camp setup.
+  const campFull = spotsLeft === 0
   const count = campers.length
   const total = settings.walkInFee * count
-  const valid = campers.every((camper) => camperValid(camp, camper)) && contactValid(contact) && codeValid(code)
+  const valid = !campFull && campers.every((camper) => camperValid(camp, camper)) && contactValid(contact) && codeValid(code) && !mpesaCodeUsed(code)
   const setCount = (next: number) => setCampers((current) => (next > current.length ? [...current, ...Array.from({ length: next - current.length }, emptyCamper)] : current.slice(0, next)))
   const updateCamper = (index: number, patch: Partial<CamperForm>) => setCampers((current) => current.map((camper, i) => (i === index ? { ...camper, ...patch } : camper)))
   const switchCamp = (next: string) => {
     setCamp(next as Camp)
+    const nextLeft = Math.max(camps[next as Camp].camperLimit - camps[next as Camp].spotsUsed, 0)
+    setCampers((current) => current.slice(0, Math.max(1, Math.min(maxBatch, nextLeft))))
     setCampers((current) => current.map((camper) => ({ ...camper, age: "" })))
     setContact((current) => ({ ...current, relationship: camps[next as Camp].relationships.includes(current.relationship) ? current.relationship : "" }))
   }
   const reset = () => { setCampers([emptyCamper()]); setContact(emptyContact()); setCode("") }
 
+  const [duplicate, setDuplicate] = React.useState<DuplicateState | null>(null)
   const submit = () => {
+    // The same person can't be registered twice in an edition; look at the batch itself too.
+    const candidates = campers.map((camper) => ({ firstName: camper.firstName, lastName: camper.lastName, age: Number(camper.age), phone: camper.phone, campus: camper.fromMavuno === "Yes" ? camper.campus : invitedCampus }))
+    const found = candidates.flatMap((candidate) => findDuplicates(candidate))
+    const inBatch = candidates.flatMap((candidate, index) => candidates.slice(index + 1).filter((other) => `${other.firstName} ${other.lastName}`.trim().toLowerCase() === `${candidate.firstName} ${candidate.lastName}`.trim().toLowerCase() && other.age === candidate.age).map((): DuplicateMatch => ({ kind: "same", who: `${candidate.firstName} ${candidate.lastName}`, role: `${camp} camper`, reason: `${candidate.firstName} ${candidate.lastName} is in this batch twice.` })))
+    const same = [...found.filter((match) => match.kind === "same"), ...inBatch]
+    const similar = found.filter((match) => match.kind === "similar")
+    if (same.length > 0 || similar.length > 0) { setDuplicate({ same, similar, proceed: finish }); return }
+    finish()
+  }
+  // The record is made when the overlay is dismissed or its 5 seconds end; only Undo cancels it.
+  const commit = () => {
+    registerWalkIns({
+      camp,
+      code,
+      registeredById: currentUser.id,
+      campers: campers.map((camper) => ({
+        firstName: camper.firstName,
+        lastName: camper.lastName,
+        age: Number(camper.age),
+        gender: camper.gender as "Male" | "Female",
+        phone: camper.phone,
+        baptised: camper.baptised === "Yes",
+        fromMavuno: camper.fromMavuno === "Yes",
+        campus: camper.campus,
+        church: camper.church,
+        medical: camper.medical ? camper.medicalDetails : "",
+        specialNeeds: camper.specialNeeds ? camper.specialNeedsDetails : "",
+      })),
+      contact: { firstName: contact.firstName.trim(), lastName: contact.lastName.trim(), phone: contact.phone.trim(), relationship: contact.relationship },
+    })
+  }
+  const { pending, run } = useAction()
+  const finish = async () => {
+    // The check with the server (duplicates, code, spots) happens here; the record itself is made when the overlay is accepted.
+    if (!(await run(() => undefined, "register the campers"))) return
     const names = campers.map((camper) => `${camper.firstName.trim()} ${camper.lastName.trim()}`).join(", ")
     setSubmitted({ title: "Successfully registered and checked in", description: `${names} registered for ${camp} and checked in as present. M-Pesa code ${code}.`, toast: count === 1 ? "Camper successfully registered and checked in" : "Campers successfully registered and checked in" })
   }
 
   return (
     <main className="@container flex min-w-0 flex-1 flex-col gap-4 p-4 lg:p-6">
+      <EditionScope>
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <Tabs value={camp} onValueChange={switchCamp} className="w-full sm:w-fit">
           <TabsList className="grid w-full max-w-md grid-cols-2">
@@ -266,7 +321,7 @@ export function RegistrationScreen() {
         <div className="flex min-w-0 flex-col gap-4">
           <Card className="min-w-0 shadow-none">
             <CardHeader>
-              <CardTitle className="text-base">Select number of campers</CardTitle>
+              <CardTitle className="text-lg">Select number of campers</CardTitle>
               <CardDescription>How many attendees are you registering in this batch?</CardDescription>
               <CardAction>
                 <div className="flex items-center gap-2">
@@ -282,7 +337,7 @@ export function RegistrationScreen() {
 
           <Card className="min-w-0 shadow-none">
             <CardHeader>
-              <CardTitle className="text-base">Emergency contact</CardTitle>
+              <CardTitle className="text-lg">Emergency contact</CardTitle>
               <CardDescription>Held in case of an emergency on site</CardDescription>
             </CardHeader>
             <CardContent>
@@ -293,7 +348,7 @@ export function RegistrationScreen() {
 
         <Card className="min-w-0 shadow-none @7xl:sticky @7xl:top-4">
           <CardHeader>
-            <CardTitle className="text-base">Payment</CardTitle>
+            <CardTitle className="text-lg">Payment</CardTitle>
             <CardDescription>Finish your registration by sending payment via M-Pesa. You&apos;ll get a confirmation code via SMS.</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
@@ -309,17 +364,22 @@ export function RegistrationScreen() {
             <Field label="M-Pesa confirmation code">
               <Input className="bg-muted/40 tabular-nums" placeholder="e.g UINKH7FJWL" maxLength={10} value={code} onChange={(event) => setCode(event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ""))} />
               {code !== "" && !codeValid(code) && <FieldError>M-Pesa codes are 10 letters and numbers.</FieldError>}
+              {codeValid(code) && mpesaCodeUsed(code) && <FieldError>This M-Pesa code has already been used.</FieldError>}
             </Field>
             <div className="flex flex-col gap-2">
-              <Button type="button" className="w-full" disabled={!valid} onClick={submit}>Complete & auto check-in</Button>
-              {!valid && <p className="text-center text-xs text-muted-foreground">Fill in every camper, the emergency contact and the M-Pesa code to continue.</p>}
+              <LoadingButton type="button" className="w-full" pending={pending} loadingLabel="Registering..." disabled={!valid} onClick={submit}>Complete & auto check-in</LoadingButton>
+              {campFull
+                ? <p className="text-center text-sm text-destructive">{camp} is full. No more campers can be registered until a spot frees up or the limit is raised in Camp setup.</p>
+                : !valid && <p className="text-center text-xs text-muted-foreground">Fill in every camper, the emergency contact and the M-Pesa code to continue.</p>}
             </div>
           </CardContent>
         </Card>
       </div>
 
       <LeaveGuard active={!submitted && (code !== "" || JSON.stringify(campers) !== JSON.stringify([emptyCamper()]) || JSON.stringify(contact) !== JSON.stringify(emptyContact()))} unsaved={["Registration"]} />
-      {submitted && <DoneOverlay title={submitted.title} description={submitted.description} onUndo={() => setSubmitted(null)} onDone={() => { toast.success(submitted.toast); setSubmitted(null); reset() }} />}
+      <DuplicateDialog state={duplicate} onClose={() => setDuplicate(null)} />
+      {submitted && <DoneOverlay title={submitted.title} description={submitted.description} onUndo={() => setSubmitted(null)} onDone={() => { commit(); toast.success(submitted.toast); setSubmitted(null); reset() }} />}
+      </EditionScope>
     </main>
   )
 }

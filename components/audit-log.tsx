@@ -6,6 +6,9 @@ import type { DateRange } from "react-day-picker"
 import { X } from "lucide-react"
 import { IconCalendar, IconSearch } from "@tabler/icons-react"
 
+import { SortableHead } from "@/components/sortable-head"
+import { byDate, byText, useSortedRows } from "@/lib/sort"
+import { currentEditionIds, editions } from "@/lib/editions"
 import { formatDateTime } from "@/lib/format"
 import { Badge } from "@/ui/badge"
 import { Button } from "@/ui/button"
@@ -19,7 +22,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 
 type Area = "users" | "roles" | "camp-setup" | "campuses" | "campers" | "waivers-payments" | "sensitive" | "sign-in"
 type Change = { label: string; from: string; to: string }
-type Entry = { id: string; at: Date; user: string; removed?: boolean; action: string; area: Area; camp: "MYF" | "MYA" | null; subject: string; summary?: string; changes?: Change[] }
+type Entry = { id: string; at: Date; user: string; removed?: boolean; action: string; area: Area; camp: "MYF" | "MYA" | null; edition?: string; subject: string; summary?: string; changes?: Change[] }
 
 const areas: { value: Area; label: string }[] = [
   { value: "users", label: "Users" },
@@ -31,6 +34,11 @@ const areas: { value: Area; label: string }[] = [
   { value: "sensitive", label: "Sensitive access" },
   { value: "sign-in", label: "Sign-in" },
 ]
+
+// Entries about campers, waivers, payments, sensitive records and camp setup belong to an edition (the open one unless the entry says otherwise);
+// users, roles, campuses and sign-in are not tied to one.
+const editionTied: Area[] = ["campers", "waivers-payments", "camp-setup", "sensitive"]
+const editionOf = (entry: Entry) => entry.edition ?? (editionTied.includes(entry.area) ? currentEditionIds[0] : null)
 
 const at = (month: number, day: number, hour: number, minute: number) => new Date(2026, month - 1, day, hour, minute)
 
@@ -54,10 +62,17 @@ const entries: Entry[] = [
   { id: "a41", at: at(10, 16, 10, 12), user: "John Doe", action: "Invite resent", area: "users", camp: null, subject: "grace@mavuno.org" },
   { id: "a42", at: at(10, 16, 10, 5), user: "John Doe", action: "Invite cancelled", area: "users", camp: null, subject: "tom@mavuno.org" },
   { id: "a43", at: at(10, 21, 9, 44), user: "Dennis Otieno", action: "Check-in undone", area: "campers", camp: "MYA", subject: "Esther Achieng" },
+  { id: "ed1", at: at(10, 15, 10, 0), user: "John Doe", action: "Edition created", area: "camp-setup", camp: null, subject: "December 2026", summary: "01/12/2026 - 06/12/2026" },
+  { id: "ed2", at: at(10, 15, 10, 30), user: "John Doe", action: "Edition closed", area: "camp-setup", camp: null, edition: "aug-2026", subject: "August 2026" },
+  { id: "ed3", at: at(10, 15, 10, 40), user: "John Doe", action: "Edition renamed", area: "camp-setup", camp: null, edition: "easter-2026", subject: "Easter 2026", changes: [{ label: "Name", from: "Easter", to: "Easter 2026" }] },
+  { id: "ed4", at: at(10, 15, 10, 45), user: "John Doe", action: "Edition reopened", area: "camp-setup", camp: null, edition: "aug-2026", subject: "August 2026" },
+  { id: "ed6", at: at(10, 21, 9, 55), user: "Sharon Wanjiru", action: "Check-out undone", area: "campers", camp: "MYF", subject: "Hannah Kamau" },
+  { id: "ed5", at: at(10, 21, 9, 50), user: "Sharon Wanjiru", action: "Registration cancelled", area: "campers", camp: "MYF", subject: "Brian Otieno" },
   { id: "a44", at: at(10, 21, 8, 5), user: "John Doe", action: "Link resumed", area: "camp-setup", camp: "MYF", subject: "MYF registration link" },
   { id: "a45", at: at(10, 20, 18, 30), user: "John Doe", action: "Signed out", area: "sign-in", camp: null, subject: "john@mavuno.org" },
   { id: "a46", at: at(10, 19, 8, 12), user: "Dennis Otieno", action: "Password reset requested", area: "sign-in", camp: null, subject: "dennis@mavuno.org" },
   { id: "a47", at: at(10, 14, 16, 30), user: "John Doe", action: "Welcome page saved", area: "camp-setup", camp: null, subject: "Welcome page", summary: "MYA what to bring" },
+  { id: "a48", at: at(10, 21, 9, 5), user: "John Doe", action: "Summary image downloaded", area: "campers", camp: null, subject: "Quick summary" },
   { id: "a29", at: at(10, 20, 13, 5), user: "Mercy Chebet", action: "Payment flagged", area: "waivers-payments", camp: "MYF", subject: "Ann Njeri", summary: "M-Pesa RTP9X2LM4A · Short KES 200" },
   { id: "a31", at: at(10, 20, 18, 2), user: "John Doe", action: "Profile updated", area: "users", camp: null, subject: "John Doe", changes: [{ label: "Phone", from: "0711000000", to: "0712345678" }] },
   { id: "a32", at: at(10, 20, 18, 4), user: "John Doe", action: "Password changed", area: "users", camp: null, subject: "John Doe" },
@@ -71,7 +86,6 @@ const entries: Entry[] = [
   { id: "a14", at: at(10, 16, 9, 40), user: "John Doe", action: "Link paused", area: "camp-setup", camp: "MYA", subject: "MYA registration link" },
   { id: "a15", at: at(10, 14, 13, 25), user: "Peter Kamau", removed: true, action: "Camper details updated", area: "campers", camp: "MYA", subject: "Amara Njeri", changes: [{ label: "Phone number", from: "0703128450", to: "0703128456" }] },
   { id: "a25", at: at(10, 15, 10, 5), user: "John Doe", action: "Campus added", area: "campuses", camp: null, subject: "Kizazi", summary: "Limitless" },
-  { id: "a27", at: at(10, 16, 8, 20), user: "John Doe", action: "Waiver reversed", area: "waivers-payments", camp: "MYA", subject: "Samuel Kiprono", summary: "Owes KES 2,000" },
   { id: "a16", at: at(10, 14, 8, 0), user: "John Doe", action: "User removed", area: "users", camp: null, subject: "Peter Kamau" },
   { id: "a17", at: at(10, 12, 11, 20), user: "John Doe", action: "Shared settings saved", area: "camp-setup", camp: null, subject: "Shared settings", changes: [{ label: "Facilitator registration", from: "KES 400", to: "KES 500" }] },
   { id: "a18", at: at(10, 10, 15, 0), user: "John Doe", action: "User invited", area: "users", camp: null, subject: "brian@mavuno.org", summary: "Registrar, MYF only" },
@@ -111,6 +125,7 @@ export function AuditLogScreen({ initialQuery = "", initialCamp = "all", initial
   const [when, setWhen] = React.useState("all")
   const [range, setRange] = React.useState<DateRange | undefined>()
   const [area, setArea] = React.useState(initialArea)
+  const [edition, setEdition] = React.useState("all")
   const [shown, setShown] = React.useState(pageSize)
   const [open, setOpen] = React.useState<Entry | null>(null)
 
@@ -120,25 +135,46 @@ export function AuditLogScreen({ initialQuery = "", initialCamp = "all", initial
       text.includes(query.trim().toLowerCase()) &&
       (camp === "all" || (camp === "system" ? entry.camp === null : entry.camp === camp)) &&
       (area === "all" || entry.area === area) &&
+      (edition === "all" || editionOf(entry) === edition) &&
       inWhen(entry, when, range)
     )
   })
-  React.useEffect(() => setShown(pageSize), [query, camp, when, range, area])
+
+  // Heading clicks sort the log. Default: newest first, as the card says.
+  const { rows: sortedEntries, sort, toggle } = useSortedRows<Entry>(
+    filtered,
+    {
+      when: (a, b) => byDate(a.at, b.at),
+      user: (a, b) => byText(a.user, b.user),
+      action: (a, b) => byText(a.action, b.action),
+      detail: (a, b) => byText(a.subject, b.subject),
+      camp: (a, b) => byText(a.camp ?? "~", b.camp ?? "~"), // system entries (no camp) last when ascending
+    },
+    (a, b) => byDate(b.at, a.at)
+  )
+  React.useEffect(() => setShown(pageSize), [query, camp, when, range, area, edition])
 
   return (
     <main className="flex min-w-0 flex-1 flex-col gap-4 p-4 lg:p-6">
       <Card className="min-w-0 shadow-none">
         <CardHeader className="gap-1">
-          <CardTitle className="text-base">System activity</CardTitle>
+          <CardTitle className="text-lg">System activity</CardTitle>
           <CardDescription>Every change made in the portal, newest first. Only roles with the View audit log permission can open it. Entries cannot be edited or deleted by anyone, including the Super admin.</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-            <div className="relative max-w-md flex-1">
+          <div className="flex flex-col gap-2 xl:flex-row xl:items-center xl:justify-between">
+            <div className="relative w-full max-w-md xl:flex-1">
               <IconSearch className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
               <Input className="border bg-muted/50 pl-8" aria-label="Search by user, camper name, action" placeholder="Search by user, camper name, action" value={query} onChange={(event) => setQuery(event.target.value)} />
             </div>
             <div className="flex flex-wrap gap-2">
+              <Select value={edition} onValueChange={setEdition}>
+                <SelectTrigger className="w-44" aria-label="Edition"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All editions</SelectItem>
+                  {editions.map((item) => <SelectItem key={item.id} value={item.id}>{item.name}</SelectItem>)}
+                </SelectContent>
+              </Select>
               <Select value={camp} onValueChange={setCamp}>
                 <SelectTrigger className="w-36" aria-label="Camp"><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -185,15 +221,15 @@ export function AuditLogScreen({ initialQuery = "", initialCamp = "all", initial
             <Table>
               <TableHeader className="bg-muted/50">
                 <TableRow>
-                  <TableHead className="whitespace-nowrap">When</TableHead>
-                  <TableHead className="whitespace-nowrap">User</TableHead>
-                  <TableHead className="whitespace-nowrap">Action</TableHead>
-                  <TableHead className="whitespace-nowrap">Detail</TableHead>
-                  <TableHead className="whitespace-nowrap">Camp</TableHead>
+                  <SortableHead label="When" sortKey="when" sort={sort} onSort={toggle} />
+                  <SortableHead label="User" sortKey="user" sort={sort} onSort={toggle} />
+                  <SortableHead label="Action" sortKey="action" sort={sort} onSort={toggle} />
+                  <SortableHead label="Detail" sortKey="detail" sort={sort} onSort={toggle} />
+                  <SortableHead label="Camp" sortKey="camp" sort={sort} onSort={toggle} />
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filtered.slice(0, shown).map((entry) => (
+                {sortedEntries.slice(0, shown).map((entry) => (
                   <TableRow key={entry.id} className="hover:bg-muted/50">
                     <TableCell className="whitespace-nowrap text-muted-foreground tabular-nums">{formatDateTime(entry.at)}</TableCell>
                     <TableCell className="whitespace-nowrap">{entry.user}{entry.removed && <span className="text-muted-foreground"> (removed)</span>}</TableCell>

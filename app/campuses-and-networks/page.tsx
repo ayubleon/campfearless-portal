@@ -1,5 +1,6 @@
 import { AppSidebar } from '@/components/app-sidebar'
 import { CampusesAndNetworksScreen } from '@/components/campuses-and-networks'
+import { RequirePermission } from '@/components/require-permission'
 import { SiteHeader } from '@/components/site-header'
 import {
   SidebarInset,
@@ -21,7 +22,7 @@ export default function Page() {
       <AppSidebar variant="inset" />
       <SidebarInset>
         <SiteHeader title="Campuses and networks" />
-        <CampusesAndNetworksScreen />
+        <RequirePermission permission="manage-campuses"><CampusesAndNetworksScreen /></RequirePermission>
       </SidebarInset>
     </SidebarProvider>
   )

@@ -1,3 +1,5 @@
+import Image from "next/image"
+
 import { LoginForm } from "@/components/login-form"
 import { ThemeToggle } from "@/components/site-header"
 
@@ -17,10 +19,13 @@ export default function LoginPage() {
         </div>
       </div>
       <div className="relative hidden bg-muted lg:block">
-        <img
+        <Image
           src="/login-tent.webp"
           alt="An orange tent on a grassy hilltop under a cloudy sky"
-          className="absolute inset-0 h-full w-full object-cover"
+          fill
+          sizes="50vw"
+          priority
+          className="object-cover"
         />
       </div>
     </div>

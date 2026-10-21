@@ -11,9 +11,15 @@ export function ReportsSkeleton() {
           <Skeleton className="h-4 w-64 max-w-full" />
           <CardAction><Skeleton className="h-8 w-32" /></CardAction>
         </CardHeader>
-        <CardContent className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
-          <Skeleton className="h-8 w-full max-w-md" />
-          <Skeleton className="h-4 w-32" />
+        <CardContent className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+            <Skeleton className="h-8 w-full max-w-md" />
+            <Skeleton className="h-4 w-32" />
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Skeleton className="h-8 w-56" />
+            <Skeleton className="h-8 w-32" />
+          </div>
         </CardContent>
       </Card>
       <Card className="min-w-0 shadow-none">

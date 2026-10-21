@@ -15,7 +15,7 @@ import {
   UsersRound,
 } from "lucide-react"
 
-import { currentUser } from "@/lib/session"
+import { useSession } from "@/components/session-provider"
 import { NavUser } from '@/components/nav-user'
 import {
   Sidebar,
@@ -30,12 +30,8 @@ import {
   SidebarMenuItem,
 } from '@/ui/sidebar'
 
+// Each item is shown only to roles with its permission (none listed: everyone signed in).
 const data = {
-  user: {
-    name: currentUser.name,
-    email: currentUser.role,
-    avatar: "",
-  },
   sections: [
     {
       label: "",
@@ -43,23 +39,23 @@ const data = {
     },
     {
       label: "Camps",
-      items: [{ title: "Camp setup", icon: CalendarDays, url: "/camp-setup" }],
+      items: [{ title: "Camp setup", icon: CalendarDays, url: "/camp-setup", permission: "edit-camp-setup" }],
     },
     {
       label: "Registration",
       items: [
-        { title: "Reports", icon: ClipboardList, url: "/reports" },
-        { title: "Registration", icon: UserRound, url: "/registration" },
-        { title: "Waivers", icon: FileCheck2, url: "/waivers" },
-        { title: "Payments", icon: ReceiptText, url: "/payments" },
+        { title: "Reports", icon: ClipboardList, url: "/reports", permission: "view-records" },
+        { title: "Registration", icon: UserRound, url: "/registration", permission: "register" },
+        { title: "Waivers", icon: FileCheck2, url: "/waivers", permission: "issue-waivers" },
+        { title: "Payments", icon: ReceiptText, url: "/payments", permission: "verify-payments" },
       ],
     },
     {
       label: "Administration",
       items: [
-        { title: "Users and roles", icon: UsersRound, url: "/users-and-roles" },
-        { title: "Campuses and networks", icon: Building2, url: "/campuses-and-networks" },
-        { title: "Audit log", icon: History, url: "/audit-log" },
+        { title: "Users and roles", icon: UsersRound, url: "/users-and-roles", permission: "manage-users" },
+        { title: "Campuses and networks", icon: Building2, url: "/campuses-and-networks", permission: "manage-campuses" },
+        { title: "Audit log", icon: History, url: "/audit-log", permission: "view-audit-log" },
       ],
     },
   ],
@@ -67,6 +63,7 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
+  const { can, user } = useSession()
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
@@ -87,7 +84,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </span>
                 <span className="grid gap-0.5">
                   <span className="text-base font-bold tracking-tight">CAMP FEARLESS</span>
-                  <span className="text-xs font-normal text-muted-foreground">{currentUser.role}</span>
+                  <span className="text-xs font-normal text-muted-foreground">{user.role}</span>
                 </span>
               </Link>
             </SidebarMenuButton>
@@ -95,7 +92,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent className="px-2">
-        {data.sections.map((section) => (
+        {data.sections
+          .map((section) => ({ ...section, items: section.items.filter((item) => !("permission" in item) || can(item.permission as string)) }))
+          .filter((section) => section.items.length > 0)
+          .map((section) => (
           <SidebarGroup key={section.label || "dashboard"} className="py-2">
             {section.label && <SidebarGroupLabel className="px-2 pb-2 text-sm font-normal text-muted-foreground">{section.label}</SidebarGroupLabel>}
             <SidebarGroupContent>
@@ -121,7 +121,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         ))}
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={{ name: user.name, email: user.role }} />
       </SidebarFooter>
     </Sidebar>
   )
