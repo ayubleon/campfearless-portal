@@ -32,7 +32,7 @@ Permissions are the ids in `backend-tables.md` (`register`, `check-in`, `check-o
 
 | Needs | Detail |
 |---|---|
-| Read | for MYF and MYA: label, age limits, walk-in fee, spots used and left, relationship choices; the campus list (without Invited); whether the edition is open |
+| Read | for MYF and MYA: label, age limits, walk-in fee, spots used and left, relationship choices (Parent, Legal Guardian, Sibling, Relative, Other, the same for every camp); the campus list (without Invited); whether the edition is open |
 | Write | `walk-in registration`: camp, the M-Pesa code, up to 10 campers (first and last name, age, gender, phone, baptism, from Mavuno, campus or church, medical, special needs), and one emergency contact (names, phone, relationship). Creates the registrations (checked in) and one pending payment |
 | Errors | 409 duplicate person (returns who they clash with, and a `warning` for look-alikes the staff may confirm), 409 M-Pesa code already used, 409 camp full, 400 invalid fields |
 
@@ -73,7 +73,9 @@ Read only: entries filtered by edition, camp, area, when (today, 7 days, 30 days
 | Needs | Detail |
 |---|---|
 | Read | the open editions' camps: name, dates, fee, age label, registration status (open, scheduled, paused, full, closed), description, image, the three lists |
-| Write | the camper registration for MYF and MYA, and the facilitator registration (every field required except medical and special needs; names up to 30 characters, church or organisation up to 60; a phone of 10 digits starting 07 or 01; anyone not from Mavuno gets the campus Invited). Same 409 rules as walk-ins (duplicate person, M-Pesa code used, camp full) |
+| Write | the camper registration for MYF and MYA, and the facilitator registration (every field required except medical and special needs; names up to 30 characters, church or organisation up to 60; a phone of 10 digits starting 07 or 01; a camper not from Mavuno gets the campus Invited; facilitators are always from Mavuno, so they pick a real campus and are never Invited). Same 409 rules as walk-ins (duplicate person, M-Pesa code used, camp full) |
+
+**Prices are data, never code.** The online fee, the walk-in fee, the facilitator fee, the limit and the dates are set by a Super admin in Camp setup and saved with `save-camp` / `save-facilitator-fee`. The public welcome page and the registration forms must read them from the server **on every request** (they are rendered per visit, never built into the site), so a change in Camp setup shows on the welcome cards and the registration total straight away, with no code change and no work from the developers. The server also uses the fee that was current when a person registered, so a later change only affects new registrations. Amounts are always shown as `KES 1,000`.
 
 ## How the screens should wait (for the API calls above)
 

@@ -86,7 +86,7 @@ function IssueDialog({ open, pending, onClose, onIssue }: { open: boolean; pendi
               <h3 className="mb-3 text-base font-bold">Camper details</h3>
               <CamperFields camp={camp} camper={camper} id="waiver-camper" onChange={(patch) => setCamper((current) => ({ ...current, ...patch }))} />
             </section>
-            <section className="pt-6">
+            <section className="pt-10">
               <h3 className="mb-3 text-base font-bold">Emergency contact</h3>
               <ContactFields camp={camp} contact={contact} campers={1} onChange={(patch) => setContact((current) => ({ ...current, ...patch }))} />
             </section>

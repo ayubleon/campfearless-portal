@@ -893,7 +893,7 @@ export function DashboardOverview() {
                       </div>
                     </div>
                   </div>
-                  <section className="pt-6">
+                  <section className="pt-10">
                     <h3 className="text-base font-bold">Medical and special needs</h3>
                     <p className="mb-3 text-sm text-muted-foreground">{medicalSubtitle}</p>
                     <div className="flex flex-col gap-4">

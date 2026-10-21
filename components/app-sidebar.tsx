@@ -83,7 +83,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   />
                 </span>
                 <span className="grid gap-0.5">
-                  <span className="text-base font-extrabold tracking-tight">CAMP FEARLESS</span>
+                  <span className="font-title text-base font-normal">CAMP FEARLESS</span>
                   <span className="text-xs font-normal text-muted-foreground">{user.role}</span>
                 </span>
               </Link>

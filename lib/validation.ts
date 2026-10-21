@@ -13,3 +13,6 @@ export const mpesaCodeValid = (value: string) => /^[A-Z0-9]{10}$/.test(value)
 export const nameMaxChars = 30
 export const churchMaxChars = 60
 export const placeNameMaxChars = 40
+
+// Who the emergency contact can be to the camper: the same five choices for every camp, every form and the portal.
+export const relationshipOptions = ["Parent", "Legal Guardian", "Sibling", "Relative", "Other"]

@@ -1,6 +1,6 @@
 "use client"
 
-import { churchMaxChars, mpesaCodeValid, nameMaxChars, phoneError, phoneValid } from "@/lib/validation"
+import { relationshipOptions, churchMaxChars, mpesaCodeValid, nameMaxChars, phoneError, phoneValid } from "@/lib/validation"
 import { LoadingButton } from "@/components/loading-button"
 import { useAction } from "@/lib/use-action"
 import { DuplicateDialog, type DuplicateState } from "@/components/duplicate-dialog"
@@ -52,8 +52,8 @@ const fromRecord = (id: Camp, relationships: string[]) => {
   return { label: record.label, get spotsUsed() { return record.spotsUsed }, camperLimit: record.details.camperLimit, walkInFee: record.details.walkInFee, campStart: record.details.campStart, campEnd: record.details.campEnd, relationships }
 }
 export const camps: Record<Camp, { label: string; spotsUsed: number; camperLimit: number; walkInFee: number; campStart: Date; campEnd: Date; relationships: string[] }> = {
-  MYF: fromRecord("MYF", ["Parent", "Guardian", "Sibling", "Relative", "Other"]),
-  MYA: fromRecord("MYA", ["Parent", "Spouse", "Sibling", "Relative", "Friend", "Other"]),
+  MYF: fromRecord("MYF", relationshipOptions),
+  MYA: fromRecord("MYA", relationshipOptions),
 }
 const maxBatch = 10
 const paybill = { number: "400200", account: "CAMPFEARLESS" }
@@ -143,7 +143,7 @@ export function CamperFields({ camp, camper, id, onChange }: { camp: Camp; campe
       <Choice label="Want to be baptised?" options={["Yes", "No"]} value={camper.baptised} onChange={(baptised) => onChange({ baptised })} />
     </div>
 
-    <section className="pt-6">
+    <section className="pt-10">
       <h3 className="text-base font-bold">Church campus</h3>
       <p className="mb-3 text-sm text-muted-foreground">Drives the campus and network breakdowns</p>
       <div className="grid gap-4 sm:grid-cols-3">
@@ -151,7 +151,7 @@ export function CamperFields({ camp, camper, id, onChange }: { camp: Camp; campe
         {camper.fromMavuno === "Yes" ? (
           <Field label="Select campus">
             <Select value={camper.campus} onValueChange={(campus) => onChange({ campus })}>
-              <SelectTrigger className="w-full bg-muted/40"><SelectValue placeholder="Choose campus" /></SelectTrigger>
+              <SelectTrigger className="w-full bg-muted/40"><SelectValue /></SelectTrigger>
               <SelectContent>{activeCampuses().map((campus) => <SelectItem key={campus} value={campus}>{campus}</SelectItem>)}</SelectContent>
             </Select>
           </Field>
@@ -161,7 +161,7 @@ export function CamperFields({ camp, camper, id, onChange }: { camp: Camp; campe
       </div>
     </section>
 
-    <section className="pt-6">
+    <section className="pt-10">
       <h3 className="text-base font-bold">Medical and special needs</h3>
       <p className="mb-3 text-sm text-muted-foreground">{medicalSubtitle}</p>
       <div className="flex flex-col gap-4">
@@ -224,7 +224,7 @@ export function ContactFields({ camp, contact, campers, onChange }: { camp: Camp
       <div className="sm:col-span-3">
         <Field label={campers === 1 ? "Relationship to camper" : "Relationship to campers"}>
           <Select value={contact.relationship} onValueChange={(relationship) => onChange({ relationship })}>
-            <SelectTrigger className="w-full bg-muted/40"><SelectValue placeholder="Choose relationship" /></SelectTrigger>
+            <SelectTrigger className="w-full bg-muted/40"><SelectValue /></SelectTrigger>
             <SelectContent>{camps[camp].relationships.map((relationship) => <SelectItem key={relationship} value={relationship}>{relationship}</SelectItem>)}</SelectContent>
           </Select>
         </Field>
@@ -354,7 +354,7 @@ export function RegistrationScreen() {
           <CardContent className="flex flex-col gap-4">
             <div className="rounded-lg bg-muted/40 px-4 py-4 text-center">
               <div className="text-sm text-muted-foreground">Desk fee payment: Total amount due</div>
-              <div className="py-1 text-xl font-bold text-attention tabular-nums">Ksh {formatNumber(total)}</div>
+              <div className="py-1 text-xl font-bold text-attention tabular-nums">KES {formatNumber(total)}</div>
               <div className="text-sm text-muted-foreground tabular-nums">for {count} {count === 1 ? "participant" : "participants"}</div>
             </div>
             <div className="grid grid-cols-2 rounded-lg bg-muted/40 px-4 py-3 text-center text-sm">
@@ -362,7 +362,7 @@ export function RegistrationScreen() {
               <div><div className="font-medium">Account name</div><div className="font-semibold text-attention">{paybill.account}</div></div>
             </div>
             <Field label="M-Pesa confirmation code">
-              <Input className="bg-muted/40 tabular-nums" placeholder="e.g UINKH7FJWL" maxLength={10} value={code} onChange={(event) => setCode(event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ""))} />
+              <Input className="bg-muted/40 tabular-nums placeholder:text-muted-foreground/50" placeholder="e.g UINKH7FJWL" maxLength={10} value={code} onChange={(event) => setCode(event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ""))} />
               {code !== "" && !codeValid(code) && <FieldError>M-Pesa codes are 10 letters and numbers.</FieldError>}
               {codeValid(code) && mpesaCodeUsed(code) && <FieldError>This M-Pesa code has already been used.</FieldError>}
             </Field>

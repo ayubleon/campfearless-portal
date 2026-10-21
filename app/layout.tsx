@@ -1,10 +1,14 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
+import localFont from 'next/font/local'
 import './globals.css'
 import { SessionProvider } from '@/components/session-provider'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/ui/sonner'
 import { TooltipProvider } from '@/ui/tooltip'
+
+// Panton Black Caps is used for the CAMP FEARLESS name in the sidebar and for the registration title on the public site. Nothing else uses it.
+const panton = localFont({ src: './fonts/Panton-BlackCaps.otf', variable: '--font-panton', display: 'swap' })
 
 // Runs before first paint so the saved (or system) theme never flashes the wrong colours.
 const themeScript = `try{var t=localStorage.getItem('theme');if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.classList.add(t)}catch(e){}`
@@ -43,7 +47,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className={panton.variable} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>

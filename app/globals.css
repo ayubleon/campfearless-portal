@@ -46,6 +46,7 @@
   --color-status-scheduled-foreground: var(--status-scheduled-foreground);
   --color-status-flagged: var(--status-flagged);
   --color-status-flagged-foreground: var(--status-flagged-foreground);
+  --font-title: var(--font-panton), system-ui, sans-serif;
   --color-attention: var(--attention);
   --color-link: var(--link);
   --color-camp-accent: var(--camp-accent);
