@@ -23,7 +23,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/tabs"
 // Until sign-in exists, the signed-in user is hardcoded like the sidebar's.
 const currentUserEmail = "john@mavuno.org"
 
-type CampAccess = "Both" | "MYA only" | "MYF only"
+type CampAccess = "Both" | "MYF only" | "MYA only"
 type UserStatus = "active" | "inactive" | "pending"
 type User = { id: string; name: string; email: string; roleId: string; access: CampAccess; status: UserStatus }
 type Role = { id: string; name: string; description: string; canSignIn: boolean; locked?: boolean; permissions: string[] }
@@ -36,7 +36,6 @@ const permissionGroups = [
   ] },
   { label: "Waivers and payments", permissions: [
     { id: "issue-waivers", label: "Issue waivers" },
-    { id: "approve-waivers", label: "Approve waivers" },
     { id: "verify-payments", label: "Verify payments" },
   ] },
   { label: "Records", permissions: [
@@ -54,7 +53,7 @@ const permissionGroups = [
 ]
 const permissions: { id: string; label: string; sensitive?: boolean }[] = permissionGroups.flatMap((group) => group.permissions)
 const allPermissions = permissions.map((permission) => permission.id)
-const campAccessOptions: CampAccess[] = ["Both", "MYA only", "MYF only"]
+const campAccessOptions: CampAccess[] = ["Both", "MYF only", "MYA only"]
 
 const initialRoles: Role[] = [
   { id: "super-admin", name: "Super admin", description: "Full access. Creates roles and manages everything.", canSignIn: true, locked: true, permissions: allPermissions },
@@ -317,7 +316,15 @@ export function UsersAndRolesScreen() {
                                 checked={user.status === "active"}
                                 disabled={locked}
                                 aria-label={`Active: ${user.email}`}
-                                onCheckedChange={(checked) => { updateUser(user.id, { status: checked ? "active" : "inactive" }); toast.success(checked ? "User successfully activated" : "User successfully deactivated") }}
+                                onCheckedChange={(checked) => {
+                                  if (checked) { updateUser(user.id, { status: "active" }); toast.success("User successfully activated"); return }
+                                  setConfirm({
+                                    title: "Deactivate user?",
+                                    description: <><strong className="text-foreground">{user.name || user.email}</strong> will be signed out and can't sign in again until you activate them.</>,
+                                    confirmLabel: "Deactivate user",
+                                    onConfirm: () => { updateUser(user.id, { status: "inactive" }); toast.success("User successfully deactivated"); closeConfirm() },
+                                  })
+                                }}
                               />
                             )}
                           </TableCell>

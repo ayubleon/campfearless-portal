@@ -49,10 +49,10 @@ const data = {
     {
       label: "Registration",
       items: [
-        { title: "Reports", icon: ClipboardList },
-        { title: "Registration", icon: UserRound },
-        { title: "Waivers", icon: FileCheck2 },
-        { title: "Payments", icon: ReceiptText },
+        { title: "Reports", icon: ClipboardList, url: "/reports" },
+        { title: "Registration", icon: UserRound, url: "/registration" },
+        { title: "Waivers", icon: FileCheck2, url: "/waivers" },
+        { title: "Payments", icon: ReceiptText, url: "/payments" },
       ],
     },
     {
@@ -79,7 +79,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               className="h-auto gap-3 p-0 hover:bg-transparent"
             >
               <a href="#">
-                <span className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white p-1.5 dark:bg-[#18181b]">
+                <span className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-card p-1.5">
                   <img
                     src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Frame%201000005756-Snn0NVpYSU5MruXfptoDy95BACFSkJ.png"
                     alt="Camp Fearless logo"
@@ -107,7 +107,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       asChild
                       isActive={"url" in item && item.url !== undefined && pathname === item.url}
                       tooltip={item.title}
-                      className="h-9 gap-3 rounded-lg px-2.5 text-sm font-medium data-[active=true]:bg-black data-[active=true]:text-white data-[active=true]:hover:bg-black data-[active=true]:hover:text-white dark:data-[active=true]:bg-black dark:data-[active=true]:text-white"
+                      className="h-9 gap-3 rounded-lg px-2.5 text-sm font-medium data-[active=true]:bg-nav-active data-[active=true]:text-nav-active-foreground data-[active=true]:hover:bg-nav-active data-[active=true]:hover:text-nav-active-foreground"
                     >
                       <Link href={("url" in item && item.url) || "#"}>
                         <item.icon className="size-4" />

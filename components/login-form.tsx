@@ -2,10 +2,12 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { X } from "lucide-react"
 import { toast } from "sonner"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/ui/button"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/ui/dialog"
 import { Input } from "@/ui/input"
 
 export function LoginForm({
@@ -15,8 +17,17 @@ export function LoginForm({
   const router = useRouter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [resetOpen, setResetOpen] = useState(false)
+  const [resetEmail, setResetEmail] = useState("")
+  const resetValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(resetEmail.trim())
+  const sendReset = () => {
+    if (!resetValid) return
+    setResetOpen(false)
+    toast.success("Password reset link successfully sent")
+  }
 
   return (
+    <>
     <form
       className={cn("flex flex-col gap-6", className)}
       onSubmit={(event) => {
@@ -44,9 +55,9 @@ export function LoginForm({
         <label className="flex flex-col gap-2 text-sm font-medium">
           <span className="flex items-center">
             Password
-            <a href="#" className="ml-auto text-sm font-normal text-muted-foreground underline-offset-4 hover:text-foreground hover:underline">
+            <button type="button" className="ml-auto text-sm font-normal text-muted-foreground underline-offset-4 hover:text-foreground hover:underline" onClick={() => { setResetEmail(email); setResetOpen(true) }}>
               Forgot password?
-            </a>
+            </button>
           </span>
           <Input type="password" autoComplete="current-password" className="bg-muted/40" value={password} onChange={(event) => setPassword(event.target.value)} required />
         </label>
@@ -55,8 +66,25 @@ export function LoginForm({
         </Button>
       </div>
       <p className="text-center text-sm text-muted-foreground">
-        Don&apos;t have an account? Ask your <strong className="text-foreground">camp administrator</strong>.
+        Don&apos;t have an account? Ask your camp administrator.
       </p>
     </form>
+    <Dialog open={resetOpen} onOpenChange={setResetOpen}>
+      <DialogContent showCloseButton={false} className="sm:max-w-lg">
+        <DialogHeader className="relative space-y-1 text-left">
+          <DialogTitle className="text-base font-semibold leading-none tracking-tight">Reset your password</DialogTitle>
+          <DialogDescription className="text-sm text-muted-foreground">Enter your email and we'll send you a link to choose a new password.</DialogDescription>
+          <Button type="button" variant="ghost" size="icon" aria-label="Close reset password" className="absolute right-0 top-0" onClick={() => setResetOpen(false)}><X className="size-4" /></Button>
+        </DialogHeader>
+        <label className="flex flex-col gap-2 text-sm font-medium">Email
+          <Input type="email" autoComplete="email" placeholder="name@campfearless.org" className="bg-muted/40" value={resetEmail} onChange={(event) => setResetEmail(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") sendReset() }} />
+        </label>
+        <DialogFooter className="mt-4 grid grid-cols-2 gap-3 sm:mt-6 sm:justify-stretch">
+          <Button type="button" variant="outline" onClick={() => setResetOpen(false)}>Cancel</Button>
+          <Button type="button" disabled={!resetValid} onClick={sendReset}>Send reset link</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   )
 }

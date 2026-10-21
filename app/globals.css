@@ -44,6 +44,11 @@
   --color-status-paused-foreground: var(--status-paused-foreground);
   --color-status-scheduled: var(--status-scheduled);
   --color-status-scheduled-foreground: var(--status-scheduled-foreground);
+  --color-status-flagged: var(--status-flagged);
+  --color-status-flagged-foreground: var(--status-flagged-foreground);
+  --color-attention: var(--attention);
+  --color-nav-active: var(--nav-active);
+  --color-nav-active-foreground: var(--nav-active-foreground);
   --color-brand: var(--brand);
   --color-brand-hover: var(--brand-hover);
   --color-brand-foreground: var(--brand-foreground);
@@ -84,6 +89,8 @@
   --radius: 0.625rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
+  --nav-active: oklch(0.205 0 0);
+  --nav-active-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.205 0 0);
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(0.97 0 0);
@@ -98,6 +105,9 @@
   --status-paused-foreground: #ea580c;
   --status-scheduled: #dbeafe;
   --status-scheduled-foreground: #1d4ed8;
+  --status-flagged: #fee2e2;
+  --status-flagged-foreground: #b91c1c;
+  --attention: #ea580c;
   --brand: #336699;
   --brand-hover: #2b5985;
   --brand-foreground: #ffffff;
@@ -130,6 +140,8 @@
   --chart-5: oklch(0.269 0 0);
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
+  --nav-active: oklch(0 0 0);
+  --nav-active-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.488 0.243 264.376);
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(0.269 0 0);
@@ -144,6 +156,9 @@
   --status-paused-foreground: oklch(0.84 0.14 55);
   --status-scheduled: oklch(0.3 0.08 260);
   --status-scheduled-foreground: oklch(0.82 0.1 255);
+  --status-flagged: oklch(0.3 0.1 25);
+  --status-flagged-foreground: oklch(0.82 0.13 25);
+  --attention: oklch(0.75 0.16 50);
 }
 
 @layer base {
@@ -152,5 +167,32 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Printed reports: only the page content, always in light colours. */
+@media print {
+  [data-slot="sidebar"],
+  [data-slot="sidebar-gap"] {
+    display: none !important;
+  }
+  [data-slot="dialog-overlay"],
+  [data-slot="dialog-content"],
+  [data-sonner-toaster] {
+    display: none !important;
+  }
+  [data-slot="sidebar-inset"] {
+    margin: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+  .dark {
+    --background: #ffffff;
+    --foreground: #0a0a0a;
+    --card: #ffffff;
+    --card-foreground: #0a0a0a;
+    --muted: #f5f5f5;
+    --muted-foreground: #525252;
+    --border: #e5e5e5;
   }
 }

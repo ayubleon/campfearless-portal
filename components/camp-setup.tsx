@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { differenceInCalendarDays, format } from "date-fns"
 import { AlertCircle, X } from "lucide-react"
 import { IconCalendar, IconInfoCircle } from "@tabler/icons-react"
@@ -12,6 +11,8 @@ import { cn } from "@/lib/utils"
 import { formatDateTime } from "@/lib/format"
 import { statusClass } from "@/lib/status"
 import { Badge } from "@/ui/badge"
+import { UndoOverlay } from "@/components/undo-overlay"
+import { LeaveGuard } from "@/components/leave-guard"
 import { Button } from "@/ui/button"
 import { Calendar } from "@/ui/calendar"
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/ui/card"
@@ -258,7 +259,7 @@ function SetupCard<T>({ title, description, saved, fields, saveLabel, successMes
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         {children(value, editing, (patch) => setDraft((current) => ({ ...(current ?? saved), ...patch })))}
-        <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
           <Link href={auditHref} className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline">Last saved by {lastSaved.by}, <span className="tabular-nums">{formatDateTime(lastSaved.at)}</span></Link>
           {editing && (
             <div className="flex justify-end gap-3">
@@ -360,93 +361,25 @@ function CampCard({ camp, canEdit, onDirtyChange, onSave, onTogglePause }: { cam
 }
 
 function PauseOverlay({ camp, onUndo, onDone }: { camp: Camp; onUndo: () => void; onDone: () => void }) {
-  const [progress, setProgress] = React.useState(100)
-  React.useEffect(() => {
-    const startedAt = Date.now()
-    const interval = window.setInterval(() => setProgress(Math.max(0, 100 - ((Date.now() - startedAt) / 5000) * 100)), 50)
-    return () => window.clearInterval(interval)
-  }, [])
-  const title = camp.paused ? "Registration link paused" : "Registration link resumed"
-  const description = camp.paused ? `${camp.id} campers can't sign up until you resume the link.` : `${camp.id} campers can sign up again.`
-
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/20 p-4 backdrop-blur-sm">
-      <div role="status" className="relative w-[min(580px,calc(100vw-2rem))] rounded-lg border bg-background p-4 shadow-2xl">
-        <Button type="button" variant="ghost" size="icon" aria-label="Dismiss link confirmation" className="absolute right-4 top-4" onClick={onDone}><X className="size-4" /></Button>
-        <div className="space-y-2">
-          <p className="text-base font-semibold leading-none tracking-tight">{title}</p>
-          <p className="text-sm text-muted-foreground">{description}</p>
-          <div className="h-1.5 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-emerald-500 transition-[width] duration-75" style={{ width: `${progress}%` }} /></div>
-          <div className="flex justify-end gap-3 pt-2">
-            <Button type="button" variant="outline" onClick={onUndo}>Undo</Button>
-            <Button type="button" onClick={() => { onDone(); toast.success(camp.paused ? "Registration link successfully paused" : "Registration link successfully resumed") }}>Done</Button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <UndoOverlay
+      title={camp.paused ? "Registration link paused" : "Registration link resumed"}
+      description={camp.paused ? `${camp.id} campers can't sign up until you resume the link.` : `${camp.id} campers can sign up again.`}
+      onUndo={onUndo}
+      onDone={() => { onDone(); toast.success(camp.paused ? "Registration link successfully paused" : "Registration link successfully resumed") }}
+    />
   )
-}
-
-function LeaveDialog({ href, unsaved, onStay, onLeave }: { href: string | null; unsaved: string[]; onStay: () => void; onLeave: () => void }) {
-  return (
-    <Dialog open={href !== null} onOpenChange={(open) => !open && onStay()}>
-      <DialogContent showCloseButton={false} className="gap-0 sm:max-w-lg">
-        <DialogHeader className="relative space-y-1 text-left">
-          <DialogTitle className="flex items-center gap-2 text-lg font-semibold leading-none tracking-tight"><AlertCircle className="text-destructive" />Leave without saving?</DialogTitle>
-          <DialogDescription className="text-sm text-muted-foreground">You have unsaved changes to <strong className="text-foreground">{unsaved.join(" and ")}</strong>. Leaving this page will discard them.</DialogDescription>
-          <Button type="button" variant="ghost" size="icon" aria-label="Close leave page dialog" className="absolute right-0 top-0" onClick={onStay}><X className="size-4" /></Button>
-        </DialogHeader>
-        <DialogFooter className="mt-4 grid grid-cols-2 gap-3 sm:mt-6 sm:justify-stretch">
-          <Button type="button" variant="outline" onClick={onStay}>Stay on page</Button>
-          <Button type="button" onClick={onLeave}>Leave page</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  )
-}
-
-function useLeaveGuard(active: boolean) {
-  const [href, setHref] = React.useState<string | null>(null)
-
-  React.useEffect(() => {
-    if (!active) return
-    const beforeUnload = (event: BeforeUnloadEvent) => event.preventDefault()
-    const click = (event: MouseEvent) => {
-      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey) return
-      const anchor = (event.target as HTMLElement | null)?.closest("a")
-      const target = anchor?.getAttribute("href")
-      if (!anchor || !target?.startsWith("/") || anchor.target === "_blank" || target === window.location.pathname) return
-      event.preventDefault()
-      setHref(target)
-    }
-    window.addEventListener("beforeunload", beforeUnload)
-    document.addEventListener("click", click, true)
-    return () => {
-      window.removeEventListener("beforeunload", beforeUnload)
-      document.removeEventListener("click", click, true)
-    }
-  }, [active])
-
-  return [href, setHref] as const
 }
 
 export function CampSetupScreen({ canEdit = true }: { canEdit?: boolean }) {
-  const router = useRouter()
   const [camps, setCamps] = React.useState(initialCamps)
   const [shared, setShared] = React.useState<{ settings: SharedSettings; lastSaved: { by: string; at: Date } }>({ settings: { facilitatorFee: 500 }, lastSaved: { by: "John Doe", at: new Date(2026, 9, 12, 11, 20) } })
   const [dirty, setDirty] = React.useState<Record<string, boolean>>({})
   const [pauseNotice, setPauseNotice] = React.useState<CampId | null>(null)
   const unsaved = Object.keys(dirty).filter((key) => dirty[key])
-  const [leaveHref, setLeaveHref] = useLeaveGuard(unsaved.length > 0)
 
   const dirtyHandlers = React.useMemo(() => Object.fromEntries(["MYF setup", "MYA setup", "Shared settings"].map((name) => [name, (value: boolean) => setDirty((current) => (current[name] === value ? current : { ...current, [name]: value }))])), [])
   const updateCamp = (id: CampId, patch: (camp: Camp) => Partial<Camp>) => setCamps((current) => current.map((camp) => (camp.id === id ? { ...camp, ...patch(camp) } : camp)))
-
-  React.useEffect(() => {
-    if (!pauseNotice) return
-    const timeout = window.setTimeout(() => setPauseNotice(null), 5000)
-    return () => window.clearTimeout(timeout)
-  }, [pauseNotice])
 
   const noticeCamp = camps.find((camp) => camp.id === pauseNotice)
 
@@ -487,7 +420,7 @@ export function CampSetupScreen({ canEdit = true }: { canEdit?: boolean }) {
         )}
       </SetupCard>
       {noticeCamp && <PauseOverlay key={`${noticeCamp.id}-${noticeCamp.paused}`} camp={noticeCamp} onUndo={() => { updateCamp(noticeCamp.id, (current) => ({ paused: !current.paused })); setPauseNotice(null) }} onDone={() => setPauseNotice(null)} />}
-      <LeaveDialog href={leaveHref} unsaved={unsaved} onStay={() => setLeaveHref(null)} onLeave={() => { const href = leaveHref; setDirty({}); setLeaveHref(null); if (href) router.push(href) }} />
+      <LeaveGuard active={unsaved.length > 0} unsaved={unsaved} />
     </main>
   )
 }

@@ -5,6 +5,7 @@ import { AlertCircle, X } from "lucide-react"
 import { IconDotsVertical, IconPlus, IconSearch } from "@tabler/icons-react"
 import { toast } from "sonner"
 
+import { campusesByNetwork, initialNetworks, type Network } from "@/lib/campuses"
 import { Button, buttonVariants } from "@/ui/button"
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/ui/card"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/ui/dialog"
@@ -14,27 +15,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/tabs"
 
-type Network = { id: string; name: string }
 type Campus = { id: string; name: string; networkId: string; campers: number }
 
-const initialNetworks: Network[] = [
-  { id: "multipliers", name: "Multipliers" },
-  { id: "limitless", name: "Limitless" },
-  { id: "catalyst", name: "Catalyst" },
-  { id: "igniters", name: "Igniters" },
-  { id: "lifegivers", name: "Lifegivers" },
-]
-
-const seed: Record<string, string[]> = {
-  multipliers: ["Hill City", "Bondo", "Diani", "Kisumu", "Kitengela", "Mombasa", "Kitale", "Mwangaza", "Multipliers"],
-  limitless: ["Chuka", "Donholm", "Far East", "Kizazi", "Limitless", "Mashariki"],
-  catalyst: ["Catalyst", "Kikuyu", "Lavington", "Madaraka", "Kiambio", "Mathare", "Downtown"],
-  igniters: ["Connect", "Karen", "Igniters"],
-  lifegivers: ["Lifegivers", "Bustani", "Nawiri", "Juja", "Kiambu Road", "Limuru", "Lifeway"],
-}
 // Sample registrations across all camps, used to warn before deleting a campus. Kizazi and Lifeway are new campuses with none yet.
 const sampleCampers = (name: string) => (["Kizazi", "Lifeway"].includes(name) ? 0 : ([...name].reduce((sum, char) => sum + char.charCodeAt(0), 0) * 7) % 58 + 3)
-const initialCampuses: Campus[] = Object.entries(seed).flatMap(([networkId, names]) => names.map((name) => ({ id: `${networkId}-${name}`, name, networkId, campers: sampleCampers(name) })))
+const initialCampuses: Campus[] = Object.entries(campusesByNetwork).flatMap(([networkId, names]) => names.map((name) => ({ id: `${networkId}-${name}`, name, networkId, campers: sampleCampers(name) })))
 
 const byName = (a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name)
 const plural = (count: number, word: string) => `${count} ${word}${count === 1 ? "" : "es"}`
@@ -235,7 +220,7 @@ export function CampusesAndNetworksScreen() {
           <Card className="min-w-0 shadow-none">
             <CardHeader>
               <CardTitle className="text-base">Networks</CardTitle>
-              <CardDescription>Networks group campuses for reports. Shared by MYA and MYF.</CardDescription>
+              <CardDescription>Networks group campuses for reports. Shared by MYF and MYA.</CardDescription>
               <CardAction><Button type="button" onClick={() => setNameDialog({ kind: "add-network" })}><IconPlus />Add network</Button></CardAction>
             </CardHeader>
             <CardContent>
@@ -244,7 +229,7 @@ export function CampusesAndNetworksScreen() {
                   const members = campusesIn(network.id)
                   return (
                     <section key={network.id} className="flex min-w-0 flex-col overflow-hidden rounded-xl border">
-                      <div className="flex items-start justify-between gap-3 p-4">
+                      <div className="flex items-start justify-between gap-6 p-4">
                         <div className="flex flex-col gap-1">
                           <h3 className="text-base font-semibold leading-none">{network.name}</h3>
                           <p className="text-sm text-muted-foreground tabular-nums">{plural(members.length, "campus")}</p>

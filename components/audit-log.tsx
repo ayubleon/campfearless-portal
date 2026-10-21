@@ -19,7 +19,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 
 type Area = "users" | "roles" | "camp-setup" | "campuses" | "campers" | "waivers-payments" | "sensitive" | "sign-in"
 type Change = { label: string; from: string; to: string }
-type Entry = { id: string; at: Date; user: string; removed?: boolean; action: string; area: Area; camp: "MYA" | "MYF" | null; subject: string; summary?: string; changes?: Change[] }
+type Entry = { id: string; at: Date; user: string; removed?: boolean; action: string; area: Area; camp: "MYF" | "MYA" | null; subject: string; summary?: string; changes?: Change[] }
 
 const areas: { value: Area; label: string }[] = [
   { value: "users", label: "Users" },
@@ -42,7 +42,11 @@ const entries: Entry[] = [
   { id: "a5", at: at(10, 20, 16, 50), user: "John Doe", action: "Permission removed", area: "roles", camp: null, subject: "Lead registrar", summary: "Approve waivers" },
   { id: "a6", at: at(10, 20, 14, 12), user: "John Doe", action: "User role changed", area: "users", camp: null, subject: "Kevin Mutua", changes: [{ label: "Role", from: "Lead registrar", to: "Registrar" }] },
   { id: "a7", at: at(10, 20, 11, 3), user: "John Doe", action: "User deactivated", area: "users", camp: null, subject: "Kevin Mutua" },
-  { id: "a8", at: at(10, 19, 15, 20), user: "John Doe", action: "Waiver approved", area: "waivers-payments", camp: "MYF", subject: "Daniel Kiptoo" },
+  { id: "a8", at: at(10, 19, 15, 20), user: "John Doe", action: "Waiver issued", area: "waivers-payments", camp: "MYF", subject: "Mary Wanjiku", summary: "Checked in" },
+  { id: "a29", at: at(10, 20, 13, 5), user: "Mercy Chebet", action: "Payment flagged", area: "waivers-payments", camp: "MYF", subject: "Ann Njeri", summary: "M-Pesa RTP9X2LM4A · Short KES 200" },
+  { id: "a31", at: at(10, 20, 18, 2), user: "John Doe", action: "Profile updated", area: "users", camp: null, subject: "John Doe", changes: [{ label: "Phone", from: "0711000000", to: "0712345678" }] },
+  { id: "a32", at: at(10, 20, 18, 4), user: "John Doe", action: "Password changed", area: "users", camp: null, subject: "John Doe" },
+  { id: "a30", at: at(10, 20, 15, 30), user: "Sharon Wanjiru", action: "Payment reopened", area: "waivers-payments", camp: "MYF", subject: "Daniel Kiptoo", summary: "M-Pesa LOP0I8UY6T" },
   { id: "a9", at: at(10, 19, 10, 44), user: "Mercy Chebet", action: "Camper registered", area: "campers", camp: "MYF", subject: "Cynthia Wambui", summary: "Walk-in" },
   { id: "a24", at: at(10, 18, 16, 40), user: "John Doe", action: "Campus moved", area: "campuses", camp: null, subject: "Downtown", changes: [{ label: "Network", from: "Limitless", to: "Catalyst" }] },
   { id: "a10", at: at(10, 18, 14, 2), user: "John Doe", action: "Camp setup saved", area: "camp-setup", camp: "MYF", subject: "MYF setup", changes: [{ label: "Camp start", from: "30/11/2026", to: "01/12/2026" }, { label: "Registration closes", from: "25/11/2026", to: "30/11/2026" }, { label: "Camper limit", from: "900", to: "1,000" }] },
@@ -52,6 +56,7 @@ const entries: Entry[] = [
   { id: "a14", at: at(10, 16, 9, 40), user: "John Doe", action: "Link paused", area: "camp-setup", camp: "MYA", subject: "MYA registration link" },
   { id: "a15", at: at(10, 14, 13, 25), user: "Peter Kamau", removed: true, action: "Camper details updated", area: "campers", camp: "MYA", subject: "Amara Njeri", changes: [{ label: "Phone number", from: "0703128450", to: "0703128456" }] },
   { id: "a25", at: at(10, 15, 10, 5), user: "John Doe", action: "Campus added", area: "campuses", camp: null, subject: "Kizazi", summary: "Limitless" },
+  { id: "a27", at: at(10, 16, 8, 20), user: "John Doe", action: "Waiver reversed", area: "waivers-payments", camp: "MYA", subject: "Samuel Kiprono", summary: "Owes KES 2,000" },
   { id: "a16", at: at(10, 14, 8, 0), user: "John Doe", action: "User removed", area: "users", camp: null, subject: "Peter Kamau" },
   { id: "a17", at: at(10, 12, 11, 20), user: "John Doe", action: "Shared settings saved", area: "camp-setup", camp: null, subject: "Shared settings", changes: [{ label: "Facilitator registration", from: "KES 400", to: "KES 500" }] },
   { id: "a18", at: at(10, 10, 15, 0), user: "John Doe", action: "User invited", area: "users", camp: null, subject: "brian@mavuno.org", summary: "Registrar, MYF only" },
@@ -123,8 +128,8 @@ export function AuditLogScreen({ initialQuery = "", initialCamp = "all", initial
                 <SelectTrigger className="w-36" aria-label="Camp"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All camps</SelectItem>
-                  <SelectItem value="MYA">MYA</SelectItem>
                   <SelectItem value="MYF">MYF</SelectItem>
+                  <SelectItem value="MYA">MYA</SelectItem>
                   <SelectItem value="system">System-wide</SelectItem>
                 </SelectContent>
               </Select>
@@ -192,7 +197,7 @@ export function AuditLogScreen({ initialQuery = "", initialCamp = "all", initial
           </div>
 
           {filtered.length > 0 && (
-            <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center justify-between gap-6">
               <p className="text-xs text-muted-foreground tabular-nums">Showing {Math.min(shown, filtered.length)} of {filtered.length} entries</p>
               {shown < filtered.length && <Button type="button" variant="outline" onClick={() => setShown((current) => current + pageSize)}>Load more</Button>}
             </div>
