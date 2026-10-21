@@ -31,8 +31,7 @@ function SetupCardSkeleton({ columns }: { columns: number[] }) {
         <div className="grid gap-x-4 gap-y-6 md:grid-cols-2 xl:grid-cols-3">
           {columns.map((fields, index) => <ColumnSkeleton key={index} fields={fields} />)}
         </div>
-        <div className="flex flex-col gap-1 pt-2">
-          <Skeleton className="h-4 w-full max-w-md" />
+        <div className="pt-2">
           <Skeleton className="h-3 w-48" />
         </div>
       </CardContent>

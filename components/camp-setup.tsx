@@ -1,13 +1,15 @@
 "use client"
 
 import * as React from "react"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { differenceInCalendarDays, format } from "date-fns"
 import { AlertCircle, X } from "lucide-react"
-import { IconCalendar } from "@tabler/icons-react"
+import { IconCalendar, IconInfoCircle } from "@tabler/icons-react"
 import { toast } from "sonner"
 
 import { cn } from "@/lib/utils"
+import { formatDateTime } from "@/lib/format"
 import { statusClass } from "@/lib/status"
 import { Badge } from "@/ui/badge"
 import { Button } from "@/ui/button"
@@ -56,7 +58,6 @@ const initialCamps: Camp[] = [
 const formatDate = (value: Date) => format(value, "dd/MM/yyyy")
 const formatNumber = (value: number) => value.toLocaleString("en-US")
 const formatMoney = (value: number) => `KES ${formatNumber(value)}`
-const formatSavedAt = (value: Date) => format(value, "d MMM yyyy, HH:mm")
 
 const campFields: FieldSpec<CampDetails>[] = [
   { key: "editionName", label: "Edition name", format: String },
@@ -159,6 +160,21 @@ function DateField({ label, value, editing, onChange, disabled }: { label: strin
   )
 }
 
+function SpotsInfo() {
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button type="button" variant="ghost" size="icon-xs" aria-label="How camper spots are counted" className="text-muted-foreground">
+          <IconInfoCircle />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-64 text-sm" align="start" collisionPadding={16}>
+        Facilitators and waived campers are counted. Cancelled registrations free up a spot.
+      </PopoverContent>
+    </Popover>
+  )
+}
+
 function FieldError({ children }: { children: React.ReactNode }) {
   return <p className="text-sm text-destructive">{children}</p>
 }
@@ -196,15 +212,15 @@ function ReviewDialog({ open, title, changes, warnings, onCancel, onConfirm }: {
   )
 }
 
-function SetupCard<T>({ title, description, saved, fields, note, saveLabel, successMessage, lastSaved, canEdit, onDirtyChange, onSave, validate, warnings, children }: {
+function SetupCard<T>({ title, description, saved, fields, saveLabel, successMessage, lastSaved, auditHref, canEdit, onDirtyChange, onSave, validate, warnings, children }: {
   title: string
   description: string
   saved: T
   fields: FieldSpec<T>[]
-  note: string
   saveLabel: string
   successMessage: string
   lastSaved: { by: string; at: Date }
+  auditHref: string
   canEdit: boolean
   onDirtyChange: (dirty: boolean) => void
   onSave: (value: T) => void
@@ -242,11 +258,8 @@ function SetupCard<T>({ title, description, saved, fields, note, saveLabel, succ
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         {children(value, editing, (patch) => setDraft((current) => ({ ...(current ?? saved), ...patch })))}
-        <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:items-end sm:justify-between">
-          <div className="flex flex-col gap-1">
-            <p className="text-sm text-muted-foreground">{note}</p>
-            <p className="text-xs text-muted-foreground">Last saved by {lastSaved.by}, <span className="tabular-nums">{formatSavedAt(lastSaved.at)}</span></p>
-          </div>
+        <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
+          <Link href={auditHref} className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline">Last saved by {lastSaved.by}, <span className="tabular-nums">{formatDateTime(lastSaved.at)}</span></Link>
           {editing && (
             <div className="flex justify-end gap-3">
               <Button type="button" variant="outline" onClick={() => setDraft(null)}>Cancel</Button>
@@ -278,10 +291,10 @@ function CampCard({ camp, canEdit, onDirtyChange, onSave, onTogglePause }: { cam
       description={camp.description}
       saved={camp.details}
       fields={campFields}
-      note={`Changes here only affect ${camp.id}. Existing registrations keep the fee they were charged.`}
       saveLabel={`Save ${camp.id} setup`}
       successMessage={`${camp.id} setup successfully saved`}
       lastSaved={camp.lastSaved}
+      auditHref={`/audit-log?camp=${camp.id}&area=camp-setup`}
       canEdit={canEdit}
       onDirtyChange={onDirtyChange}
       onSave={onSave}
@@ -308,8 +321,7 @@ function CampCard({ camp, canEdit, onDirtyChange, onSave, onTogglePause }: { cam
                 <NumberField label="Camper limit" value={details.camperLimit} editing={editing} onChange={(camperLimit) => update({ camperLimit })} />
                 <Progress value={usedPercent} aria-label="Camper spots used" className="h-1.5 bg-muted [&>div]:bg-emerald-500" />
                 {editing && details.camperLimit < camp.spotsUsed && <FieldError>The limit can&apos;t be below the {formatNumber(camp.spotsUsed)} spots already used.</FieldError>}
-                <p className="text-sm text-muted-foreground"><span className="tabular-nums">{formatNumber(camp.spotsUsed)} of {formatNumber(details.camperLimit)}</span> camper spots used. <span className="tabular-nums">{formatNumber(spotsLeft)}</span> left.</p>
-                <p className="text-sm text-muted-foreground">Facilitators and waived campers are counted. Cancelled registrations free up a spot.</p>
+                <p className="flex items-center gap-1 text-sm text-muted-foreground"><span><span className="tabular-nums">{formatNumber(camp.spotsUsed)} of {formatNumber(details.camperLimit)}</span> camper spots used. <span className="tabular-nums">{formatNumber(spotsLeft)}</span> left.</span><SpotsInfo /></p>
               </div>
             </section>
             <section className="flex min-w-0 flex-col gap-4">
@@ -455,10 +467,10 @@ export function CampSetupScreen({ canEdit = true }: { canEdit?: boolean }) {
         description="Fees that apply to both MYF and MYA."
         saved={shared.settings}
         fields={sharedFields}
-        note="Changes here affect both MYF and MYA. Existing registrations keep the fee they were charged."
         saveLabel="Save shared settings"
         successMessage="Shared settings successfully saved"
         lastSaved={shared.lastSaved}
+        auditHref="/audit-log?camp=system&area=camp-setup"
         canEdit={canEdit}
         onDirtyChange={dirtyHandlers["Shared settings"]}
         onSave={(settings) => setShared({ settings, lastSaved: { by: currentUser, at: new Date() } })}

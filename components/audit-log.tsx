@@ -1,0 +1,227 @@
+"use client"
+
+import * as React from "react"
+import { endOfDay, format, startOfDay, subDays } from "date-fns"
+import type { DateRange } from "react-day-picker"
+import { X } from "lucide-react"
+import { IconCalendar, IconSearch } from "@tabler/icons-react"
+
+import { formatDateTime } from "@/lib/format"
+import { Badge } from "@/ui/badge"
+import { Button } from "@/ui/button"
+import { Calendar } from "@/ui/calendar"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/ui/card"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/ui/dialog"
+import { Input } from "@/ui/input"
+import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/ui/table"
+
+type Area = "users" | "roles" | "camp-setup" | "campuses" | "campers" | "waivers-payments" | "sensitive" | "sign-in"
+type Change = { label: string; from: string; to: string }
+type Entry = { id: string; at: Date; user: string; removed?: boolean; action: string; area: Area; camp: "MYA" | "MYF" | null; subject: string; summary?: string; changes?: Change[] }
+
+const areas: { value: Area; label: string }[] = [
+  { value: "users", label: "Users" },
+  { value: "roles", label: "Roles" },
+  { value: "camp-setup", label: "Camp setup" },
+  { value: "campuses", label: "Campuses and networks" },
+  { value: "campers", label: "Campers" },
+  { value: "waivers-payments", label: "Waivers and payments" },
+  { value: "sensitive", label: "Sensitive access" },
+  { value: "sign-in", label: "Sign-in" },
+]
+
+const at = (month: number, day: number, hour: number, minute: number) => new Date(2026, month - 1, day, hour, minute)
+
+const entries: Entry[] = [
+  { id: "a1", at: at(10, 21, 9, 42), user: "Dennis Otieno", action: "Checked in", area: "campers", camp: "MYA", subject: "Esther Achieng" },
+  { id: "a2", at: at(10, 21, 9, 15), user: "Sharon Wanjiru", action: "Exit permit issued", area: "campers", camp: "MYA", subject: "Hannah Kamau" },
+  { id: "a3", at: at(10, 21, 8, 30), user: "Sharon Wanjiru", action: "Medical details viewed", area: "sensitive", camp: "MYF", subject: "Ibrahim Hassan" },
+  { id: "a4", at: at(10, 20, 17, 5), user: "John Doe", action: "Permission granted", area: "roles", camp: null, subject: "Registrar", summary: "Print records" },
+  { id: "a5", at: at(10, 20, 16, 50), user: "John Doe", action: "Permission removed", area: "roles", camp: null, subject: "Lead registrar", summary: "Approve waivers" },
+  { id: "a6", at: at(10, 20, 14, 12), user: "John Doe", action: "User role changed", area: "users", camp: null, subject: "Kevin Mutua", changes: [{ label: "Role", from: "Lead registrar", to: "Registrar" }] },
+  { id: "a7", at: at(10, 20, 11, 3), user: "John Doe", action: "User deactivated", area: "users", camp: null, subject: "Kevin Mutua" },
+  { id: "a8", at: at(10, 19, 15, 20), user: "John Doe", action: "Waiver approved", area: "waivers-payments", camp: "MYF", subject: "Daniel Kiptoo" },
+  { id: "a9", at: at(10, 19, 10, 44), user: "Mercy Chebet", action: "Camper registered", area: "campers", camp: "MYF", subject: "Cynthia Wambui", summary: "Walk-in" },
+  { id: "a24", at: at(10, 18, 16, 40), user: "John Doe", action: "Campus moved", area: "campuses", camp: null, subject: "Downtown", changes: [{ label: "Network", from: "Limitless", to: "Catalyst" }] },
+  { id: "a10", at: at(10, 18, 14, 2), user: "John Doe", action: "Camp setup saved", area: "camp-setup", camp: "MYF", subject: "MYF setup", changes: [{ label: "Camp start", from: "30/11/2026", to: "01/12/2026" }, { label: "Registration closes", from: "25/11/2026", to: "30/11/2026" }, { label: "Camper limit", from: "900", to: "1,000" }] },
+  { id: "a11", at: at(10, 18, 9, 30), user: "Sharon Wanjiru", action: "Payment verified", area: "waivers-payments", camp: "MYA", subject: "Felix Mwangi", summary: "M-Pesa QJK4H7XW2P" },
+  { id: "a12", at: at(10, 17, 16, 10), user: "Sharon Wanjiru", action: "Records exported", area: "sensitive", camp: "MYA", subject: "Camp roster", summary: "590 campers" },
+  { id: "a13", at: at(10, 16, 9, 45), user: "John Doe", action: "Camp setup saved", area: "camp-setup", camp: "MYA", subject: "MYA setup", changes: [{ label: "Walk-in (desk) registration", from: "KES 1,800", to: "KES 2,000" }] },
+  { id: "a14", at: at(10, 16, 9, 40), user: "John Doe", action: "Link paused", area: "camp-setup", camp: "MYA", subject: "MYA registration link" },
+  { id: "a15", at: at(10, 14, 13, 25), user: "Peter Kamau", removed: true, action: "Camper details updated", area: "campers", camp: "MYA", subject: "Amara Njeri", changes: [{ label: "Phone number", from: "0703128450", to: "0703128456" }] },
+  { id: "a25", at: at(10, 15, 10, 5), user: "John Doe", action: "Campus added", area: "campuses", camp: null, subject: "Kizazi", summary: "Limitless" },
+  { id: "a16", at: at(10, 14, 8, 0), user: "John Doe", action: "User removed", area: "users", camp: null, subject: "Peter Kamau" },
+  { id: "a17", at: at(10, 12, 11, 20), user: "John Doe", action: "Shared settings saved", area: "camp-setup", camp: null, subject: "Shared settings", changes: [{ label: "Facilitator registration", from: "KES 400", to: "KES 500" }] },
+  { id: "a18", at: at(10, 10, 15, 0), user: "John Doe", action: "User invited", area: "users", camp: null, subject: "brian@mavuno.org", summary: "Registrar, MYF only" },
+  { id: "a19", at: at(10, 8, 10, 16), user: "Dennis Otieno", action: "Signed in", area: "sign-in", camp: null, subject: "dennis@mavuno.org" },
+  { id: "a20", at: at(10, 8, 10, 15), user: "Dennis Otieno", action: "Sign-in failed", area: "sign-in", camp: null, subject: "dennis@mavuno.org", summary: "Wrong password" },
+  { id: "a21", at: at(10, 5, 12, 0), user: "John Doe", action: "Role edited", area: "roles", camp: null, subject: "Lead registrar", changes: [{ label: "Description", from: "Runs the desk.", to: "Leads the registration desk." }] },
+  { id: "a22", at: at(9, 25, 11, 30), user: "John Doe", action: "Records printed", area: "sensitive", camp: "MYF", subject: "Camp roster", summary: "214 campers" },
+  { id: "a23", at: at(9, 20, 10, 5), user: "John Doe", action: "Camp access changed", area: "users", camp: null, subject: "Dennis Otieno", changes: [{ label: "Camp access", from: "Both", to: "MYA only" }] },
+]
+
+const pageSize = 10
+
+function inWhen(entry: Entry, when: string, range: DateRange | undefined) {
+  const now = new Date()
+  if (when === "today") return entry.at >= startOfDay(now)
+  if (when === "7d") return entry.at >= startOfDay(subDays(now, 6))
+  if (when === "30d") return entry.at >= startOfDay(subDays(now, 29))
+  if (when === "custom" && range?.from) return entry.at >= startOfDay(range.from) && entry.at <= endOfDay(range.to ?? range.from)
+  return true
+}
+
+function Detail({ entry, onOpen }: { entry: Entry; onOpen: () => void }) {
+  const changes = entry.changes ?? []
+  return (
+    <span>
+      <span className="font-medium">{entry.subject}</span>
+      {entry.summary && <span className="text-muted-foreground"> · {entry.summary}</span>}
+      {changes.length === 1 && <span className="text-muted-foreground"> · {changes[0].label} {changes[0].from} → <span className="text-foreground">{changes[0].to}</span></span>}
+      {changes.length > 1 && <span className="text-muted-foreground"> · <button type="button" className="text-foreground underline underline-offset-4" onClick={onOpen}>{changes.length} changes</button></span>}
+    </span>
+  )
+}
+
+export function AuditLogScreen({ initialQuery = "", initialCamp = "all", initialArea = "all" }: { initialQuery?: string; initialCamp?: string; initialArea?: string }) {
+  const [query, setQuery] = React.useState(initialQuery)
+  const [camp, setCamp] = React.useState(initialCamp)
+  const [when, setWhen] = React.useState("all")
+  const [range, setRange] = React.useState<DateRange | undefined>()
+  const [area, setArea] = React.useState(initialArea)
+  const [shown, setShown] = React.useState(pageSize)
+  const [open, setOpen] = React.useState<Entry | null>(null)
+
+  const filtered = entries.filter((entry) => {
+    const text = `${entry.user} ${entry.action} ${entry.subject} ${entry.summary ?? ""} ${(entry.changes ?? []).map((change) => `${change.label} ${change.from} ${change.to}`).join(" ")}`.toLowerCase()
+    return (
+      text.includes(query.trim().toLowerCase()) &&
+      (camp === "all" || (camp === "system" ? entry.camp === null : entry.camp === camp)) &&
+      (area === "all" || entry.area === area) &&
+      inWhen(entry, when, range)
+    )
+  })
+  React.useEffect(() => setShown(pageSize), [query, camp, when, range, area])
+
+  return (
+    <main className="flex min-w-0 flex-1 flex-col gap-4 p-4 lg:p-6">
+      <Card className="min-w-0 shadow-none">
+        <CardHeader className="gap-1">
+          <CardTitle className="text-base">System activity</CardTitle>
+          <CardDescription>Every change made in the portal, newest first. Only roles with the View audit log permission can open it. Entries cannot be edited or deleted by anyone, including the Super admin.</CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+            <div className="relative max-w-md flex-1">
+              <IconSearch className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input className="border bg-muted/50 pl-8" placeholder="Search by user, camper name, action" value={query} onChange={(event) => setQuery(event.target.value)} />
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Select value={camp} onValueChange={setCamp}>
+                <SelectTrigger className="w-36" aria-label="Camp"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All camps</SelectItem>
+                  <SelectItem value="MYA">MYA</SelectItem>
+                  <SelectItem value="MYF">MYF</SelectItem>
+                  <SelectItem value="system">System-wide</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={when} onValueChange={setWhen}>
+                <SelectTrigger className="w-36" aria-label="When"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All time</SelectItem>
+                  <SelectItem value="today">Today</SelectItem>
+                  <SelectItem value="7d">Last 7 days</SelectItem>
+                  <SelectItem value="30d">Last 30 days</SelectItem>
+                  <SelectItem value="custom">Custom range</SelectItem>
+                </SelectContent>
+              </Select>
+              {when === "custom" && (
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button type="button" variant="outline" className="w-56 justify-between font-normal tabular-nums">
+                      <span className="truncate">{range?.from ? `${format(range.from, "dd/MM/yyyy")} – ${format(range.to ?? range.from, "dd/MM/yyyy")}` : "Pick dates"}</span>
+                      <IconCalendar className="text-muted-foreground" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto overflow-hidden p-0" align="end">
+                    <Calendar mode="range" selected={range} onSelect={setRange} defaultMonth={range?.from ?? new Date()} disabled={{ after: new Date() }} />
+                  </PopoverContent>
+                </Popover>
+              )}
+              <Select value={area} onValueChange={setArea}>
+                <SelectTrigger className="w-44" aria-label="Action"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All actions</SelectItem>
+                  {areas.map((item) => <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="overflow-x-auto rounded-lg border">
+            <Table>
+              <TableHeader className="bg-muted/50">
+                <TableRow>
+                  <TableHead className="whitespace-nowrap">When</TableHead>
+                  <TableHead className="whitespace-nowrap">User</TableHead>
+                  <TableHead className="whitespace-nowrap">Action</TableHead>
+                  <TableHead className="whitespace-nowrap">Detail</TableHead>
+                  <TableHead className="whitespace-nowrap">Camp</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filtered.slice(0, shown).map((entry) => (
+                  <TableRow key={entry.id} className="hover:bg-muted/50">
+                    <TableCell className="whitespace-nowrap text-muted-foreground tabular-nums">{formatDateTime(entry.at)}</TableCell>
+                    <TableCell className="whitespace-nowrap">{entry.user}{entry.removed && <span className="text-muted-foreground"> (removed)</span>}</TableCell>
+                    <TableCell className="whitespace-nowrap"><Badge variant="outline" className="whitespace-nowrap">{entry.action}</Badge></TableCell>
+                    <TableCell className="whitespace-nowrap"><Detail entry={entry} onOpen={() => setOpen(entry)} /></TableCell>
+                    <TableCell className="whitespace-nowrap">{entry.camp ?? "-"}</TableCell>
+                  </TableRow>
+                ))}
+                {filtered.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">No entries match these filters.</TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+
+          {filtered.length > 0 && (
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-xs text-muted-foreground tabular-nums">Showing {Math.min(shown, filtered.length)} of {filtered.length} entries</p>
+              {shown < filtered.length && <Button type="button" variant="outline" onClick={() => setShown((current) => current + pageSize)}>Load more</Button>}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Dialog open={open !== null} onOpenChange={(next) => !next && setOpen(null)}>
+        <DialogContent showCloseButton={false} className="gap-0 sm:max-w-lg">
+          <DialogHeader className="relative space-y-1 text-left">
+            <DialogTitle className="text-base font-semibold leading-none tracking-tight">{open?.action}</DialogTitle>
+            <DialogDescription className="text-sm text-muted-foreground">
+              <strong className="text-foreground">{open?.subject}</strong> by {open?.user}{open?.removed ? " (removed)" : ""}, <span className="tabular-nums">{open ? formatDateTime(open.at) : ""}</span>
+            </DialogDescription>
+            <Button type="button" variant="ghost" size="icon" aria-label="Close entry details" className="absolute right-0 top-0" onClick={() => setOpen(null)}><X className="size-4" /></Button>
+          </DialogHeader>
+          <div className="flex max-h-72 flex-col gap-2 overflow-y-auto pt-4">
+            {(open?.changes ?? []).map((change) => (
+              <div key={change.label} className="rounded-lg border bg-muted/20 px-4 py-3 text-sm">
+                <div className="text-muted-foreground">{change.label}</div>
+                <div className="tabular-nums">{change.from} → <strong className="text-foreground">{change.to}</strong></div>
+              </div>
+            ))}
+          </div>
+          <DialogFooter className="mt-4 flex-row justify-end gap-3 sm:mt-6">
+            <Button type="button" variant="outline" onClick={() => setOpen(null)}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </main>
+  )
+}

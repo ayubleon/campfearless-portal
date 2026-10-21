@@ -29,7 +29,7 @@ import {
   SidebarMenuItem,
 } from '@/ui/sidebar'
 
-const roleName = "Registration Facilitator"
+const roleName = "Super admin"
 
 const data = {
   user: {
@@ -58,9 +58,9 @@ const data = {
     {
       label: "Administration",
       items: [
-        { title: "Users and roles", icon: UsersRound },
-        { title: "Campuses and networks", icon: Building2 },
-        { title: "Audit log", icon: History },
+        { title: "Users and roles", icon: UsersRound, url: "/users-and-roles" },
+        { title: "Campuses and networks", icon: Building2, url: "/campuses-and-networks" },
+        { title: "Audit log", icon: History, url: "/audit-log" },
       ],
     },
   ],
@@ -105,11 +105,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton
                       asChild
-                      isActive={"url" in item && pathname === item.url}
+                      isActive={"url" in item && item.url !== undefined && pathname === item.url}
                       tooltip={item.title}
                       className="h-9 gap-3 rounded-lg px-2.5 text-sm font-medium data-[active=true]:bg-black data-[active=true]:text-white data-[active=true]:hover:bg-black data-[active=true]:hover:text-white dark:data-[active=true]:bg-black dark:data-[active=true]:text-white"
                     >
-                      <Link href={"url" in item ? item.url : "#"}>
+                      <Link href={("url" in item && item.url) || "#"}>
                         <item.icon className="size-4" />
                         <span>{item.title}</span>
                       </Link>

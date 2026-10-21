@@ -13,7 +13,7 @@
 - After every `shadcn add`, check the new files before using them:
   - `import { cn } from "cn"` must be `import { cn } from "@/lib/utils"`. If `package.json` gained a `cn` dependency, remove it (`pnpm remove cn`); it is an unrelated npm package.
   - Tailwind v3 CSS-variable classes must be v4 syntax: `h-[--cell-size]` → `h-(--cell-size)`. The v3 form silently produces no styles. Declarations with a colon (`[--cell-size:2rem]`) stay as they are.
-  - Re-apply local changes the overwrite removed. The only one today is the success/error toast styles in `ui/sonner.tsx`.
+  - Re-apply local changes the overwrite removed: the success/error toast styles in `ui/sonner.tsx`, and `position = "popper"`, `align = "start"` defaults in `SelectContent` (`ui/select.tsx`).
 - `TooltipProvider` wraps the app in `app/layout.tsx`. The sidebar's tooltips crash without it.
 - If a component comes from another style or registry, restyle it to match before using it: `h-8` controls, `rounded-lg`, `text-sm`, same focus ring as `ui/button.tsx`.
 
@@ -47,6 +47,7 @@
 - Dialog title: `text-base font-semibold leading-none tracking-tight`. Exception: destructive or irreversible confirmations use `text-lg` with an icon (see Dialogs).
 - Body text `text-sm`. Secondary text `text-muted-foreground`. Small meta and legends `text-xs text-muted-foreground`.
 - Emphasis inside muted text: `<strong className="text-foreground">`.
+- Dates with a time always use `formatDateTime` from `@/lib/format`: "20/10/26, 09:20 AM". Date-only fields use `dd/MM/yyyy`. Never `toLocaleString`, which shows month first on some machines.
 - Numbers in stats: `tabular-nums`. Stat value `text-base font-semibold`; chart center value `text-xl`.
 - Page title in `SiteHeader`: `text-base font-semibold`.
 - Exception: auth pages (`app/login`) keep the shadcn login block heading, `text-2xl font-bold`. They have no `SiteHeader` or sidebar.
@@ -71,12 +72,12 @@
 
 | Status | Classes |
 |---|---|
-| Checked in | `border-transparent bg-status-checked-in text-status-checked-in-foreground` |
+| Checked in / Can sign in | `border-transparent bg-status-checked-in text-status-checked-in-foreground` |
 | Registered | `border-transparent bg-status-registered text-status-registered-foreground` |
 | Active link | `border-transparent bg-status-checked-in text-status-checked-in-foreground` |
-| Scheduled | `border-transparent bg-status-scheduled text-status-scheduled-foreground` |
+| Scheduled / Invite pending | `border-transparent bg-status-scheduled text-status-scheduled-foreground` |
 | Paused | `border-status-paused-foreground/30 bg-status-paused text-status-paused-foreground` |
-| Checked out / Inactive / neutral | `rounded-full border-2 border-border bg-muted text-muted-foreground` |
+| Checked out / Inactive / No access / Locked / Sensitive / neutral | `rounded-full border-2 border-border bg-muted text-muted-foreground` |
 
 - The mapping is `statusClass(status)` in `lib/status.ts`. Import it; never copy it into a component. A new status means a new `status-*` token pair in `globals.css` (light and dark) plus a branch there.
 - When a badge's meaning depends on dates, add a one-line `text-sm text-muted-foreground` hint near it that explains it: "Opens in 12 days.", "Closes in 40 days.", "Closed on 30/11/2026.", "Campers can't sign up until you resume the link."
@@ -97,7 +98,7 @@
 - Every dialog's buttons go in `DialogFooter`, never a plain `div`. It is a tinted band with a top border and its own `p-4` that runs to the dialog's edges. Never override its top padding (`pt-0`, `sm:pt-0`), or the buttons touch the border.
   - Confirmation dialog: `<DialogFooter className="mt-4 grid grid-cols-2 gap-3 sm:mt-6 sm:justify-stretch">`, with equal-width Cancel and Confirm.
   - List or selection dialog (`p-4`): `<DialogFooter className="mt-4 flex-row justify-end gap-3">`.
-  - Form dialog (`p-6`): `<DialogFooter className="-mx-6 -mb-6 mt-2 flex-row justify-end gap-3 px-6 py-4">`, so the band still reaches the edges.
+  - Form dialog (`p-4 sm:p-6`): `<DialogFooter className="-mx-4 -mb-4 mt-4 shrink-0 flex-row justify-end gap-3 px-4 py-4 sm:-mx-6 sm:-mb-6 sm:mt-6 sm:px-6">`, so the band still reaches the edges.
 - Two-option choices (gender, yes/no) are two `Button`s in `flex gap-3`: the selected one is `variant="default"`, the other `variant="outline"`.
 - Disable the confirm button until it is valid (`disabled={selected.size === 0}`).
 
@@ -111,7 +112,8 @@
     <Button type="button" variant="ghost" size="icon" aria-label="Close <dialog name>" className="absolute right-0 top-0" onClick={close}><X className="size-4" /></Button>
   </DialogHeader>
   ```
-- Width by purpose: confirmation `sm:max-w-lg`, list or selection `sm:max-w-xl` with `gap-0 p-4`, form `sm:max-w-4xl` with `gap-4 p-6`.
+- Width by purpose: confirmation `sm:max-w-lg`, list or selection `sm:max-w-xl` with `gap-0 p-4`, form `sm:max-w-4xl` with `gap-4 p-4 sm:p-6`.
+- Any dialog that can be taller than a phone screen (forms, long lists) must fit the viewport: `DialogContent className="max-h-[calc(100dvh-2rem)] grid-rows-[auto_minmax(0,1fr)] …"`, then after the header one `flex min-h-0 flex-col` wrapper holding a scroll area (`-mx-4 flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 pb-1 sm:-mx-6 sm:px-6`) and the `DialogFooter`. Header and footer stay visible; only the body scrolls. See the edit camper dialog in the dashboard.
 - Destructive or irreversible confirmation: the title includes `<AlertCircle className="text-destructive" />` and uses `text-lg`. The description names the subject in `<strong className="text-foreground">` and states the result ("This will transition their status to **Checked out**").
 
 ## Forms
@@ -123,6 +125,7 @@
 - Field grid: `grid gap-4 sm:grid-cols-3`. Form sections: `<section className="pt-6"><h3 className="mb-3 text-base font-semibold">…</h3>`.
 - Search input: relative wrapper, `<IconSearch className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />`, `Input className="border bg-muted/50 pl-8"`. In-input icons are always `size-4` and vertically centered; the 24px tabler default overflows the 32px input. Placeholder style: "Search by name, phone, M-Pesa code". Filter searches update live as you type. Lookup searches that open a result dialog also run on Enter.
 - Expandable option card: `rounded-2xl border bg-muted/30 p-4 text-sm` with `focus-within:border-ring focus-within:ring-1 focus-within:ring-ring/20`. Reveal its details with the `grid-rows-[0fr]` → `grid-rows-[1fr]` + opacity transition (`duration-300 ease-out`), helper text indented `pl-6 text-muted-foreground`.
+- Selects open as a dropdown below their trigger. `ui/select.tsx` defaults `SelectContent` to `position="popper"` and `align="start"`; shadcn's item-aligned list covers the trigger and breaks inside the Base UI dialog.
 - Filter selects sit next to the search with a fixed width (`SelectTrigger className="w-32"` / `w-36`). The first option is "All …".
 - Date field: `Popover` + `Calendar` from `@/ui`. The trigger is `<Button variant="outline" className="w-full min-w-0 justify-between bg-muted/40 px-2.5 font-normal tabular-nums">` with the date in `<span className="min-w-0 truncate">` and `IconCalendar` in `text-muted-foreground` on the right. `PopoverContent className="w-auto overflow-hidden p-0" align="start"` (without `overflow-hidden` the calendar corners stick out). Format `dd/MM/yyyy`. Paired dates block impossible ranges with `disabled={{ before: start }}`.
 - Money field: an absolute `KES` prefix (`left-2.5`, `text-muted-foreground`) inside a relative wrapper, `Input className="bg-muted/40 pl-11 tabular-nums" inputMode="numeric"`. Read-only values show as "KES 1,000".
@@ -135,7 +138,8 @@
 - Read-only values use the same label and height as inputs so the layout doesn't move when editing: `<div className="flex h-8 min-w-0 items-center rounded-lg border bg-muted/20 px-2.5 text-sm font-normal tabular-nums">`. Use a `div` wrapper, not a `label`, in read-only mode.
 - In edit mode the card footer shows the note on the left and **Cancel** (outline, discards the draft) and **Save …** (default) on the right. Save is disabled until something changed and every field is valid.
 - Save opens a **review dialog** (confirmation width `sm:max-w-lg`): title "Review <card> changes", description "Check these changes before you save them.", then one stat-tile row per *changed* field only, `{old} → <strong className="text-foreground">{new}</strong>`. Consequences follow as `text-sm text-muted-foreground` lines with `AlertCircle className="mt-0.5 size-4 shrink-0 text-destructive"` (for example: new fees only apply to new registrations). Footer buttons: Cancel and **Save changes**. Confirming fires "<Card> successfully saved" and returns the card to read-only.
-- Card footer meta: the note (`text-sm text-muted-foreground`) and below it `text-xs text-muted-foreground` "Last saved by <name>, 18 Oct 2026, 14:02".
+- Card footer meta: only `text-xs text-muted-foreground` "Last saved by <name>, 18 Oct 2026, 14:02". Don't add standing notes that restate the card title or a consequence the review dialog already shows; put consequences in the review dialog, where they appear only when they apply.
+- Explanations that would repeat in several cards (how a number is counted, what a rule means) go behind an info button at the end of the line they explain, not as repeated text: `<Button variant="ghost" size="icon-xs" aria-label="…" className="text-muted-foreground"><IconInfoCircle /></Button>` opening a `Popover` with `PopoverContent className="w-64 text-sm" align="start" collisionPadding={16}`. Use a popover, not a tooltip, so it opens on tap.
 - A setting shared by several cards gets its own card ("Shared settings") rather than living inside one of them.
 - Unsaved edits are guarded: internal link clicks open a destructive confirmation ("Leave without saving?", `text-lg` title with `AlertCircle`, buttons **Stay on page** and **Leave page**) naming the unsaved cards in `<strong className="text-foreground">`, and `beforeunload` covers reloads and closing the tab.
 
@@ -145,12 +149,17 @@
 - Every `TableHead` and `TableCell` has `whitespace-nowrap`.
 - Two-line cells: first line `font-medium` (or plain), second line `text-muted-foreground`, e.g. name + "Age: 24 - Female", contact + phone.
 - Empty values show `-`.
-- Last column "More" (`w-10`): a row actions `DropdownMenu`. Trigger `buttonVariants({ variant: "ghost", size: "icon" })` with `IconDotsVertical` and `aria-label="More actions"`. Content `align="end" sideOffset={6} className="min-w-44"`. Destructive item last, after a `DropdownMenuSeparator`, styled `text-destructive focus:text-destructive`.
+- Destructive menu items always keep their normal label ("Delete network", "Remove user") and stay clickable. When the action isn't allowed yet, clicking opens the destructive dialog explaining why ("Can't delete Catalyst yet", "It still has 7 campuses…") with a button that helps fix it ("Show its campuses") or "Got it". Never put the reason in the menu label or grey the item out.
+- Last column (`w-10`) has no visible title, only `<span className="sr-only">More actions</span>` in its `TableHead`. It holds a row actions `DropdownMenu`. Trigger `buttonVariants({ variant: "ghost", size: "icon" })` with `IconDotsVertical` and `aria-label="More actions"`. Content `align="end" sideOffset={6} className="min-w-44"`. Destructive item last, after a `DropdownMenuSeparator`, styled `text-destructive focus:text-destructive`.
+- Long lists that belong to groups (campuses by network, permissions by area) show group header rows: `<TableRow className="bg-muted/30 hover:bg-muted/30">` with one `TableCell colSpan` in `py-2 text-xs font-medium text-muted-foreground`, e.g. "Catalyst · 7 campuses". Rows stay A–Z inside each group.
+- Don't put an editable select in every row for a change that affects reports (moving a campus to another network). Show the value as text or as the group, and offer "Move to network…" in the row menu, opening a small dialog with the select ("(current)" marked) and a disabled confirm until the value changes.
 - Toolbar above the table: `flex flex-col gap-2 md:flex-row md:items-center md:justify-between`, with search `relative max-w-md flex-1` on the left and filters on the right.
 
 ## Tabs
 
 `<Tabs className="w-fit"><TabsList className="grid w-full max-w-md grid-cols-N">`, each `TabsTrigger className="w-full"`.
+
+Actions inside a tab (Invite user, Add role) go in the `CardAction` of the card they act on, never next to the tabs.
 
 ## Charts
 
@@ -162,6 +171,14 @@
 
 - `lucide-react` for dialog icons (`X` close, `AlertCircle` warnings). `@tabler/icons-react` for in-page icons (`IconSearch`, `IconDotsVertical`, `IconChevronDown`).
 - Same purpose, same icon. Icon size inside buttons comes from the button (`size-4`).
+
+## Audit log
+
+- Every action a screen adds that changes data, or opens sensitive records (print, export, medical details), needs an audit log entry. Add its sample row to `components/audit-log.tsx`.
+- Action: a short past-tense label from a fixed list, in sentence case ("Permission granted", "Camp setup saved"), grouped under one area (Users, Roles, Camp setup, Campuses and networks, Campers, Waivers and payments, Sensitive access, Sign-in). Shown as `<Badge variant="outline">`.
+- Detail: the subject first in `font-medium` (camper, user, role or setup), then ` · ` and the change in `text-muted-foreground`. One change reads "Label old → new". Several changes read "N changes", a button that opens the read-only details dialog listing each old → new.
+- Removed users keep their name with "(removed)". Entries never get edit, delete or row menus.
+- A screen with a "Last saved by …" line links it to the audit log, pre-filtered with `?camp=`, `?area=` or `?q=`.
 
 ## Before finishing a screen
 

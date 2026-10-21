@@ -59,8 +59,10 @@ function SelectTrigger({
 function SelectContent({
   className,
   children,
-  position = "item-aligned",
-  align = "center",
+  // Local change: open below the trigger. The shadcn default (item-aligned) covers the trigger
+  // and closes again when clicked inside the Base UI dialog.
+  position = "popper",
+  align = "start",
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Content>) {
   return (
