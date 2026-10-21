@@ -81,7 +81,7 @@ export function EditionsCard({ canEdit = true }: { canEdit?: boolean }) {
     <Card className="min-w-0 shadow-none">
       <CardHeader>
         <CardTitle className="text-lg">Camp editions</CardTitle>
-        <CardDescription>An edition is one run of the camps. Registrations, payments and waivers belong to the edition they were made in.</CardDescription>
+        <CardDescription>One run of the camps. Registrations, payments and waivers belong to the edition they were made in.</CardDescription>
         {canEdit && <CardAction><Button type="button" variant="outline" onClick={() => setEditing("new")}>New edition</Button></CardAction>}
       </CardHeader>
       <CardContent>

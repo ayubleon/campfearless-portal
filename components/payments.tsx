@@ -129,13 +129,13 @@ export function PaymentsScreen() {
       <Card className="min-w-0 shadow-none">
         <CardHeader>
           <CardTitle className="text-lg">Verify M-Pesa payments</CardTitle>
-          <CardDescription>M-Pesa messages are checked by hand. Read the amount from the message, type it in, then verify. When the amount equals the total expected for everyone on that code it shows Matched and you can verify it. Anything else gets flagged, and flagged payments can be printed from Reports for follow-up.</CardDescription>
+          <CardDescription>Type the amount from each M-Pesa message, then verify it when it matches.</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <div className="flex flex-col gap-2 lg:flex-row lg:items-center">
             <div className="relative w-full max-w-md lg:min-w-48 lg:flex-1">
               <IconSearch className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-              <Input className="border bg-muted/50 pl-8" aria-label="Search by name, M-Pesa code, who registered" placeholder="Search by name, M-Pesa code, who registered" value={query} onChange={(event) => setQuery(event.target.value)} />
+              <Input className="border bg-muted/50 pl-8" aria-label="Search by name or M-Pesa code" placeholder="Search by name or M-Pesa code" value={query} onChange={(event) => setQuery(event.target.value)} />
             </div>
             <div className="flex flex-wrap gap-2">
               <Select value={camp} onValueChange={setCamp}>

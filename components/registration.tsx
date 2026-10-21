@@ -198,7 +198,7 @@ function CamperCard({ camp, camper, number, total, onChange }: { camp: Camp; cam
     <Card className="min-w-0 shadow-none">
       <CardHeader>
         <CardTitle className="text-lg">Camper details</CardTitle>
-        <CardDescription>Fill in your details as per your legal documents. Every field is required except medical and special needs.</CardDescription>
+        <CardDescription>Fill in the details as on their legal documents. Only medical and special needs are optional.</CardDescription>
         <CardAction><span className="text-sm text-attention tabular-nums">Camper {number}/{total}</span></CardAction>
       </CardHeader>
       <CardContent className="flex flex-col">

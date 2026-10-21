@@ -159,7 +159,7 @@ export function AuditLogScreen({ initialQuery = "", initialCamp = "all", initial
       <Card className="min-w-0 shadow-none">
         <CardHeader className="gap-1">
           <CardTitle className="text-lg">System activity</CardTitle>
-          <CardDescription>Every change made in the portal, newest first. Only roles with the View audit log permission can open it. Entries cannot be edited or deleted by anyone, including the Super admin.</CardDescription>
+          <CardDescription>Every change made in the portal, newest first; entries can't be edited or deleted.</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <div className="flex flex-col gap-2 xl:flex-row xl:items-center xl:justify-between">

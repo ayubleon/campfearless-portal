@@ -166,7 +166,7 @@ export function WaiversScreen() {
       <Card className="min-w-0 shadow-none">
         <CardHeader>
           <CardTitle className="text-lg">Full waivers</CardTitle>
-          <CardDescription>Waivers are full only. Issuing one registers the camper with a fee of KES 0, at the desk or in advance. Campers with a waiver check in with no payment. Every change is logged.</CardDescription>
+          <CardDescription>Register campers with a fee of KES 0, at the desk or in advance.</CardDescription>
           <CardAction><Button type="button" onClick={() => setIssuing(true)}><IconTicket />Issue waiver</Button></CardAction>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">

@@ -49,7 +49,7 @@
 
 - All headings, labels, buttons, menu items and badges use **sentence case**: "Check in", "Issue exit permit", "Camp roster & status monitor".
 - `CardTitle` gets `className="text-lg"` (kept explicit so a style change can't silently enlarge titles). Its weight is `font-semibold`, set once in `ui/card.tsx` (nova default is medium), so every card title is bolder; never override it per card.
-- `CardDescription`: default (`text-sm text-muted-foreground`). One sentence that says what the card does.
+- `CardDescription`: default (`text-sm text-muted-foreground`). One short sentence that says what the card does, about 100 characters at most and never more than one line on a desktop. How a rule works (what Matched means, who can see the page) goes behind an info button or in the review dialog, not in the description.
 - Dialog title: `text-base font-semibold leading-none tracking-tight`. Exception: destructive or irreversible confirmations use `text-lg` with an icon (see Dialogs).
 - Body text `text-sm`. Secondary text `text-muted-foreground`. Small meta and legends `text-xs text-muted-foreground`.
 - Emphasis inside muted text: `<strong className="text-foreground">`.

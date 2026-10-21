@@ -756,7 +756,7 @@ export function DashboardOverview() {
           <Card className="shadow-none">
             <CardHeader>
               <CardTitle className="text-lg">{editionLabel(editionId)} is closed</CardTitle>
-              <CardDescription>Check-in, walk-in registration and exit permits are off for a closed edition. Its records stay in Reports.</CardDescription>
+              <CardDescription>Check-in, walk-in registration and exit permits are off. Its records stay in Reports.</CardDescription>
               <CardAction>
                 <Button asChild variant="outline">
                   <Link href="/reports">View in Reports</Link>
