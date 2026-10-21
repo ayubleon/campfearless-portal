@@ -55,7 +55,7 @@
 - Emphasis inside muted text: `<strong className="text-foreground">`.
 - Dates with a time always use `formatDateTime` from `@/lib/format`: "20/10/26, 09:20 AM". Date-only fields use `dd/MM/yyyy`. Never `toLocaleString`, which shows month first on some machines.
 - Numbers in stats: `tabular-nums`. Stat value `text-base font-semibold`; chart center value `text-xl`.
-- Page title in `SiteHeader`: `text-base font-semibold`.
+- Page title in `SiteHeader`: `text-base font-bold`.
 - Exception: auth pages (`app/login`) keep the shadcn login block heading, `text-2xl font-bold`. They have no `SiteHeader` or sidebar.
 
 ## Cards
