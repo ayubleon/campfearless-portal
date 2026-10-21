@@ -71,7 +71,7 @@ The welcome page address is permanent and shows whichever editions are open.
 ### Staff
 
 **permissions** (id, label, group, sensitive): a fixed list the code knows (register, check-in, check-out, issue-waivers, verify-payments, view-records, print-records, export-records, view-medical, edit-camp-setup, manage-campuses, manage-users, view-audit-log).
-**roles** (id, name, description, can_sign_in, locked). Roles that can't sign in are the **facilitator teams** (Kitchen crew, Security, ...). `Super admin` is locked.
+**roles** (id, name, description, can_sign_in, locked). Roles that can't sign in are the **facilitator teams** (Kitchen crew, Security, ...). The system must always have at least **two active Super admins** (enforce on every user change). `Super admin` is locked.
 **role_permissions** (role_id, permission_id).
 **users** (id, first_name, last_name, email unique, phone, role_id, camp_access `both|myf|mya`, status `active|inactive|pending`, password_hash, invited_at). A pending invite may have no name yet. Password reset needs a **password_resets** table (user_id, token_hash, expires_at, used_at).
 

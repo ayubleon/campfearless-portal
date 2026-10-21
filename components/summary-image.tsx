@@ -71,7 +71,7 @@ function orangeLogo(logo: HTMLImageElement, w: number, h: number) {
 async function drawSummary(items: Item[], createdAt: Date, scopeLabel: string): Promise<Snapshot> {
   await document.fonts.ready
   const logo = new window.Image()
-  logo.src = "/camp-fearless-logo.png"
+  logo.src = "/camp-fearless-logo.svg"
   const background = new window.Image()
   background.src = "/camp-summary-background.webp"
   await Promise.all([logo.decode().catch(() => undefined), background.decode().catch(() => undefined)])

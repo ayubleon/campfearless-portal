@@ -3,7 +3,7 @@
 import { LoadingButton } from "@/components/loading-button"
 import { useAction } from "@/lib/use-action"
 import { isEmail, placeNameMaxChars } from "@/lib/validation"
-import { allPermissions, campAccessOptions, initialRoles, initialUsers, permissionGroups, permissions, type CampAccess, type Role, type User, type UserStatus } from "@/lib/staff"
+import { allPermissions, campAccessOptions, initialRoles, initialUsers, isNeededSuperAdmin, minSuperAdmins, permissionGroups, permissions, type CampAccess, type Role, type User, type UserStatus } from "@/lib/staff"
 import * as React from "react"
 import Link from "next/link"
 import { AlertCircle, X } from "lucide-react"
@@ -194,8 +194,7 @@ export function UsersAndRolesScreen() {
     (a, b) => byText(a.name, b.name)
   )
   const signInRoles = roles.filter((role) => role.canSignIn)
-  const superAdmins = users.filter((user) => user.roleId === "super-admin" && user.status === "active").length
-  const isProtected = (user: User) => user.email === currentUser.email || (user.roleId === "super-admin" && user.status === "active" && superAdmins <= 1)
+  const isProtected = (user: User) => user.email === currentUser.email || isNeededSuperAdmin(users, user)
   const updateUser = (id: string, patch: Partial<User>) => setUsers((current) => current.map((user) => (user.id === id ? { ...user, ...patch } : user)))
   const closeConfirm = () => setConfirm(null)
 
@@ -331,7 +330,7 @@ export function UsersAndRolesScreen() {
                                     title: you ? "You can't remove yourself" : `Can't remove ${user.name}`,
                                     description: you
                                       ? <>Ask another <strong className="text-foreground">Super admin</strong> to remove your account.</>
-                                      : <><strong className="text-foreground">{user.name}</strong> is the last active Super admin. Give someone else the Super admin role first.</>,
+                                      : <><strong className="text-foreground">{user.name}</strong> is one of the {minSuperAdmins} Super admins the system must always have. Make someone else a Super admin first.</>,
                                     confirmLabel: "Got it",
                                     showCancel: false,
                                     onConfirm: closeConfirm,

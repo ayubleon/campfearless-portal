@@ -62,7 +62,7 @@ Read: networks and campuses (a campus has its network). Write: `add`, `rename`, 
 
 ## Users and roles (`manage-users`)
 
-Read: users (name, email, role, camp access, status active, inactive or pending) and roles (name, description, can sign in, permissions, how many users). Write: `invite` (email, role, camp access; 409 if the email has an account); `resend-invite`; `cancel-invite`; `change` a user's role, access or status (a user can't deactivate themselves or the last Super admin); `remove` a user; `create-role`, `edit-role` (name, description, can sign in; 409 on a duplicate name), `delete-role` (409 while users have it), `set-permission` (granting a sensitive one is confirmed in the screen).
+Read: users (name, email, role, camp access, status active, inactive or pending) and roles (name, description, can sign in, permissions, how many users). Write: `invite` (email, role, camp access; 409 if the email has an account); `resend-invite`; `cancel-invite`; `change` a user's role, access or status (a user can't deactivate or remove themselves, and the system must always keep **at least two active Super admins** (409 when a change would leave fewer: removing, deactivating or changing the role of one of two)); `remove` a user; `create-role`, `edit-role` (name, description, can sign in; 409 on a duplicate name), `delete-role` (409 while users have it), `set-permission` (granting a sensitive one is confirmed in the screen).
 
 ## Audit log (`view-audit-log`)
 

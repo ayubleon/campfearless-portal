@@ -51,7 +51,17 @@ export const initialUsers: User[] = [
   { id: "u5", name: "Mercy Chebet", email: "mercy@mavuno.org", roleId: "registrar", access: "Both", status: "active" },
   { id: "u6", name: "Kevin Mutua", email: "kevin@mavuno.org", roleId: "registrar", access: "Both", status: "inactive" },
   { id: "u7", name: "", email: "brian@mavuno.org", roleId: "registrar", access: "MYF only", status: "pending" },
+  { id: "u8", name: "Grace Njeri", email: "grace@mavuno.org", roleId: "super-admin", access: "Both", status: "active" },
 ]
+
+// The system always keeps at least this many active Super admins, so losing one account never locks everyone out.
+export const minSuperAdmins = 2
+
+export const activeSuperAdmins = (users: User[]) => users.filter((user) => user.roleId === "super-admin" && user.status === "active").length
+
+// True when removing, deactivating or demoting this user would leave fewer than the minimum.
+export const isNeededSuperAdmin = (users: User[], user: User) =>
+  user.roleId === "super-admin" && user.status === "active" && activeSuperAdmins(users) <= minSuperAdmins
 
 
 export const userName = (id: string) => initialUsers.find((user) => user.id === id)?.name ?? ""

@@ -64,7 +64,7 @@ export function LoginForm({
       {...props}
     >
       <div className="flex flex-col items-center space-y-1.5 text-center">
-        <Image src="/camp-fearless-logo.png" alt="Camp Fearless logo" width={120} height={128} priority className="mb-4 h-16 w-auto dark:invert" />
+        <Image src="/camp-fearless-logo.svg" alt="Camp Fearless logo" width={300} height={300} priority unoptimized className="mb-4 h-16 w-auto dark:invert" />
         <h1 className="text-2xl font-bold">Log in to your account</h1>
         <p className="text-balance text-sm text-muted-foreground">
           Enter your email and password to open the camp portal.
