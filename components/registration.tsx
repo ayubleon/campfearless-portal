@@ -103,7 +103,7 @@ export function Choice<T extends string>({ label, options, value, onChange }: { 
 function OptionCard({ name, checked, title, helper, detailsLabel, placeholder, details, onToggle, onDetails }: { name: string; checked: boolean; title: string; helper: string; detailsLabel: string; placeholder: string; details: string; onToggle: () => void; onDetails: (value: string) => void }) {
   return (
     <label className="flex cursor-pointer flex-col gap-1 rounded-2xl border bg-muted/30 p-4 text-sm transition-colors focus-within:border-ring focus-within:ring-1 focus-within:ring-ring/20">
-      <span className="flex items-start gap-2 font-medium"><Checkbox checked={checked} onCheckedChange={() => onToggle()} className="mt-0.5" />{title}</span>
+      <span className="flex items-start gap-2 font-medium"><Checkbox checked={checked} onCheckedChange={() => onToggle()} className="mt-0.5 bg-background dark:bg-input/30" />{title}</span>
       <span className="pl-6 text-muted-foreground">{helper}</span>
       <span className={cn("-mx-1 -mb-1 grid overflow-hidden transition-[grid-template-rows,opacity,margin] duration-300 ease-out", checked ? "mt-2 grid-rows-[1fr] opacity-100" : "-mt-2 grid-rows-[0fr] opacity-0")}>
         <span className="flex min-h-0 flex-col gap-2 px-1 pb-1">
@@ -354,7 +354,7 @@ export function RegistrationScreen() {
           <CardContent className="flex flex-col gap-4">
             <div className="rounded-lg bg-muted/40 px-4 py-4 text-center">
               <div className="text-sm text-muted-foreground">Desk fee payment: Total amount due</div>
-              <div className="py-1 text-xl font-semibold text-attention tabular-nums">Ksh {formatNumber(total)}</div>
+              <div className="py-1 text-xl font-bold text-attention tabular-nums">Ksh {formatNumber(total)}</div>
               <div className="text-sm text-muted-foreground tabular-nums">for {count} {count === 1 ? "participant" : "participants"}</div>
             </div>
             <div className="grid grid-cols-2 rounded-lg bg-muted/40 px-4 py-3 text-center text-sm">
@@ -368,9 +368,7 @@ export function RegistrationScreen() {
             </Field>
             <div className="flex flex-col gap-2">
               <LoadingButton type="button" className="w-full" pending={pending} loadingLabel="Registering..." disabled={!valid} onClick={submit}>Complete & auto check-in</LoadingButton>
-              {campFull
-                ? <p className="text-center text-sm text-destructive">{camp} is full. No more campers can be registered until a spot frees up or the limit is raised in Camp setup.</p>
-                : !valid && <p className="text-center text-xs text-muted-foreground">Fill in every camper, the emergency contact and the M-Pesa code to continue.</p>}
+              {campFull && <p className="text-center text-sm text-destructive">{camp} is full. No more campers can be registered until a spot frees up or the limit is raised in Camp setup.</p>}
             </div>
           </CardContent>
         </Card>

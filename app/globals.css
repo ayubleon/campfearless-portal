@@ -93,7 +93,7 @@
   --radius: 0.625rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
-  --camp-accent: #f05a22;
+  --camp-accent: #f05922;
   --camp-accent-hover: #d84f1b;
   --camp-accent-foreground: #ffffff;
   --link: #1d4ed8;
@@ -115,7 +115,7 @@
   --status-scheduled-foreground: #1d4ed8;
   --status-flagged: #fee2e2;
   --status-flagged-foreground: #b91c1c;
-  --attention: #c2410c;
+  --attention: #f05922;
   --brand: #336699;
   --brand-hover: #2b5985;
   --brand-foreground: #ffffff;
@@ -148,7 +148,7 @@
   --chart-5: oklch(0.269 0 0);
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
-  --camp-accent: #f05a22;
+  --camp-accent: #f05922;
   --camp-accent-hover: #d84f1b;
   --camp-accent-foreground: #ffffff;
   --link: oklch(0.78 0.12 255);
@@ -202,7 +202,7 @@
   --radius: 0.625rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
-  --camp-accent: #f05a22;
+  --camp-accent: #f05922;
   --camp-accent-hover: #d84f1b;
   --camp-accent-foreground: #ffffff;
   --nav-active: oklch(0.205 0 0);
@@ -223,7 +223,7 @@
   --status-scheduled-foreground: #1d4ed8;
   --status-flagged: #fee2e2;
   --status-flagged-foreground: #b91c1c;
-  --attention: #c2410c;
+  --attention: #f05922;
   --brand: #336699;
   --brand-hover: #2b5985;
   --brand-foreground: #ffffff;

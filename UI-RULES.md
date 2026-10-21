@@ -26,8 +26,8 @@
   - `link`: the colour of a text link that must stand out from the surrounding text (blue, underlined, with a lighter blue in dark mode). Use `text-link underline decoration-link/30 underline-offset-4 hover:decoration-link`. Used for the welcome page address in Camp setup.
   - `status-*` pairs: badge backgrounds and text (see Badges).
   - `status-flagged` pair: red badges for things that need follow-up ("Flagged", "Short 100", "Over 100"). Matched and Verified use the green `status-checked-in` pair.
-  - `camp-accent` / `camp-accent-hover` / `camp-accent-foreground`: the orange MYF Register button in the welcome page preview. Used only inside a `force-light` box. It is the Mavuno and Camp Fearless brand orange `#f05a22`, with white text, as the brand asks (white on that orange is 3.4:1, below 4.5:1, so keep the text large and bold). The summary image uses the same orange for its logo and title, which are large enough for 3:1.
-  - `attention`: orange text for money due and payment details on the registration screen (`text-attention`). Not for badges or buttons.
+  - `camp-accent` / `camp-accent-hover` / `camp-accent-foreground`: the orange MYF Register button in the welcome page preview. Used only inside a `force-light` box. It is the Mavuno and Camp Fearless brand orange `#f05922`, with white text, as the brand asks (white on that orange is 3.4:1, below 4.5:1, so keep the text large and bold). The summary image uses the same orange for its logo and title, which are large enough for 3:1.
+  - `attention`: the same brand orange `#f05922` for money due and payment details on the registration screen (`text-attention`). Not for badges or buttons.
 - Destructive meaning uses `text-destructive`: menu items, alert icons, inline field errors. Not red palette classes.
 - Progress bars (undo overlay, usage bars) use `bg-emerald-500` on a `bg-muted` track, `h-1.5`. This is the only palette class allowed outside the exceptions above.
 - Every screen must look right in light **and** dark. Test dark with the header switch, not only with system dark mode. A token without a `.dark` value is a bug.
@@ -296,6 +296,8 @@ Actions inside a tab (Invite user, Add role) go in the `CardAction` of the card 
 - The signed-in user comes from `currentUser` in `lib/session.ts` (name, email, role), never a hard-coded string in a screen.
 - Numbers with thousands commas use `formatNumber` from `lib/format.ts`; dates use `formatDateTime`. Never define a local copy.
 - Every route's `page.tsx` exports `metadata = { title: "<Page name>" }`; the root layout adds " · Camp Fearless". Never leave the default title.
+- **Switching theme never flashes.** `ThemeProvider` turns CSS transitions off for the instant the `light`/`dark` class changes (then back on), so cards, buttons and inputs don't fade from the old colours over the new page background. Never change the theme class anywhere else.
+- **Checkboxes on a muted surface are white in light mode.** A `Checkbox` inside a tinted card (the Medical and special needs option cards) gets `bg-background dark:bg-input/30`, so the empty box stays visible.
 - The theme (light or dark) is saved in `localStorage` under `theme` and applied by an inline script in `app/layout.tsx` before first paint. Never set the theme class from a `useEffect` alone.
 - `SidebarInset` has `min-w-0` so wide tables scroll inside their own wrapper instead of stretching the page. Don't remove it.
 - Every search input has an `aria-label` equal to its placeholder, and every `PopoverContent` has an `aria-label` ("Choose camp start", "How camper spots are counted").

@@ -16,12 +16,20 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const updateTheme = (nextTheme: Theme) => {
+    // Cards, buttons and inputs fade their colours on hover. Without this, the page background flips at once while they
+    // fade slowly from the old theme, which shows as a flash of white (or black). Switch off transitions for the change.
+    const style = document.createElement('style')
+    style.appendChild(document.createTextNode('*,*::before,*::after{transition:none!important}'))
+    document.head.appendChild(style)
     setTheme(nextTheme)
     document.documentElement.classList.remove('light', 'dark')
     document.documentElement.classList.add(nextTheme)
     try {
       localStorage.setItem('theme', nextTheme)
     } catch {}
+    // Reading the computed style forces the browser to apply the change before transitions come back.
+    window.getComputedStyle(document.body).color
+    setTimeout(() => style.remove(), 1)
   }
 
   return <ThemeContext.Provider value={{ theme, setTheme: updateTheme }}>{children}</ThemeContext.Provider>
