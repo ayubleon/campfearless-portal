@@ -76,7 +76,7 @@
 | Registered | `border-transparent bg-status-registered text-status-registered-foreground` |
 | Active link | `border-transparent bg-status-checked-in text-status-checked-in-foreground` |
 | Scheduled / Invite pending | `border-transparent bg-status-scheduled text-status-scheduled-foreground` |
-| Paused | `border-status-paused-foreground/30 bg-status-paused text-status-paused-foreground` |
+| Paused | `border-transparent bg-status-paused text-status-paused-foreground` |
 | Checked out / Inactive / No access / Locked / Sensitive / neutral | `rounded-full border-2 border-border bg-muted text-muted-foreground` |
 
 - The mapping is `statusClass(status)` in `lib/status.ts`. Import it; never copy it into a component. A new status means a new `status-*` token pair in `globals.css` (light and dark) plus a branch there.
@@ -132,6 +132,10 @@
 - Number fields format with thousands commas as you type (`toLocaleString("en-US")`).
 - Inline field error: `<p className="text-sm text-destructive">` under the field, saying what is wrong and the limit ("The limit can't be below the 320 spots already used."). Errors block saving; warnings (allowed but risky) appear as text too and again in the review dialog.
 
+## Item cards (a header plus a list of chips)
+
+- Used for networks and their campuses. `<section className="flex min-w-0 flex-col overflow-hidden rounded-xl border">` with the header in `flex items-start justify-between gap-3 p-4` (title `text-base font-semibold leading-none`, count `text-sm text-muted-foreground`, row `MoreMenu` on the right) and the chips in a tinted tray: `flex flex-1 flex-wrap content-start gap-2 border-t bg-muted/40 p-4`. Chips are `rounded-md border bg-muted/50 px-2.5 py-1 text-sm`. No separator inset inside the padding.
+
 ## Settings screens (editable cards)
 
 - Cards that change saved settings are **read-only until Edit**: `CardTitle` and `CardDescription` in `CardHeader`, plus `<CardAction><Button variant="outline">Edit</Button></CardAction>`. Hide Edit for roles that may not change settings.
@@ -151,6 +155,7 @@
 - Empty values show `-`.
 - Destructive menu items always keep their normal label ("Delete network", "Remove user") and stay clickable. When the action isn't allowed yet, clicking opens the destructive dialog explaining why ("Can't delete Catalyst yet", "It still has 7 campuses…") with a button that helps fix it ("Show its campuses") or "Got it". Never put the reason in the menu label or grey the item out.
 - Last column (`w-10`) has no visible title, only `<span className="sr-only">More actions</span>` in its `TableHead`. It holds a row actions `DropdownMenu`. Trigger `buttonVariants({ variant: "ghost", size: "icon" })` with `IconDotsVertical` and `aria-label="More actions"`. Content `align="end" sideOffset={6} className="min-w-44"`. Destructive item last, after a `DropdownMenuSeparator`, styled `text-destructive focus:text-destructive`.
+- Setup screens (campuses, roles, camp setup) don't show camper counts or other reporting numbers in their tables. Those depend on which camp and dates you mean, so they belong in Reports with filters. A count may appear in a destructive confirmation when it explains the risk ("53 campers have registered at Madaraka across all camps").
 - Long lists that belong to groups (campuses by network, permissions by area) show group header rows: `<TableRow className="bg-muted/30 hover:bg-muted/30">` with one `TableCell colSpan` in `py-2 text-xs font-medium text-muted-foreground`, e.g. "Catalyst · 7 campuses". Rows stay A–Z inside each group.
 - Don't put an editable select in every row for a change that affects reports (moving a campus to another network). Show the value as text or as the group, and offer "Move to network…" in the row menu, opening a small dialog with the select ("(current)" marked) and a disabled confirm until the value changes.
 - Toolbar above the table: `flex flex-col gap-2 md:flex-row md:items-center md:justify-between`, with search `relative max-w-md flex-1` on the left and filters on the right.

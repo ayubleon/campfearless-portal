@@ -18,12 +18,12 @@ export function CampusesAndNetworksSkeleton() {
         <CardContent>
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
             {Array.from({ length: 5 }, (_, index) => (
-              <div key={index} className="flex flex-col gap-4 rounded-xl border p-4">
-                <div className="flex flex-col gap-2">
+              <div key={index} className="flex flex-col overflow-hidden rounded-xl border">
+                <div className="flex flex-col gap-2 p-4">
                   <Skeleton className="h-4 w-28" />
                   <Skeleton className="h-4 w-20" />
                 </div>
-                <div className="flex flex-wrap gap-2 border-t pt-4">
+                <div className="flex flex-1 flex-wrap content-start gap-2 border-t bg-muted/40 p-4">
                   {Array.from({ length: 6 }, (_, chip) => <Skeleton key={chip} className="h-7 w-20" />)}
                 </div>
               </div>

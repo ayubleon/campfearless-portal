@@ -32,7 +32,7 @@ const seed: Record<string, string[]> = {
   igniters: ["Connect", "Karen", "Igniters"],
   lifegivers: ["Lifegivers", "Bustani", "Nawiri", "Juja", "Kiambu Road", "Limuru", "Lifeway"],
 }
-// Sample registrations this year (MYA + MYF). Kizazi and Lifeway are new campuses with none yet.
+// Sample registrations across all camps, used to warn before deleting a campus. Kizazi and Lifeway are new campuses with none yet.
 const sampleCampers = (name: string) => (["Kizazi", "Lifeway"].includes(name) ? 0 : ([...name].reduce((sum, char) => sum + char.charCodeAt(0), 0) * 7) % 58 + 3)
 const initialCampuses: Campus[] = Object.entries(seed).flatMap(([networkId, names]) => names.map((name) => ({ id: `${networkId}-${name}`, name, networkId, campers: sampleCampers(name) })))
 
@@ -120,7 +120,7 @@ function DeleteDialog({ target, onCancel, onConfirm, onShowCampuses }: { target:
             {blocked
               ? <>It still has <strong className="text-foreground">{plural(target?.campuses ?? 0, "campus")}</strong>. Move them to another network first, then delete it.</>
               : target?.kind === "campus"
-                ? <>{target.campers ? <><strong className="text-foreground">{target.campers} campers</strong> are registered at {target.name} this year. </> : null}Campers can no longer choose <strong className="text-foreground">{target.name}</strong> when they register. Existing registrations and reports keep it.</>
+                ? <>{target.campers ? <><strong className="text-foreground">{target.campers} campers</strong> have registered at {target.name} across all camps. </> : null}Campers can no longer choose <strong className="text-foreground">{target.name}</strong> when they register. Existing registrations and reports keep it.</>
                 : <>This permanently deletes the <strong className="text-foreground">{target?.name}</strong> network.</>}
           </DialogDescription>
           <Button type="button" variant="ghost" size="icon" aria-label="Close delete dialog" className="absolute right-0 top-0" onClick={onCancel}><X className="size-4" /></Button>
@@ -243,8 +243,8 @@ export function CampusesAndNetworksScreen() {
                 {sortedNetworks.map((network) => {
                   const members = campusesIn(network.id)
                   return (
-                    <section key={network.id} className="flex min-w-0 flex-col gap-4 rounded-xl border p-4">
-                      <div className="flex items-start justify-between gap-3">
+                    <section key={network.id} className="flex min-w-0 flex-col overflow-hidden rounded-xl border">
+                      <div className="flex items-start justify-between gap-3 p-4">
                         <div className="flex flex-col gap-1">
                           <h3 className="text-base font-semibold leading-none">{network.name}</h3>
                           <p className="text-sm text-muted-foreground tabular-nums">{plural(members.length, "campus")}</p>
@@ -256,7 +256,7 @@ export function CampusesAndNetworksScreen() {
                           <DropdownMenuItem className="text-destructive focus:text-destructive" onSelect={() => setDeleting({ id: network.id, name: network.name, kind: "network", campuses: members.length })}>Delete network</DropdownMenuItem>
                         </MoreMenu>
                       </div>
-                      <div className="flex flex-wrap gap-2 border-t pt-4">
+                      <div className="flex flex-1 flex-wrap content-start gap-2 border-t bg-muted/40 p-4">
                         {members.length > 0
                           ? members.map((campus) => <span key={campus.id} className="rounded-md border bg-muted/50 px-2.5 py-1 text-sm">{campus.name}</span>)
                           : <span className="text-sm text-muted-foreground">No campuses yet.</span>}
@@ -295,7 +295,6 @@ export function CampusesAndNetworksScreen() {
                   <TableHeader className="bg-muted/50">
                     <TableRow>
                       <TableHead className="whitespace-nowrap">Campus</TableHead>
-                      <TableHead className="whitespace-nowrap text-right">Campers this year</TableHead>
                       <TableHead className="w-10"><span className="sr-only">More actions</span></TableHead>
                     </TableRow>
                   </TableHeader>
@@ -303,12 +302,11 @@ export function CampusesAndNetworksScreen() {
                     {groups.map(({ network, members }) => (
                       <React.Fragment key={network.id}>
                         <TableRow className="bg-muted/30 hover:bg-muted/30">
-                          <TableCell colSpan={3} className="whitespace-nowrap py-2 text-xs font-medium text-muted-foreground">{network.name} · <span className="tabular-nums">{plural(campusesIn(network.id).length, "campus")}</span></TableCell>
+                          <TableCell colSpan={2} className="whitespace-nowrap py-2 text-xs font-medium text-muted-foreground">{network.name} · <span className="tabular-nums">{plural(campusesIn(network.id).length, "campus")}</span></TableCell>
                         </TableRow>
                         {members.map((campus) => (
                           <TableRow key={campus.id} className="hover:bg-muted/50">
                             <TableCell className="w-full whitespace-nowrap font-medium">{campus.name}</TableCell>
-                            <TableCell className="whitespace-nowrap text-right tabular-nums">{campus.campers || "-"}</TableCell>
                             <TableCell>
                               <MoreMenu label="More actions">
                                 <DropdownMenuItem onSelect={() => setNameDialog({ kind: "rename-campus", campus })}>Rename campus</DropdownMenuItem>
@@ -323,7 +321,7 @@ export function CampusesAndNetworksScreen() {
                     ))}
                     {groups.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={3} className="h-24 text-center text-muted-foreground">No campuses match your search.</TableCell>
+                        <TableCell colSpan={2} className="h-24 text-center text-muted-foreground">No campuses match your search.</TableCell>
                       </TableRow>
                     )}
                   </TableBody>
