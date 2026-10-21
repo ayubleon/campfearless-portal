@@ -302,6 +302,10 @@ Actions inside a tab (Invite user, Add role) go in the `CardAction` of the card 
 - Light-mode text must pass 4.5:1 contrast on its background: use `text-muted-foreground`, the `status-*` pairs and `text-attention` as defined, never a lighter shade.
 - Each `loading.tsx` skeleton should be within about 10% of the real page's height (rows and cards included) so nothing jumps when content arrives.
 
+## Logo
+
+- The Camp Fearless logo is always the SVG, never a PNG: black on light backgrounds (`dark:invert` where the theme can be dark), white on a dark picture, orange when the summary image tints it. Portal: `public/camp-fearless-logo.svg`; welcome site: `camp-fearless-logo-dark.svg` (light pages) and `camp-fearless-logo.svg` (registration hero).
+
 ## Error pages
 
 - `app/not-found.tsx` and `app/error.tsx` are the only error pages: centred `text-base font-semibold` title, one muted sentence, and a **Go to dashboard** button (plus **Try again** on errors).
