@@ -91,7 +91,7 @@ function OptionCard({ name, checked, title, helper, detailsLabel, placeholder, d
     <label className="flex cursor-pointer flex-col gap-2 rounded-2xl border bg-muted/30 p-4 text-sm transition-colors focus-within:border-ring focus-within:ring-1 focus-within:ring-ring/20">
       <span className="flex items-start gap-2 font-medium"><Checkbox checked={checked} onCheckedChange={() => onToggle()} className="mt-0.5" />{title}</span>
       <span className="pl-6 text-muted-foreground">{helper}</span>
-      <span className={cn("grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 ease-out", checked ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0")}>
+      <span className={cn("grid overflow-hidden transition-[grid-template-rows,opacity,margin] duration-300 ease-out", checked ? "grid-rows-[1fr] opacity-100" : "-mt-2 grid-rows-[0fr] opacity-0")}>
         <span className="flex min-h-0 flex-col gap-2 pt-2">
           <span className="font-medium">{detailsLabel}</span>
           <Textarea className="min-h-20 resize-none bg-background text-sm font-normal" placeholder={placeholder} value={details} onChange={(event) => onDetails(event.target.value)} />

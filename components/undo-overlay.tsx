@@ -29,7 +29,7 @@ export function UndoOverlay({ title, description, onUndo, onDone, duration = 500
           <Button type="button" variant="ghost" size="icon" aria-label="Dismiss confirmation" className="absolute right-0 top-0" onClick={onDone}><X className="size-4" /></Button>
         </DialogHeader>
         <div className="h-1.5 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-emerald-500 transition-[width] duration-75" style={{ width: `${progress}%` }} /></div>
-        <DialogFooter className="mt-4 grid grid-cols-2 gap-3 sm:mt-6 sm:justify-stretch">
+        <DialogFooter className="grid grid-cols-2 gap-3 sm:justify-stretch">
           <Button type="button" variant="outline" onClick={onUndo}>Undo</Button>
           <Button type="button" onClick={onDone}>Done</Button>
         </DialogFooter>
