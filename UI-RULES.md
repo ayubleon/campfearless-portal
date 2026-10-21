@@ -308,7 +308,7 @@ Actions inside a tab (Invite user, Add role) go in the `CardAction` of the card 
 
 ## Welcome page type
 
-- The public welcome page (and its copy in the portal's Welcome page preview) has its own scale: the page heading 30px; camp names (MYF and MYA) `text-lg font-bold` (18px); the "Camp requirements" dialog title `text-base font-bold` (16px); "What to bring", "What to expect" and "Good to know" `text-sm font-semibold` (14px). Keep `components/welcome-preview.tsx` in step with `campfearless-welcome`.
+- The public welcome page (and its copy in the portal's Welcome page preview) has its own scale: the page heading, logo and subtitle use the Log in screen's styling (logo `h-16`, title `text-2xl font-bold`, subtitle `text-sm text-muted-foreground`, same spacing); camp names (MYF and MYA) `text-lg font-bold` (18px); the "Camp requirements" dialog title `text-base font-bold` (16px); "What to bring", "What to expect" and "Good to know" `text-sm font-semibold` (14px). Keep `components/welcome-preview.tsx` in step with `campfearless-welcome`.
 
 ## Error pages
 
