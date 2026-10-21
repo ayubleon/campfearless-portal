@@ -313,7 +313,7 @@ Actions inside a tab (Invite user, Add role) go in the `CardAction` of the card 
 
 ## The one special font
 
-- **Panton Black Caps** (`app/fonts/Panton-BlackCaps.otf`, class `font-title font-normal`, one weight) is used in exactly two places: the CAMP FEARLESS name in the sidebar, and the registration title on the public site. Nothing else in the system uses it. Check the licence allows web use before going live.
+- **Panton Black Caps** (`app/fonts/Panton-BlackCaps.otf`, class `font-title font-normal`, one weight) is used in exactly three places: the CAMP FEARLESS name in the sidebar, and, on the public site, the welcome page heading ("Welcome to Mavuno Camp Fearless") and the registration title. Nothing else in the system uses it. Check the licence allows web use before going live.
 
 ## Welcome page type
 
