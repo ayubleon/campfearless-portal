@@ -308,7 +308,7 @@ Actions inside a tab (Invite user, Add role) go in the `CardAction` of the card 
 - Numbers with thousands commas use `formatNumber` from `lib/format.ts`; dates use `formatDateTime`. Never define a local copy.
 - Every route's `page.tsx` exports `metadata = { title: "<Page name>" }`; the root layout adds " · Camp Fearless". Never leave the default title.
 - **Switching theme never flashes.** `ThemeProvider` turns CSS transitions off for the instant the `light`/`dark` class changes (then back on), so cards, buttons and inputs don't fade from the old colours over the new page background. Never change the theme class anywhere else.
-- **Checkboxes on a muted surface are white in light mode.** A `Checkbox` inside a tinted card (the Medical and special needs option cards) gets `bg-background dark:bg-input/30`, so the empty box stays visible.
+- **Checkboxes on a muted surface are white in light mode.** A `Checkbox` inside a tinted card (the Medical and special needs option cards) gets `bg-background shadow-sm dark:bg-input/30`, so the empty box stays visible, with a small drop shadow.
 - The theme (light or dark) is saved in `localStorage` under `theme` and applied by an inline script in `app/layout.tsx` before first paint. Never set the theme class from a `useEffect` alone.
 - `SidebarInset` has `min-w-0` so wide tables scroll inside their own wrapper instead of stretching the page. Don't remove it.
 - Every search input has an `aria-label` equal to its placeholder, and every `PopoverContent` has an `aria-label` ("Choose camp start", "How camper spots are counted").

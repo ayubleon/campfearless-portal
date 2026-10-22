@@ -905,7 +905,7 @@ export function DashboardOverview() {
                           <Checkbox
                             checked={editCamper.medical}
                             onCheckedChange={(checked) => setEditCamper({ ...editCamper, medical: checked === true })}
-                            className="mt-0.5 bg-background dark:bg-input/30"
+                            className="mt-0.5 bg-background shadow-sm dark:bg-input/30"
                           />
                           Medical condition / Severe allergies
                         </span>
@@ -936,7 +936,7 @@ export function DashboardOverview() {
                           <Checkbox
                             checked={editCamper.specialNeeds}
                             onCheckedChange={(checked) => setEditCamper({ ...editCamper, specialNeeds: checked === true })}
-                            className="mt-0.5 bg-background dark:bg-input/30"
+                            className="mt-0.5 bg-background shadow-sm dark:bg-input/30"
                           />
                           Special needs / Accessibility support
                         </span>

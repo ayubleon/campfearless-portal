@@ -104,7 +104,7 @@ export function Choice<T extends string>({ label, options, value, onChange }: { 
 function OptionCard({ name, checked, title, helper, detailsLabel, placeholder, details, onToggle, onDetails }: { name: string; checked: boolean; title: string; helper: string; detailsLabel: string; placeholder: string; details: string; onToggle: () => void; onDetails: (value: string) => void }) {
   return (
     <label className="flex cursor-pointer flex-col gap-1 rounded-2xl border bg-muted/30 p-4 text-sm transition-colors focus-within:border-ring focus-within:ring-1 focus-within:ring-ring/20">
-      <span className="flex items-start gap-2 font-medium"><Checkbox checked={checked} onCheckedChange={() => onToggle()} className="mt-0.5 bg-background dark:bg-input/30" />{title}</span>
+      <span className="flex items-start gap-2 font-medium"><Checkbox checked={checked} onCheckedChange={() => onToggle()} className="mt-0.5 bg-background shadow-sm dark:bg-input/30" />{title}</span>
       <span className="pl-6 text-muted-foreground">{helper}</span>
       <span className={cn("-mx-1 -mb-1 grid overflow-hidden transition-[grid-template-rows,opacity,margin] duration-300 ease-out", checked ? "mt-2 grid-rows-[1fr] opacity-100" : "-mt-2 grid-rows-[0fr] opacity-0")}>
         <span className="flex min-h-0 flex-col gap-2 px-1 pb-1">
