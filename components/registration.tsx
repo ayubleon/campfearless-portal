@@ -16,7 +16,7 @@ import { activeCampuses, invitedCampus } from "@/lib/campuses"
 import { cn } from "@/lib/utils"
 import { LeaveGuard } from "@/components/leave-guard"
 import { Field } from "@/components/field"
-import { campRecord } from "@/lib/camp-data"
+import { campRecord, runningCamps } from "@/lib/camp-data"
 import { Button } from "@/ui/button"
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/ui/card"
 import { UndoOverlay } from "@/components/undo-overlay"
@@ -49,9 +49,9 @@ export type ContactForm = { firstName: string; lastName: string; phone: string; 
 // Name, dates, fee, limit and spots used come from the camp records (the same ones Camp setup edits).
 const fromRecord = (id: Camp, relationships: string[]) => {
   const record = campRecord(id)
-  return { label: record.label, get spotsUsed() { return record.spotsUsed }, camperLimit: record.details.camperLimit, walkInFee: record.details.walkInFee, campStart: record.details.campStart, campEnd: record.details.campEnd, relationships }
+  return { label: record.label, get spotsUsed() { return record.spotsUsed }, camperLimit: record.details.camperLimit, walkInFee: record.details.walkInFee, get campStart() { return record.details.campStart }, get campEnd() { return record.details.campEnd }, relationships }
 }
-export const camps: Record<Camp, { label: string; spotsUsed: number; camperLimit: number; walkInFee: number; campStart: Date; campEnd: Date; relationships: string[] }> = {
+export const camps: Record<Camp, { label: string; spotsUsed: number; camperLimit: number; walkInFee: number; campStart: Date | null; campEnd: Date | null; relationships: string[] }> = {
   MYF: fromRecord("MYF", relationshipOptions),
   MYA: fromRecord("MYA", relationshipOptions),
 }
@@ -238,7 +238,8 @@ export function DoneOverlay({ title, description, onUndo, onDone }: { title: str
 }
 
 export function RegistrationScreen() {
-  const [camp, setCamp] = React.useState<Camp>("MYF")
+  const running = runningCamps()
+  const [camp, setCamp] = React.useState<Camp>(running[0] ?? "MYF")
   const [campers, setCampers] = React.useState<CamperForm[]>([emptyCamper()])
   const [contact, setContact] = React.useState<ContactForm>(emptyContact())
   const [code, setCode] = React.useState("")
@@ -308,12 +309,14 @@ export function RegistrationScreen() {
     <main className="@container flex min-w-0 flex-1 flex-col gap-4 p-4 lg:p-6">
       <EditionScope>
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <Tabs value={camp} onValueChange={switchCamp} className="w-full sm:w-fit">
-          <TabsList className="grid w-full max-w-md grid-cols-2">
-            <TabsTrigger className="w-full" value="MYF">{camps.MYF.label}</TabsTrigger>
-            <TabsTrigger className="w-full" value="MYA">{camps.MYA.label}</TabsTrigger>
-          </TabsList>
-        </Tabs>
+        {running.length > 1 ? (
+          <Tabs value={camp} onValueChange={switchCamp} className="w-full sm:w-fit">
+            <TabsList className="grid w-full max-w-md grid-cols-2">
+              <TabsTrigger className="w-full" value="MYF">{camps.MYF.label}</TabsTrigger>
+              <TabsTrigger className="w-full" value="MYA">{camps.MYA.label}</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        ) : <p className="text-sm font-medium">{camps[camp].label}</p>}
         <p className="text-sm text-muted-foreground tabular-nums">{formatNumber(settings.spotsUsed)} of {formatNumber(settings.camperLimit)} camper spots used. {formatNumber(spotsLeft)} left.</p>
       </div>
 

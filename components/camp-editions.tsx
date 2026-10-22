@@ -7,8 +7,8 @@ import { AlertCircle, X } from "lucide-react"
 import { IconDotsVertical } from "@tabler/icons-react"
 import { toast } from "sonner"
 
-import { editionDates } from "@/lib/camp-data"
-import { editions as initialEditions, type Edition } from "@/lib/editions"
+import { editionDates, startNewEditionCamps } from "@/lib/camp-data"
+import { editions as initialEditions, setEditionOpen, startEdition, type Edition } from "@/lib/editions"
 import { statusClass } from "@/lib/status"
 import { cn } from "@/lib/utils"
 import { Badge } from "@/ui/badge"
@@ -53,8 +53,8 @@ function EditionDialog({ edition, names, pending, onClose, onSave }: { edition: 
   )
 }
 
-export function EditionsCard({ canEdit = true }: { canEdit?: boolean }) {
-  const [list, setList] = React.useState<Edition[]>(initialEditions)
+export function EditionsCard({ canEdit = true, onNewEdition, onEditionsChange }: { canEdit?: boolean; onNewEdition?: (id: string) => void; onEditionsChange?: () => void }) {
+  const [list, setList] = React.useState<Edition[]>(() => initialEditions.map((item) => ({ ...item })))
   const [editing, setEditing] = React.useState<Edition | "new" | null>(null)
   const [closing, setClosing] = React.useState<Edition | null>(null)
   const { pending, run } = useAction()
@@ -62,11 +62,20 @@ export function EditionsCard({ canEdit = true }: { canEdit?: boolean }) {
   const [switching, setSwitching] = React.useState<{ name: string; reopen: Edition | null } | null>(null)
   const openOne = list.find((item) => item.open)
   const openEdition = (name: string, reopen: Edition | null) => {
-    setList((current) => {
-      const closed = current.map((item) => ({ ...item, open: false }))
-      return reopen ? closed.map((item) => (item.id === reopen.id ? { ...item, open: true } : item)) : [{ id: name.toLowerCase().replace(/[^a-z0-9]+/g, "-"), name, open: true, facilitatorFee: closed[0]?.facilitatorFee ?? 0 }, ...closed]
-    })
-    toast.success(reopen ? "Edition successfully reopened" : "Edition successfully created")
+    if (reopen) {
+      setList((current) => current.map((item) => ({ ...item, open: item.id === reopen.id })))
+      setEditionOpen(reopen.id, true)
+      toast.success("Edition successfully reopened")
+      onEditionsChange?.()
+      return
+    }
+    // A new edition keeps the last edition's fees and limits, but its camp dates start empty: the Super admin has to set them in Camp setup.
+    const created: Edition = { id: name.toLowerCase().replace(/[^a-z0-9]+/g, "-"), name, open: true, facilitatorFee: list[0]?.facilitatorFee ?? 0 }
+    setList((current) => [created, ...current.map((item) => ({ ...item, open: false }))])
+    startEdition(created)
+    startNewEditionCamps(created.id)
+    toast.success("Edition successfully created")
+    onNewEdition?.(created.id)
   }
   // The year comes from the edition's camp dates (editions are named freely); one without dates yet counts as this year.
   const yearOf = (id: string) => editionDates(id)?.start.getFullYear() ?? new Date().getFullYear()
@@ -179,7 +188,7 @@ export function EditionsCard({ canEdit = true }: { canEdit?: boolean }) {
           </DialogHeader>
           <DialogFooter className="mt-4 grid grid-cols-2 gap-3 sm:mt-6 sm:justify-stretch">
             <Button type="button" variant="outline" disabled={pending} onClick={() => setClosing(null)}>Cancel</Button>
-            <LoadingButton type="button" pending={pending} loadingLabel="Closing..." onClick={async () => { if (!closing) return; if (!(await run(() => patch(closing.id, { open: false }), "close the edition"))) return; setClosing(null); toast.success("Edition successfully closed") }}>Close edition</LoadingButton>
+            <LoadingButton type="button" pending={pending} loadingLabel="Closing..." onClick={async () => { if (!closing) return; if (!(await run(() => { patch(closing.id, { open: false }); setEditionOpen(closing.id, false); onEditionsChange?.() }, "close the edition"))) return; setClosing(null); toast.success("Edition successfully closed") }}>Close edition</LoadingButton>
           </DialogFooter>
         </DialogContent>
       </Dialog>

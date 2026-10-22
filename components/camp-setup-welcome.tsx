@@ -6,9 +6,9 @@ import { differenceInCalendarDays, format } from "date-fns"
 import { IconCopy, IconExternalLink, IconEye, IconInfoCircle } from "@tabler/icons-react"
 import { toast } from "sonner"
 
-import { FieldError, SetupCard, SetupField, ValueBox, type CampId, type FieldSpec } from "@/components/camp-setup"
+import { FieldError, InfoTip, SetupCard, SetupField, ValueBox, type CampId, type FieldSpec } from "@/components/camp-setup"
 import { WelcomePreviewDialog, type PreviewCamp } from "@/components/welcome-preview"
-import { campRecord, type CampRecord } from "@/lib/camp-data"
+import { campRecord, publicSite, runningCamps, type CampRecord } from "@/lib/camp-data"
 import { formatCamperDateRange, formatNumber } from "@/lib/format"
 import { Button } from "@/ui/button"
 import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover"
@@ -18,7 +18,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/tooltip"
 import { Textarea } from "@/ui/textarea"
 
 // The public welcome page (campfearless-welcome). Its address is fixed; the content below is what Camp setup feeds it.
-const welcomeLink = "https://campfearless-welcome.vercel.app"
+const welcomeLink = `https://${publicSite}`
 // Short enough for about three lines on the card. A character limit cannot be dodged by typing without spaces.
 const maxChars = 160
 const maxImageBytes = 5 * 1024 * 1024
@@ -75,15 +75,17 @@ export function welcomeValid(settings: WelcomeSettings) {
 // What the welcome page's Register button says, from the camp's own setup (paused, dates, capacity).
 function registerState(record: CampRecord) {
   const today = new Date()
-  if (differenceInCalendarDays(record.details.closes, today) < 0) return { open: false, label: "Registration closed" }
+  const { opens, closes } = record.details
+  if (!opens || !closes) return { open: false, label: "Registration not open yet" }
+  if (differenceInCalendarDays(closes, today) < 0) return { open: false, label: "Registration closed" }
   if (record.paused) return { open: false, label: "Registration paused" }
-  if (record.details.opens > today) return { open: false, label: `Opens ${format(record.details.opens, "d MMM")}` }
+  if (opens > today) return { open: false, label: `Opens ${format(opens, "d MMM")}` }
   if (record.spotsUsed >= record.details.camperLimit) return { open: false, label: "Registration closed" }
   return { open: true, label: `Register for ${record.id}` }
 }
 
 function previewCamps(settings: WelcomeSettings): PreviewCamp[] {
-  return campTabs.map(({ id, label, defaultImage }) => {
+  return campTabs.filter(({ id }) => runningCamps().includes(id)).map(({ id, label, defaultImage }) => {
     const record = campRecord(id)
     return {
       id,
@@ -194,14 +196,16 @@ function WelcomeLinkLine() {
 }
 
 export function WelcomePageCard({ saved, lastSaved, canEdit, onDirtyChange, onSave }: { saved: WelcomeSettings; lastSaved: { by: string; at: Date }; canEdit: boolean; onDirtyChange: (dirty: boolean) => void; onSave: (settings: WelcomeSettings) => void }) {
-  const [tab, setTab] = React.useState<CampId>("MYF")
+  // Only the camps the open edition runs are shown; a camp that is switched off has no welcome page content to edit.
+  const shownTabs = campTabs.filter(({ id }) => runningCamps().includes(id))
+  const [tab, setTab] = React.useState<CampId>(shownTabs[0]?.id ?? "MYF")
   const [preview, setPreview] = React.useState<WelcomeSettings | null>(null)
 
   return (
     <>
     <SetupCard
       title="Welcome page"
-      description="What campers see when they choose a camp. Camp names, dates, fees and registration links come from each camp's setup."
+      description={<>What campers see when they choose a camp.<InfoTip label="Where the camp names, dates and fees come from">Camp names, dates, fees and registration links come from each camp&apos;s setup.</InfoTip></>}
       saved={saved}
       fields={welcomeFields}
       saveLabel="Save welcome page"
@@ -224,17 +228,17 @@ export function WelcomePageCard({ saved, lastSaved, canEdit, onDirtyChange, onSa
       {(settings, editing, update) => (
         <div className="flex flex-col gap-6">
           <Tabs value={tab} onValueChange={(value) => setTab(value as CampId)} className="flex flex-col gap-4">
-            <TabsList className="grid w-full max-w-md grid-cols-2">
-              {campTabs.map(({ id, label }) => <TabsTrigger key={id} className="w-full" value={id}>{label}</TabsTrigger>)}
-            </TabsList>
-            {campTabs.map(({ id, defaultImage }) => {
+            {shownTabs.length > 1 && <TabsList className="grid w-full max-w-md grid-cols-2">
+              {shownTabs.map(({ id, label }) => <TabsTrigger key={id} className="w-full" value={id}>{label}</TabsTrigger>)}
+            </TabsList>}
+            {shownTabs.map(({ id, defaultImage }) => {
               const description = settings[keyOf(id, "description")]
               const chars = description.length
               const set = (part: Part) => (value: string) => update({ [keyOf(id, part)]: value } as Partial<WelcomeSettings>)
               return (
                 <TabsContent key={id} value={id} className="grid gap-x-4 gap-y-6 md:grid-cols-2">
                   <section className="flex min-w-0 flex-col gap-4">
-                    <h3 className="text-sm text-muted-foreground">Card</h3>
+                    <h3 className="-mb-2 text-sm text-muted-foreground">Card</h3>
                     <ImageField camp={id} defaultImage={defaultImage} value={settings[keyOf(id, "image")]} editing={editing} onChange={set("image")} />
                     <SetupField label="Description" editing={editing}>
                       {editing ? (
@@ -250,7 +254,7 @@ export function WelcomePageCard({ saved, lastSaved, canEdit, onDirtyChange, onSa
                     </SetupField>
                   </section>
                   <section className="flex min-w-0 flex-col gap-4">
-                    <h3 className="text-sm text-muted-foreground">Requirements</h3>
+                    <h3 className="-mb-2 text-sm text-muted-foreground">Requirements</h3>
                     <ListField label="What to bring" value={settings[keyOf(id, "bring")]} editing={editing} hint="The first 3 show on the camp card." onChange={set("bring")} />
                     {editing && items(settings[keyOf(id, "bring")]).length === 0 && <FieldError>Add at least one item to bring.</FieldError>}
                     <ListField label="What to expect" value={settings[keyOf(id, "expect")]} editing={editing} onChange={set("expect")} />

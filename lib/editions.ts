@@ -13,6 +13,19 @@ export const editions: Edition[] = [
 // The edition that is open for registration. Reports open on it.
 export const currentEditionIds = editions.filter((edition) => edition.open).map((edition) => edition.id)
 
+// Creating an edition opens it and closes the others (one is open at a time). A placeholder for the server: the lists are updated in place.
+export function startEdition(edition: Edition) {
+  for (const item of editions) item.open = false
+  editions.unshift({ ...edition, open: true })
+  currentEditionIds.splice(0, currentEditionIds.length, edition.id)
+}
+
+// Closing an edition, or reopening one (which closes the one that is open). Also updates the list of open editions the other screens read.
+export function setEditionOpen(id: string, open: boolean) {
+  for (const item of editions) item.open = open ? item.id === id : item.open && item.id !== id
+  currentEditionIds.splice(0, currentEditionIds.length, ...editions.filter((item) => item.open).map((item) => item.id))
+}
+
 export function editionLabel(id: string) {
   return editions.find((edition) => edition.id === id)?.name ?? id
 }

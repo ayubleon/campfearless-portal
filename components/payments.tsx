@@ -1,5 +1,6 @@
 "use client"
 
+import { runningCamps } from "@/lib/camp-data"
 import { campusLabel } from "@/lib/campuses"
 import { currentEditionIds } from "@/lib/editions"
 import { campersOfPayment, expectedForPayment, facilitatorsOfPayment, fullName, payments as paymentRecords } from "@/lib/records"
@@ -69,6 +70,7 @@ const checkLabel = (check: Check) => (check.kind === "enter" ? "Enter amount" : 
 const statusLabel: Record<PaymentStatus, string> = { pending: "Awaiting verification", verified: "Verified", flagged: "Flagged" }
 
 export function PaymentsScreen() {
+  const running = runningCamps()
   const [payments, setPayments] = React.useState(buildPayments)
   const [query, setQuery] = React.useState("")
   const [camp, setCamp] = React.useState("all")
@@ -138,14 +140,14 @@ export function PaymentsScreen() {
               <Input className="border bg-muted/50 pl-8" aria-label="Search by name or M-Pesa code" placeholder="Search by name or M-Pesa code" value={query} onChange={(event) => setQuery(event.target.value)} />
             </div>
             <div className="flex flex-wrap gap-2">
-              <Select value={camp} onValueChange={setCamp}>
+              {running.length > 1 && <Select value={camp} onValueChange={setCamp}>
                 <SelectTrigger className="w-32" aria-label="Camp"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All camps</SelectItem>
                   <SelectItem value="MYF">MYF</SelectItem>
                   <SelectItem value="MYA">MYA</SelectItem>
                 </SelectContent>
-              </Select>
+              </Select>}
               <Select value={campus} onValueChange={setCampus}>
                 <SelectTrigger className="w-36" aria-label="Campus"><SelectValue /></SelectTrigger>
                 <SelectContent>

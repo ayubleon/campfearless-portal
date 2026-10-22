@@ -36,12 +36,12 @@ An **edition** is one run of the camps (MYF and MYA together), **named by the ad
 | column | notes |
 |---|---|
 | edition_id, camp_id | primary key together |
-| camp_start, camp_end | dates; the edition's dates are derived from these |
+| camp_start, camp_end | dates; the edition's dates are derived from these. **Empty (null) in a newly created edition** until a Super admin sets them |
 | camper_limit | |
 | online_fee, walk_in_fee | KES per camper |
-| registration_opens, registration_closes | dates |
-| link_slug | the camp's own registration link, e.g. `myf-2026-x7k2` under `register.mavuno.org` |
+| registration_opens, registration_closes | dates; **null in a new edition**. While any of the four dates is null the camp's registration answers "Registration not open yet" and nobody can register |
 | paused | registration link paused; campers can't sign up |
+| runs | `true` by default. `false` means the edition does not hold this camp (for example only MYA runs). A camp that doesn't run is left out of the welcome page, its registration address answers "MYF isn't running this time" (not a 404), and it leaves the dashboard tabs, Registration, Waivers and Payments and their camp filters; past records stay in Reports. The server refuses to switch a camp off while anyone is registered for it, or if it would leave the edition with no camp (409) |
 | last_saved_by, last_saved_at | shown as "Last saved by" and linked to the audit log |
 
 **welcome_content** (what the public welcome page shows; one row per camp, kept across editions)
@@ -52,7 +52,7 @@ An **edition** is one run of the camps (MYF and MYA together), **named by the ad
 | image | file reference, or null for the default image |
 | bring, expect, know | lists, one item per line (store as rows in a child table or JSON) |
 
-The welcome page address is permanent and shows whichever editions are open.
+**Each camp has one permanent registration address** (`/register/myf`, `/register/mya`, on the public site), the same in every edition, so links shared in WhatsApp groups or printed on posters keep working. There is no per-edition link and no slug to store. The page sends the camper to the open edition's settings, and says "Registration closed", "Opens 1 Oct", "paused" or "isn't running this time" when that applies. The welcome page address is permanent and shows whichever editions are open.
 
 **Length limits** (enforce them in the API too): first, last and emergency-contact names 30 characters; church or organisation 60; names of campuses, networks, roles and editions 40; medical and special needs 40.
 
@@ -158,7 +158,7 @@ Payments are verified by hand against the Paybill (number and account are settin
 4. **Arrival.** Dashboard: look up by name, M-Pesa code or phone and check in (undoable for 5 seconds). Walk-ins are checked in as soon as their payment is verified. An exit permit marks an early departure; check-out follows.
 5. **Walk-in and waivers.** Registration (staff) captures a walk-in with a higher fee. Waivers issues a free registration: **Walk-in** (checked in now) or **In advance**.
 6. **Reports.** Pick edition (one or several to combine), camp, campus and the other filters; choose a template and columns; edit the title; print or export. Every print and export is audited.
-7. **Close the edition.** Close it in Camp setup: Registration, Waivers, Payments and check-in stop for it, the link stops taking sign-ups, records remain in Reports. It can be reopened.
+7. **Close the edition.** (Nothing happens automatically when a camp ends or its registration window closes: the link just stops taking sign-ups after `registration_closes`, and a Super admin closes the edition by hand. The Camp setup screen reminds them once every camp's `camp_end` has passed.) Close it in Camp setup: Registration, Waivers, Payments and check-in stop for it, the link stops taking sign-ups, records remain in Reports. It can be reopened.
 
 ## What is placeholder, and what to replace when you join the backend
 

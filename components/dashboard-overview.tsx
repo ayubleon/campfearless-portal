@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/tooltip"
 import { EditionScope } from "@/components/edition-scope"
 import { SortableHead } from "@/components/sortable-head"
-import { campRecord } from "@/lib/camp-data"
+import { campRecord, runningCamps } from "@/lib/camp-data"
 import { campusLabel } from "@/lib/campuses"
 import { ageValid } from "@/components/registration"
 import { nameMaxChars, phoneError, phoneValid } from "@/lib/validation"
@@ -48,7 +48,7 @@ const spotsLeft = (id: CampKey, editionId: string) => Math.max(campRecord(id).de
 // three to a row (a last odd one spans what is left of its row).
 function summaryItems(scope: CampScope, editionId: string): [string, string][] {
   const stats = statsFor(scope, statsForEdition(editionId))
-  const camps: CampKey[] = scope === "all" ? ["MYF", "MYA"] : [scope]
+  const camps: CampKey[] = scope === "all" ? runningCamps() : [scope]
   return [
     [String(stats.registered), "Total registered campers"],
     [String(stats.walkIn), "Walk in registrations"],
@@ -240,7 +240,10 @@ function RowActions({
 }
 
 export function DashboardOverview() {
-  const [campus, setCampus] = React.useState("all")
+  // When the edition runs only one camp there are no camp tabs: everything is that camp.
+  const running = runningCamps()
+  const [chosenCamp, setCampus] = React.useState("all")
+  const campus = running.length === 1 ? running[0].toLowerCase() : chosenCamp
   // The tabs scope the charts and the Quick summary as well as the roster.
   const scope: CampScope = campus === "all" ? "all" : (campus.toUpperCase() as CampKey)
   // The roster is the shared records plus what staff edited here. Edit camper updates the row (a prototype: it resets on refresh).
@@ -503,7 +506,7 @@ export function DashboardOverview() {
             </div>
           </DialogContent>
         </Dialog>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        {running.length > 1 && <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <Tabs value={campus} onValueChange={setCampus} className="w-fit">
             <TabsList className="grid w-full max-w-md grid-cols-3">
               <TabsTrigger className="w-full" value="all">
@@ -517,7 +520,7 @@ export function DashboardOverview() {
               </TabsTrigger>
             </TabsList>
           </Tabs>
-        </div>
+        </div>}
         <section className="grid min-w-0 gap-4 md:grid-cols-2 xl:grid-cols-[1fr_1fr_0.9fr]">
           <DonutCard
             title="Campers attendance"

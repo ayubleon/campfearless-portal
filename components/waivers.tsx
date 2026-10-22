@@ -11,6 +11,7 @@ import { X } from "lucide-react"
 import { IconDotsVertical, IconSearch, IconTicket } from "@tabler/icons-react"
 import { toast } from "sonner"
 
+import { runningCamps } from "@/lib/camp-data"
 import { campusLabel, invitedCampus } from "@/lib/campuses"
 import { currentEditionIds } from "@/lib/editions"
 import { campers, findDuplicates, fullName } from "@/lib/records"
@@ -38,7 +39,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 type Waiver = { id: string; name: string; age: string; gender: string; phone: string; camp: Camp; campus: string; baptised: string; source: "Walk-in" | "In advance"; arrived: boolean; issuedAt: Date; issuedBy: string }
 
 // At the desk during camp the camper is usually present; before camp a waiver is issued in advance.
-const duringCamp = (camp: Camp) => { const now = new Date(); return now >= camps[camp].campStart && now <= new Date(camps[camp].campEnd.getTime() + 86_400_000) }
+const duringCamp = (camp: Camp) => { const { campStart, campEnd } = camps[camp]; const now = new Date(); return !!campStart && !!campEnd && now >= campStart && now <= new Date(campEnd.getTime() + 86_400_000) }
 
 // The rows are the campers who hold a waiver (lib/records.ts), so a waived camper is the same person everywhere else.
 const initialWaivers: Waiver[] = campers
@@ -59,7 +60,8 @@ const initialWaivers: Waiver[] = campers
   }))
 
 function IssueDialog({ open, pending, onClose, onIssue }: { open: boolean; pending: boolean; onClose: () => void; onIssue: (camp: Camp, camper: CamperForm, contact: ContactForm, checkIn: boolean) => void }) {
-  const [camp, setCamp] = React.useState<Camp>("MYF")
+  const running = runningCamps()
+  const [camp, setCamp] = React.useState<Camp>(running[0] ?? "MYF")
   const [camper, setCamper] = React.useState<CamperForm>(emptyCamper())
   const [contact, setContact] = React.useState<ContactForm>(emptyContact())
   const [checkIn, setCheckIn] = React.useState(false)
@@ -76,12 +78,12 @@ function IssueDialog({ open, pending, onClose, onIssue }: { open: boolean; pendi
         </DialogHeader>
         <div className="flex min-h-0 flex-col">
           <div className="-mx-4 flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 pb-1 sm:-mx-6 sm:px-6">
-            <Tabs value={camp} onValueChange={(value) => { const next = value as Camp; setCamp(next); setCheckIn(duringCamp(next)); setCamper((current) => ({ ...current, age: "" })); setContact((current) => ({ ...current, relationship: camps[next].relationships.includes(current.relationship) ? current.relationship : "" })) }} className="w-full">
+            {running.length > 1 && <Tabs value={camp} onValueChange={(value) => { const next = value as Camp; setCamp(next); setCheckIn(duringCamp(next)); setCamper((current) => ({ ...current, age: "" })); setContact((current) => ({ ...current, relationship: camps[next].relationships.includes(current.relationship) ? current.relationship : "" })) }} className="w-full">
               <TabsList className="grid w-full max-w-md grid-cols-2">
                 <TabsTrigger className="w-full" value="MYF">{camps.MYF.label}</TabsTrigger>
                 <TabsTrigger className="w-full" value="MYA">{camps.MYA.label}</TabsTrigger>
               </TabsList>
-            </Tabs>
+            </Tabs>}
             <section className="pt-2">
               <h3 className="mb-3 text-base font-bold">Camper details</h3>
               <CamperFields camp={camp} camper={camper} id="waiver-camper" onChange={(patch) => setCamper((current) => ({ ...current, ...patch }))} />
@@ -106,6 +108,7 @@ function IssueDialog({ open, pending, onClose, onIssue }: { open: boolean; pendi
 }
 
 export function WaiversScreen() {
+  const running = runningCamps()
   const { can } = useSession()
   const [waivers, setWaivers] = React.useState(initialWaivers)
   const [query, setQuery] = React.useState("")
@@ -176,14 +179,14 @@ export function WaiversScreen() {
               <Input className="border bg-muted/50 pl-8" aria-label="Search by name, phone, campus" placeholder="Search by name, phone, campus" value={query} onChange={(event) => setQuery(event.target.value)} />
             </div>
             <div className="flex gap-2">
-              <Select value={campFilter} onValueChange={setCampFilter}>
+              {running.length > 1 && <Select value={campFilter} onValueChange={setCampFilter}>
                 <SelectTrigger className="w-32" aria-label="Camp"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All camps</SelectItem>
                   <SelectItem value="MYF">MYF</SelectItem>
                   <SelectItem value="MYA">MYA</SelectItem>
                 </SelectContent>
-              </Select>
+              </Select>}
               <Select value={campusFilter} onValueChange={setCampusFilter}>
                 <SelectTrigger className="w-36" aria-label="Campus"><SelectValue /></SelectTrigger>
                 <SelectContent>

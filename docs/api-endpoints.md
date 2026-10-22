@@ -53,7 +53,7 @@ Read, three reports, each with the **edition** filter (one or several, so editio
 | Tab | Reads | Saves |
 |---|---|---|
 | Editions | all editions: name, open or closed, dates (worked out from their camps) | `create-edition` (name; copies the last edition's settings); `rename`; `close`; `reopen` (closes the other open one, after the screen asks) |
-| Camp settings | for the open edition: each camp's dates, limit, fees, registration window, link, paused; the shared facilitator fee; the welcome page content | `save-camp` (dates, limit, online and walk-in fee, registration opens and closes; the limit can't be below spots used); `pause` and `resume` the link; `save-facilitator-fee`; `save-welcome` (per camp: description up to 160 characters, image, three lists); `upload-welcome-image` (an image under 5 MB) |
+| Camp settings | for the open edition: each camp's dates, limit, fees, registration window, link, paused; the shared facilitator fee; the welcome page content | `save-camp` (dates, limit, online and walk-in fee, registration opens and closes; the limit can't be below spots used); `pause` and `resume` the link; `switch-camp` (turn a camp off or on for the open edition: 409 while anyone is registered for it or if it is the edition's only camp); `save-facilitator-fee`; `save-welcome` (per camp: description up to 160 characters, image, three lists); `upload-welcome-image` (an image under 5 MB) |
 | Both | the overlap warning: camps of one edition should not run at the same time (a warning, not an error) | |
 
 ## Campuses and networks (`manage-campuses`)
@@ -72,7 +72,7 @@ Read only: entries filtered by edition, camp, area, when (today, 7 days, 30 days
 
 | Needs | Detail |
 |---|---|
-| Read | the open editions' camps: name, dates, fee, age label, registration status (open, scheduled, paused, full, closed), description, image, the three lists |
+| Read | the open editions' camps that run (a camp switched off in Camp setup is not returned, and its permanent registration address answers a clear "isn't running this time" message, not a 404): name, dates, fee, age label, registration status (open, scheduled, paused, full, closed), description, image, the three lists |
 | Write | the camper registration for MYF and MYA, and the facilitator registration (every field required except medical and special needs; names up to 30 characters, church or organisation up to 60; a phone of 10 digits starting 07 or 01; a camper not from Mavuno gets the campus Invited; facilitators are always from Mavuno, so they pick a real campus and are never Invited). Same 409 rules as walk-ins (duplicate person, M-Pesa code used, camp full) |
 
 **Prices are data, never code.** The online fee, the walk-in fee, the facilitator fee, the limit and the dates are set by a Super admin in Camp setup and saved with `save-camp` / `save-facilitator-fee`. The public welcome page and the registration forms must read them from the server **on every request** (they are rendered per visit, never built into the site), so a change in Camp setup shows on the welcome cards and the registration total straight away, with no code change and no work from the developers. The server also uses the fee that was current when a person registered, so a later change only affects new registrations. Amounts are always shown as `KES 1,000`.

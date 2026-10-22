@@ -84,6 +84,8 @@ const entries: Entry[] = [
   { id: "a12", at: at(10, 17, 16, 10), user: "Sharon Wanjiru", action: "Records exported", area: "sensitive", camp: "MYA", subject: "Camp roster", summary: "590 campers" },
   { id: "a13", at: at(10, 16, 9, 45), user: "John Doe", action: "Camp setup saved", area: "camp-setup", camp: "MYA", subject: "MYA setup", changes: [{ label: "Walk-in (desk) registration", from: "KES 1,800", to: "KES 2,000" }] },
   { id: "a14", at: at(10, 16, 9, 40), user: "John Doe", action: "Link paused", area: "camp-setup", camp: "MYA", subject: "MYA registration link" },
+  { id: "a14b", at: at(10, 16, 9, 30), user: "John Doe", action: "Camp switched off", area: "camp-setup", camp: "MYF", subject: "MYF setup", summary: "Not run in this edition" },
+  { id: "a14c", at: at(10, 16, 9, 20), user: "John Doe", action: "Camp switched on", area: "camp-setup", camp: "MYF", subject: "MYF setup", summary: "Runs in this edition" },
   { id: "a15", at: at(10, 14, 13, 25), user: "Peter Kamau", removed: true, action: "Camper details updated", area: "campers", camp: "MYA", subject: "Amara Njeri", changes: [{ label: "Phone number", from: "0703128450", to: "0703128456" }] },
   { id: "a25", at: at(10, 15, 10, 5), user: "John Doe", action: "Campus added", area: "campuses", camp: null, subject: "Kizazi", summary: "Limitless" },
   { id: "a16", at: at(10, 14, 8, 0), user: "John Doe", action: "User removed", area: "users", camp: null, subject: "Peter Kamau" },
