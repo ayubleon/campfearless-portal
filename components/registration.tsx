@@ -56,7 +56,7 @@ export const camps: Record<Camp, { label: string; spotsUsed: number; camperLimit
   MYF: fromRecord("MYF", relationshipOptions),
   MYA: fromRecord("MYA", relationshipOptions),
 }
-const maxBatch = 10
+export const maxBatch = 10
 const paybill = { number: "400200", account: "CAMPFEARLESS" }
 
 // Medical and special needs notes end up on printed lists, so they stay short.
@@ -194,9 +194,19 @@ export function CamperFields({ camp, camper, id, onChange }: { camp: Camp; campe
   )
 }
 
-function CamperCard({ camp, camper, number, total, onChange, onRemove }: { camp: Camp; camper: CamperForm; number: number; total: number; onChange: (patch: Partial<CamperForm>) => void; onRemove: () => void }) {
+// The same person can't be registered twice in an edition; the batch itself is checked too. Used by walk-ins and by waivers.
+export function batchDuplicates(camp: Camp, campers: CamperForm[]) {
+  const candidates = campers.map((camper) => ({ firstName: camper.firstName, lastName: camper.lastName, age: Number(camper.age), phone: camper.phone, campus: camper.fromMavuno === "Yes" ? camper.campus : invitedCampus }))
+    const found = candidates.flatMap((candidate) => findDuplicates(candidate))
+    const inBatch = candidates.flatMap((candidate, index) => candidates.slice(index + 1).filter((other) => `${other.firstName} ${other.lastName}`.trim().toLowerCase() === `${candidate.firstName} ${candidate.lastName}`.trim().toLowerCase() && other.age === candidate.age).map((): DuplicateMatch => ({ kind: "same", who: `${candidate.firstName} ${candidate.lastName}`, role: `${camp} camper`, reason: `${candidate.firstName} ${candidate.lastName} is in this batch twice.` })))
+    const same = [...found.filter((match) => match.kind === "same"), ...inBatch]
+    const similar = found.filter((match) => match.kind === "similar")
+  return { same, similar }
+}
+
+export function CamperCard({ camp, camper, number, total, onChange, onRemove }: { camp: Camp; camper: CamperForm; number: number; total: number; onChange: (patch: Partial<CamperForm>) => void; onRemove: () => void }) {
   return (
-    <Card className="min-w-0 shadow-none">
+    <Card className="min-w-0 shrink-0 shadow-none">
       <CardHeader>
         <CardTitle className="text-base">Camper details</CardTitle>
         <CardDescription>Fill in the details as on their legal documents. Only medical and special needs are optional.</CardDescription>
@@ -276,12 +286,7 @@ export function RegistrationScreen() {
 
   const [duplicate, setDuplicate] = React.useState<DuplicateState | null>(null)
   const submit = () => {
-    // The same person can't be registered twice in an edition; look at the batch itself too.
-    const candidates = campers.map((camper) => ({ firstName: camper.firstName, lastName: camper.lastName, age: Number(camper.age), phone: camper.phone, campus: camper.fromMavuno === "Yes" ? camper.campus : invitedCampus }))
-    const found = candidates.flatMap((candidate) => findDuplicates(candidate))
-    const inBatch = candidates.flatMap((candidate, index) => candidates.slice(index + 1).filter((other) => `${other.firstName} ${other.lastName}`.trim().toLowerCase() === `${candidate.firstName} ${candidate.lastName}`.trim().toLowerCase() && other.age === candidate.age).map((): DuplicateMatch => ({ kind: "same", who: `${candidate.firstName} ${candidate.lastName}`, role: `${camp} camper`, reason: `${candidate.firstName} ${candidate.lastName} is in this batch twice.` })))
-    const same = [...found.filter((match) => match.kind === "same"), ...inBatch]
-    const similar = found.filter((match) => match.kind === "similar")
+    const { same, similar } = batchDuplicates(camp, campers)
     if (same.length > 0 || similar.length > 0) { setDuplicate({ same, similar, proceed: finish }); return }
     finish()
   }

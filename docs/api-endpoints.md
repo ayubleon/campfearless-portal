@@ -38,7 +38,7 @@ Permissions are the ids in `backend-tables.md` (`register`, `check-in`, `check-o
 
 ## Waivers (`issue-waivers`, `check-in`)
 
-Read: waivers of the open edition (name, age, gender, phone, camp, campus, baptised, Walk-in or In advance, arrived, issued on, issued by), filtered by camp, campus, arrival, search. Write: `issue-waiver` (same fields as a camper, plus "check in now"); `check-in` an existing waiver; `undo`. Errors: same 409 duplicate rule.
+Read: waivers of the open edition (name, age, gender, phone, camp, campus, baptised, Walk-in or In advance, arrived, issued on, issued by), filtered by camp, campus, arrival, search. Write: `issue-waiver` (a batch of up to 10 campers sharing one emergency contact, same fields as a camper, plus "check in now" for the whole batch; each camper gets their own waiver and registration, all with a fee of KES 0); `check-in` an existing waiver; `undo`. Errors: same 409 duplicate rule.
 
 ## Payments (`verify-payments`)
 

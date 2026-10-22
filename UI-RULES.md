@@ -264,6 +264,7 @@ Actions inside a tab (Invite user, Add role) go in the `CardAction` of the card 
 ## Waivers
 
 - The **Waiver** column says how a waiver was issued: a green **Walk-in** (issued at the desk and checked in right away) or a blue **In advance** (issued earlier; the camper checks in on arrival). It replaces a Status column that only ever said "Waived". The **Arrival** column still shows Checked in or Not arrived.
+- **Issue waiver is a batch form built like the walk-in Registration screen.** The pop-up has the same containers: **Select number of campers** (− 1 + stepper, up to 10), one **Camper details** card per camper (with Church campus and Medical and special needs inside, and the remove button on camper 2 onwards), **Emergency contact** (shared by the whole batch) and a **Check in now** card with the switch. There is no payment card: every camper in the batch is registered with a fee of KES 0. The footer button reads "Issue waiver" for one camper and "Issue waivers" for several ("... & check in" when the switch is on); the duplicate check covers the batch (`batchDuplicates` in `components/registration.tsx`), and the done overlay and toast name everyone who was issued ("Waivers successfully issued").
 - A new waiver is Walk-in when **Check in right away** is on, otherwise In advance.
 - Filters beside the search, in this order: All camps, All campuses (the campuses that appear in the list, A to Z), All arrivals (Not arrived, Checked in).
 
