@@ -31,6 +31,9 @@ const backgroundVeil = 0.62 // how much white covers the texture: 0 is the raw t
 const jpegQuality = 0.88 // a textured background makes a PNG several MB; a JPEG is a fraction of that
 
 type Item = [value: string, label: string]
+// The shape of the last image, so the dialog opens at about its final size instead of stretching to the window and then shrinking.
+let lastAspect = 1.65
+
 type Snapshot = { canvas: HTMLCanvasElement; url: string; createdAt: Date; width: number; height: number }
 
 function roundedRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
@@ -77,6 +80,9 @@ async function drawSummary(items: Item[], createdAt: Date, scopeLabel: string): 
   await Promise.all([logo.decode().catch(() => undefined), background.decode().catch(() => undefined)])
 
   const font = getComputedStyle(document.body).fontFamily || "sans-serif"
+  // The CAMP FEARLESS title is set in Panton Black Caps, the same font as the sidebar name (a canvas needs the font loaded before it draws).
+  const titleFont = getComputedStyle(document.documentElement).getPropertyValue("--font-panton").trim() || font
+  await document.fonts.load(`48px ${titleFont}`).catch(() => undefined)
   const scale = 2
   const tileWidth = (width - pad * 2 - gap * (columns - 1)) / columns
 
@@ -116,7 +122,7 @@ async function drawSummary(items: Item[], createdAt: Date, scopeLabel: string): 
   const textX = pad + logoWidth + (logoWidth ? 28 : 0)
   ctx.textBaseline = "alphabetic"
   ctx.fillStyle = orange
-  ctx.font = `800 48px ${font}`
+  ctx.font = `400 48px ${titleFont}`
   ctx.fillText("CAMP FEARLESS", textX, pad + 46)
   ctx.fillStyle = muted
   ctx.font = `500 30px ${font}`
@@ -154,6 +160,7 @@ async function drawSummary(items: Item[], createdAt: Date, scopeLabel: string): 
   ctx.font = `400 ${footerSize}px ${font}`
   ctx.fillText(`Created ${formatDateTime(createdAt)} by ${currentUser.name}`, pad, footerY)
 
+  lastAspect = width / height
   return { canvas, url: canvas.toDataURL("image/jpeg", jpegQuality), createdAt, width, height }
 }
 
@@ -198,9 +205,9 @@ export function SummaryImageDialog({ open, items, scopeLabel, onClose }: { open:
             {snapshot ? (
               <Image src={snapshot.url} alt={`Quick summary created ${formatDateTime(snapshot.createdAt)}`} width={snapshot.width} height={snapshot.height} unoptimized className="h-auto w-full rounded-lg border" />
             ) : failed ? (
-              <div className="flex aspect-[4/5] w-full items-center justify-center rounded-lg border bg-muted/20 px-6 text-center text-sm text-muted-foreground">The image couldn&apos;t be created on this device. Close this and try again.</div>
+              <div style={{ aspectRatio: lastAspect }} className="flex w-full items-center justify-center rounded-lg border bg-muted/20 px-6 text-center text-sm text-muted-foreground">The image couldn&apos;t be created on this device. Close this and try again.</div>
             ) : (
-              <div className="aspect-[4/5] w-full animate-pulse rounded-lg border bg-muted/40" aria-busy="true" />
+              <div style={{ aspectRatio: lastAspect }} className="w-full animate-pulse rounded-lg border bg-muted/40" aria-busy="true" />
             )}
           </div>
           <DialogFooter className="-mx-4 -mb-4 mt-4 shrink-0 flex-row justify-end gap-3 px-4 py-4 sm:-mx-6 sm:-mb-6 sm:mt-6 sm:px-6">
