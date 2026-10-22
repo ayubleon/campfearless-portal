@@ -1,6 +1,6 @@
-# Campfearless portal: UI rules
+# Camp Fearless portal: design rules
 
-`components/dashboard-overview.tsx` is the reference screen. Every new screen must match its spacing, type, colors, badges, toasts and component usage. If a rule below is unclear, copy what that file does. Never use a pattern that file doesn't use.
+`components/dashboard-overview.tsx` is the reference screen. Every new screen should match its spacing, type, colors, badges, toasts and component usage. If a rule below is unclear, follow what that file does, and avoid patterns it doesn't use.
 
 `components/camp-setup.tsx` is the reference for settings screens: editable cards, the review-before-save dialog, date fields, money fields and link status badges. Copy it for any screen where people change saved settings.
 
@@ -8,7 +8,7 @@
 
 - Import UI primitives from `@/ui/*` (e.g. `@/ui/button`, `@/ui/card`). There is no `components/ui` folder.
 - Use `cn` from `@/lib/utils`.
-- `components.json` uses the shadcn **`radix-nova`** style: the nova look (32px / `h-8` controls, `rounded-lg` controls, `rounded-xl` cards with a `ring-1 ring-foreground/10` edge, 16px card spacing) on Radix primitives imported from the unified `radix-ui` package. Add missing components with the shadcn MCP or `pnpm dlx shadcn@latest add <name>`. They install into `ui/` already matching. The project uses **pnpm**, never npm or yarn.
+- `components.json` uses the shadcn **`radix-nova`** style: the nova look (32px / `h-8` controls, `rounded-lg` controls, `rounded-xl` cards with a `ring-1 ring-foreground/10` edge, 16px card spacing) on Radix primitives imported from the unified `radix-ui` package. Add missing components with `pnpm dlx shadcn@latest add <name>`; they install into `ui/` already matching. The project uses **pnpm**, never npm or yarn.
 - Exception: `ui/dialog.tsx` is the Base UI (`base-nova`) dialog. It already has the nova look. Never run `shadcn add dialog` or `--overwrite` on it.
 - After every `shadcn add`, check the new files before using them:
   - `import { cn } from "cn"` must be `import { cn } from "@/lib/utils"`. If `package.json` gained a `cn` dependency, remove it (`pnpm remove cn`); it is an unrelated npm package.
@@ -342,7 +342,3 @@ Actions inside a tab (Invite user, Add role) go in the `CardAction` of the card 
 ## Shared links
 
 - A shared link shows Camp Fearless's own preview image (`app/opengraph-image.jpg` and `app/twitter-image.jpg`, 1200 x 630) and tab icons (`public/apple-icon.png`, `icon-light-32x32.png`, `icon-dark-32x32.png`): the orange Camp Fearless mark, never a template default. Keep the preview images under about 300 KB. `metadataBase` in `app/layout.tsx` points at the Vercel address so the preview image can be found.
-
-## Shared links
-
-- A shared link shows Camp Fearless's own preview image (`app/opengraph-image.jpg` and `app/twitter-image.jpg`, 1200 x 630) and tab icons (`public/apple-icon.png`, `icon-light-32x32.png`, `icon-dark-32x32.png`): the orange Camp Fearless mark, never a template default (the old black "v0" icon is gone). Keep the preview images under about 300 KB. `metadataBase` in `app/layout.tsx` points at https://campfearlessportal.vercel.app so the preview image can be found.
