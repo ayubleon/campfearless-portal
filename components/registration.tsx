@@ -8,6 +8,7 @@ import { findDuplicates, mpesaCodeUsed, registerWalkIns, type DuplicateMatch } f
 import { currentUser } from "@/lib/session"
 import { EditionScope } from "@/components/edition-scope"
 import * as React from "react"
+import { Trash2 } from "lucide-react"
 import { IconMinus, IconPlus } from "@tabler/icons-react"
 import { toast } from "sonner"
 
@@ -193,13 +194,20 @@ export function CamperFields({ camp, camper, id, onChange }: { camp: Camp; campe
   )
 }
 
-function CamperCard({ camp, camper, number, total, onChange }: { camp: Camp; camper: CamperForm; number: number; total: number; onChange: (patch: Partial<CamperForm>) => void }) {
+function CamperCard({ camp, camper, number, total, onChange, onRemove }: { camp: Camp; camper: CamperForm; number: number; total: number; onChange: (patch: Partial<CamperForm>) => void; onRemove: () => void }) {
   return (
     <Card className="min-w-0 shadow-none">
       <CardHeader>
         <CardTitle className="text-base">Camper details</CardTitle>
         <CardDescription>Fill in the details as on their legal documents. Only medical and special needs are optional.</CardDescription>
-        <CardAction><span className="text-sm text-attention tabular-nums">Camper {number}/{total}</span></CardAction>
+        <CardAction className="flex items-center gap-3">
+          <span className="text-sm text-attention tabular-nums">Camper {number}/{total}</span>
+          {number > 1 && (
+            <Button type="button" variant="outline" size="icon" aria-label={`Remove camper ${number}`} className="text-muted-foreground/70 hover:border-muted-foreground/70 hover:bg-transparent hover:text-destructive" onClick={onRemove}>
+              <Trash2 />
+            </Button>
+          )}
+        </CardAction>
       </CardHeader>
       <CardContent className="flex flex-col">
         <CamperFields camp={camp} camper={camper} id={`camper-${number}`} onChange={onChange} />
@@ -254,6 +262,8 @@ export function RegistrationScreen() {
   const total = settings.walkInFee * count
   const valid = !campFull && campers.every((camper) => camperValid(camp, camper)) && contactValid(contact) && codeValid(code) && !mpesaCodeUsed(code)
   const setCount = (next: number) => setCampers((current) => (next > current.length ? [...current, ...Array.from({ length: next - current.length }, emptyCamper)] : current.slice(0, next)))
+  // Camper 2 and onwards can be removed again; camper 1 stays, so a batch is never empty.
+  const removeCamper = (index: number) => setCampers((current) => current.filter((_, i) => i !== index))
   const updateCamper = (index: number, patch: Partial<CamperForm>) => setCampers((current) => current.map((camper, i) => (i === index ? { ...camper, ...patch } : camper)))
   const switchCamp = (next: string) => {
     setCamp(next as Camp)
@@ -336,7 +346,7 @@ export function RegistrationScreen() {
             </CardHeader>
           </Card>
 
-          {campers.map((camper, index) => <CamperCard key={index} camp={camp} camper={camper} number={index + 1} total={count} onChange={(patch) => updateCamper(index, patch)} />)}
+          {campers.map((camper, index) => <CamperCard key={index} camp={camp} camper={camper} number={index + 1} total={count} onChange={(patch) => updateCamper(index, patch)} onRemove={() => removeCamper(index)} />)}
 
           <Card className="min-w-0 shadow-none">
             <CardHeader>
