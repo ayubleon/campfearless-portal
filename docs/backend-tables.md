@@ -62,6 +62,8 @@ An **edition** is one run of the camps (MYF and MYA together), **named by the ad
 
 **Duplicates.** Reject a second registration of the same person in one edition (camper or facilitator): same full name and phone, or same name, age and campus (case and spacing ignored). The same phone under another name, or the same name and campus with a different age or phone, is allowed but returned as a warning staff must confirm (families share phones). Do this on every path: the camp links, the facilitator link, walk-ins and waivers. The portal checks `mpesa_code` uniqueness before verifying too.
 
+**Facilitators register afresh every edition.** A facilitator belongs to one edition only: nobody carries over to the next edition's roster, payments or reports. A returning facilitator registers again through the facilitator page, which creates a new `facilitator_registrations` row (new team, camp, fee payment and emergency contact), reusing the same `people` row if the person is already known. The duplicate check only looks inside the open edition, so someone who served last time is not a duplicate. Nothing is pre-filled from the earlier edition.
+
 **Facilitators.** They are chosen offline: people who attend training are added to a WhatsApp group, and the facilitator registration link is shared only there. There is no portal action to change a camper into a facilitator.
 
 ### Places
