@@ -9,9 +9,10 @@ import { LoadingButton } from "@/components/loading-button"
 import { checkAmount, type Check } from "@/lib/payment-check"
 import { useAction } from "@/lib/use-action"
 import { EditionScope } from "@/components/edition-scope"
+import { StatementImportDialog } from "@/components/statement-import"
 import * as React from "react"
 import { X } from "lucide-react"
-import { IconSearch } from "@tabler/icons-react"
+import { IconSearch, IconUpload } from "@tabler/icons-react"
 import { toast } from "sonner"
 
 import { formatNumber } from "@/lib/format"
@@ -21,7 +22,7 @@ import { statusClass } from "@/lib/status"
 import { cn } from "@/lib/utils"
 import { Badge } from "@/ui/badge"
 import { Button } from "@/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/ui/card"
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/ui/card"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/ui/dialog"
 import { Input } from "@/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/select"
@@ -78,6 +79,7 @@ export function PaymentsScreen() {
   const [kind, setKind] = React.useState("all")
   const [status, setStatus] = React.useState("all")
   const [verifying, setVerifying] = React.useState<Payment | null>(null)
+  const [importing, setImporting] = React.useState(false)
 
   const update = (id: string, patch: Partial<Payment>) => setPayments((current) => current.map((payment) => (payment.id === id ? { ...payment, ...patch } : payment)))
   // Each change goes through the server call: the button shows its loading state and the row can't be changed twice.
@@ -88,6 +90,15 @@ export function PaymentsScreen() {
     const ok = await run(() => update(payment.id, { status: next }), failedTo)
     setActiveId(null)
     if (ok) toast.success(message)
+  }
+
+  // Fills the amounts found in an imported Safaricom statement. Verifying each one stays a separate, manual step.
+  const applyStatement = async (entries: { id: string; paid: number }[]) => {
+    const ok = await run(() => setPayments((current) => current.map((payment) => {
+      const entry = entries.find((item) => item.id === payment.id)
+      return entry && payment.status === "pending" ? { ...payment, amount: String(entry.paid) } : payment
+    })), "import the statement")
+    if (ok) toast.success("Statement successfully imported")
   }
 
   const campusOptions = Array.from(new Set(payments.map((payment) => payment.campus))).sort((a, b) => a.localeCompare(b))
@@ -131,7 +142,8 @@ export function PaymentsScreen() {
       <Card className="min-w-0 shadow-none">
         <CardHeader>
           <CardTitle className="text-base">Verify M-Pesa payments</CardTitle>
-          <CardDescription>Type the amount from each M-Pesa message, then verify it when it matches.</CardDescription>
+          <CardDescription>Type the amount from each M-Pesa message, or import the statement, then verify it when it matches.</CardDescription>
+          <CardAction><Button type="button" variant="outline" onClick={() => setImporting(true)}><IconUpload /> Import statement</Button></CardAction>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <div className="flex flex-col gap-2 xl:flex-row xl:items-center">
@@ -264,6 +276,8 @@ export function PaymentsScreen() {
           </div>
         </CardContent>
       </Card>
+
+      <StatementImportDialog open={importing} onOpenChange={setImporting} pending={pending} declared={payments.map((payment) => ({ id: payment.id, code: payment.code, expected: payment.expected, status: payment.status, who: payment.people.map((person) => person.name).join(", ") }))} onApply={applyStatement} />
 
       <Dialog open={verifying !== null} onOpenChange={(open) => !open && setVerifying(null)}>
         <DialogContent showCloseButton={false} className="gap-0 sm:max-w-lg">

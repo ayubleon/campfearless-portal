@@ -73,6 +73,7 @@ const entries: Entry[] = [
   { id: "a46", at: at(10, 19, 8, 12), user: "Dennis Otieno", action: "Password reset requested", area: "sign-in", camp: null, subject: "dennis@mavuno.org" },
   { id: "a47", at: at(10, 14, 16, 30), user: "John Doe", action: "Welcome page saved", area: "camp-setup", camp: null, subject: "Welcome page", summary: "MYA what to bring" },
   { id: "a48", at: at(10, 21, 9, 5), user: "John Doe", action: "Summary image downloaded", area: "campers", camp: null, subject: "Quick summary" },
+  { id: "a49", at: at(10, 21, 10, 15), user: "Mercy Chebet", action: "Statement imported", area: "waivers-payments", camp: null, subject: "Safaricom statement", summary: "18 amounts filled" },
   { id: "a29", at: at(10, 20, 13, 5), user: "Mercy Chebet", action: "Payment flagged", area: "waivers-payments", camp: "MYF", subject: "Ann Njeri", summary: "M-Pesa RTP9X2LM4A · Short KES 200" },
   { id: "a31", at: at(10, 20, 18, 2), user: "John Doe", action: "Profile updated", area: "users", camp: null, subject: "John Doe", changes: [{ label: "Phone", from: "0711000000", to: "0712345678" }] },
   { id: "a32", at: at(10, 20, 18, 4), user: "John Doe", action: "Password changed", area: "users", camp: null, subject: "John Doe" },

@@ -30,7 +30,6 @@ import { limitMedical, medicalMaxChars, medicalSubtitle } from "@/components/reg
 import { formatDateTime } from "@/lib/format"
 import { statusClass } from "@/lib/status"
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/ui/card"
-import { UndoOverlay } from "@/components/undo-overlay"
 import { Checkbox } from "@/ui/checkbox"
 import { Input } from "@/ui/input"
 import { Textarea } from "@/ui/textarea"
@@ -290,7 +289,6 @@ export function DashboardOverview() {
   const [checkInSearch, setCheckInSearch] = React.useState("")
   const [checkInOpen, setCheckInOpen] = React.useState(false)
   const [selectedCheckIns, setSelectedCheckIns] = React.useState<Set<string>>(new Set())
-  const [checkInSuccess, setCheckInSuccess] = React.useState<{ ids: string[]; attendee: string } | null>(null)
   // Edit camper rules: the same ones as Registration (names, the camp's age limits, a valid phone).
   const editRecord = editCamper ? campers.find((camper) => camper.id === editCamper.id) : undefined
   const editAgeError = !editCamper || !editRecord
@@ -359,7 +357,7 @@ export function DashboardOverview() {
       setRowStatuses((current) => ({ ...current, [id]: "Checked in" }))
     }, "check in the camper")
     setActiveId(null)
-    if (ok) setCheckInSuccess({ ids: [id], attendee: campers.find((camper) => camper.id === id)?.name ?? "Camper" })
+    if (ok) announceCheckIn([id], campers.find((camper) => camper.id === id)?.name ?? "Camper")
   }
   const applyUndo = (kind: "check-in" | "check-out", id: string) => {
     setCheckedOutCampers((current) => {
@@ -390,31 +388,21 @@ export function DashboardOverview() {
     setExitPermitCamper(campers.find((camper) => camper.id === id)?.name ?? null)
     setExitPermitId(id)
   }
-  const undoCheckInSuccess = () => {
-    checkInSuccess?.ids.forEach((id) => {
+  // Check-in happens all day, so it confirms with a toast, not a dialog: it has already taken effect, and Undo is there for 5 seconds.
+  const announceCheckIn = (ids: string[], attendee: string) => {
+    const undo = () => {
       setCheckedInCampers((current) => {
         const next = new Set(current)
-        next.delete(id)
+        ids.forEach((id) => next.delete(id))
         return next
       })
-      setRowStatuses((current) => ({ ...current, [id]: "Registered" }))
-    })
-    setCheckInSuccess(null)
-    toast.success("Camper check-in successfully cancelled")
+      setRowStatuses((current) => ({ ...current, ...Object.fromEntries(ids.map((id) => [id, "Registered"])) }))
+      toast.success("Camper check-in successfully cancelled")
+    }
+    toast.success(`${attendee} successfully checked in`, { duration: 5000, action: { label: "Undo", onClick: undo } })
   }
   return (
     <>
-      {checkInSuccess && (
-        <UndoOverlay
-          title="Successfully checked in"
-          description={`Attendee: ${checkInSuccess.attendee} successfully verified and checking in.`}
-          onUndo={undoCheckInSuccess}
-          onDone={() => {
-            setCheckInSuccess(null)
-            toast.success("Camper successfully checked in")
-          }}
-        />
-      )}
       <main className="flex min-w-0 flex-1 flex-col gap-4 p-4 lg:p-6">
       <EditionScope>
         <Dialog open={checkInOpen} onOpenChange={setCheckInOpen}>
@@ -486,17 +474,12 @@ export function DashboardOverview() {
                     }, "check in the camper")
                     if (!ok) return
                     setCheckInOpen(false)
-                    window.setTimeout(
-                      () =>
-                        setCheckInSuccess({
-                          ids: Array.from(selectedCheckIns),
-                          attendee:
-                            checkInMatches
-                              .filter(({ id }) => selectedCheckIns.has(id))
-                              .map(({ camper }) => camper.name)
-                              .join(", ") || "Camper",
-                        }),
-                      450
+                    announceCheckIn(
+                      Array.from(selectedCheckIns),
+                      checkInMatches
+                        .filter(({ id }) => selectedCheckIns.has(id))
+                        .map(({ camper }) => camper.name)
+                        .join(", ") || "Camper"
                     )
                   }}
                 >
